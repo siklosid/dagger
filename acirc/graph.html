@@ -1,0 +1,113 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis.css" type="text/css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.16.1/vis-network.min.js"> </script>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 800;
+            height: 800;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"id": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "label": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "shape": "dot", "title": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"id": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "label": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "shape": "dot", "title": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"id": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "label": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "shape": "dot", "title": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"id": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "label": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "shape": "dot", "title": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"id": "redshift://production/tmp/data1", "label": "redshift://production/tmp/data1", "shape": "dot", "title": "redshift://production/tmp/data1"}, {"id": "s3://datalake/data1.parquet", "label": "s3://datalake/data1.parquet", "shape": "dot", "title": "s3://datalake/data1.parquet"}, {"id": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "label": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "shape": "dot", "title": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"id": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "label": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "shape": "dot", "title": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"id": "redshift://production/tmp/data2", "label": "redshift://production/tmp/data2", "shape": "dot", "title": "redshift://production/tmp/data2"}, {"id": "s3://datalake/data2.parquet", "label": "s3://datalake/data2.parquet", "shape": "dot", "title": "s3://datalake/data2.parquet"}, {"id": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "label": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "shape": "dot", "title": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"id": "redshift://production/tmp/joined", "label": "redshift://production/tmp/joined", "shape": "dot", "title": "redshift://production/tmp/joined"}, {"id": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "label": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "shape": "dot", "title": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}]);
+        edges = new vis.DataSet([{"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "redshift://production/tmp/data1"}, {"from": "s3://datalake/data1.parquet", "to": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "s3://datalake/data1.parquet", "to": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "redshift://production/tmp/data1", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "redshift://production/tmp/data1", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "redshift://production/tmp/data2"}, {"from": "s3://datalake/data2.parquet", "to": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "s3://datalake/data2.parquet", "to": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "redshift://production/tmp/data2", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2"}, {"from": "redshift://production/tmp/data2", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe2", "to": "redshift://production/tmp/joined"}, {"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1"}, {"from": "(\u0027load_data1\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "redshift://production/tmp/data1"}, {"from": "(\u0027load_data2\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "redshift://production/tmp/data2"}, {"from": "(\u0027join\u0027, \u0027.yaml\u0027):..-tests-fixtures-config_finder-root-david.siklosi-pipe1", "to": "redshift://production/tmp/joined"}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": false,
+            "type": "continuous"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -80000,
+            "springConstant": 0.001,
+            "springLength": 250
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
