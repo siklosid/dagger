@@ -1,8 +1,8 @@
 import logging
-from pipeline.pipeline import Pipeline
-from config_finder.config_finder import ConfigFinder
-from pipeline.task_factory import TaskFactory
-import conf
+from acirc.pipeline.pipeline import Pipeline
+from acirc.config_finder.config_finder import ConfigFinder
+from acirc.pipeline.task_factory import TaskFactory
+import acirc.conf as conf
 
 from os.path import join, splitext, relpath
 import yaml

@@ -1,5 +1,5 @@
-from pipeline.task import Task
-from pipeline.tasks import (
+from acirc.pipeline.task import Task
+from acirc.pipeline.tasks import (
     bash_task,
     redshift_load_task,
     redshift_transform_task,

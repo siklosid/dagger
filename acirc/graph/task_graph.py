@@ -1,13 +1,9 @@
-from pipeline.pipeline import Pipeline
-from pipeline.task import Task
-from pipeline.io import IO
+from acirc.pipeline.pipeline import Pipeline
+from acirc.pipeline.task import Task
+from acirc.pipeline.io import IO
 
 from abc import ABC, abstractmethod
 import sys
-
-import networkx as nx
-from pyvis.network import Network
-
 import logging
 _logger = logging.getLogger('graph')
 
@@ -132,22 +128,22 @@ class TaskGraph:
                 fs.write("\t" + str(child_node))
             fs.write("\n")
 
-    def draw_graph(self):
-        node_color = []
-        for node in self._graph.nodes(data=True):
-            print(node[1]['color'])
-            if node[1]['type'] == 'pipeline':
-                node_color.append('purple')
-            elif node[1]['type'] == 'task':
-                node_color.append('blue')
-            else:
-                node_color.append('red')
-
-        g = Network(height=800, width=800)
-        g.barnes_hut()
-        g.from_nx(self._graph)
-        print("Drawing graph")
-        g.show("graph.html")
+    # def draw_graph(self):
+    #     node_color = []
+    #     for node in self._graph.nodes(data=True):
+    #         print(node[1]['color'])
+    #         if node[1]['type'] == 'pipeline':
+    #             node_color.append('purple')
+    #         elif node[1]['type'] == 'task':
+    #             node_color.append('blue')
+    #         else:
+    #             node_color.append('red')
+    #
+    #     g = Network(height=800, width=800)
+    #     g.barnes_hut()
+    #     g.from_nx(self._graph)
+    #     print("Drawing graph")
+    #     g.show("graph.html")
 
     # def add_pipeline(self, pipeline: Pipeline):
     #     if pipeline.name in self._pipelines:

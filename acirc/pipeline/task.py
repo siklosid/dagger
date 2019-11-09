@@ -1,5 +1,5 @@
-from pipeline.io import IO
-from pipeline.io_factory import IOFactory
+from acirc.pipeline.io import IO
+from acirc.pipeline.io_factory import IOFactory
 
 import logging
 _logger = logging.getLogger('configFinder')

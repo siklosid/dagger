@@ -1,5 +1,5 @@
-from pipeline.io import IO
-from pipeline.ios import (
+from acirc.pipeline.io import IO
+from acirc.pipeline.ios import (
     s3_io,
     redshift_io
 )

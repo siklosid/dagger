@@ -1,4 +1,4 @@
-from pipeline.io import IO
+from acirc.pipeline.io import IO
 
 
 class RedshiftIO(IO):

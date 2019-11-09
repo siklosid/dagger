@@ -1,13 +1,12 @@
 import logging
 
 import os
-import dotenv
 
 BASE_PATH = os.path.join(os.getcwd(), '..')
 EXTRAS_DIR = os.path.join(BASE_PATH, 'extras')
 
 
-DAGS_DIR = '/Users/davidsiklosi/circ/cookie_workshop/acirc/tests/fixtures/config_finder/root/dags/'
+DAGS_DIR = '/Users/davidsiklosi/circ/tooling/acirc/tests/fixtures/config_finder/root/dags/'
 
 
 ## Logging config

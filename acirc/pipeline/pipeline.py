@@ -1,4 +1,4 @@
-from pipeline.task import Task
+from acirc.pipeline.task import Task
 
 
 class Pipeline:
