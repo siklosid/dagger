@@ -6,6 +6,8 @@ _logger = logging.getLogger('configFinder')
 
 
 class Task:
+    ref_name = None
+
     def __init__(self, name: str, pipeline_name, config: dict):
         self._name = name
         self._pipeline_name = pipeline_name

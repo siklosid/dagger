@@ -16,6 +16,18 @@ class Pipeline:
         return self._name
 
     @property
+    def owner(self):
+        return self._owner
+
+    @property
+    def schedule(self):
+        return self._schedule
+
+    @property
+    def parameters(self):
+        return self._parameters
+
+    @property
     def tasks(self):
         return self._tasks
 

@@ -6,4 +6,3 @@ class BashTask(Task):
 
     def __init__(self, name, pipeline_name, job_config):
         super().__init__(name, pipeline_name, job_config)
-
