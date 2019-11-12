@@ -12,6 +12,7 @@ from circ.utils.operator_factories import make_control_flow
 class DagCreator:
     def __init__(self, task_graph: Graph):
         self._task_graph = task_graph
+        self._operator_factory = OperatorFactory()
 
     @staticmethod
     def _get_default_args():
@@ -52,7 +53,7 @@ class DagCreator:
         tasks = {}
         for node_id, node in self._task_graph.get_nodes(TaskGraph.NODE_TYPE_TASK).items():
             pipeline_id = node.obj.pipeline_name
-            tasks[node_id] = OperatorFactory.create_operator(node.obj, dags[pipeline_id])
+            tasks[node_id] = self._operator_factory.create_operator(node.obj, dags[pipeline_id])
 
         return tasks
 
