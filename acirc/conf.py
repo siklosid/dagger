@@ -6,8 +6,8 @@ BASE_PATH = os.path.join(os.getcwd(), '..')
 EXTRAS_DIR = os.path.join(BASE_PATH, 'extras')
 
 
-DAGS_DIR = '/Users/davidsiklosi/circ/tooling/acirc/tests/fixtures/config_finder/root/dags/'
-
+DAGS_DIR = os.path.join(os.environ['AIRFLOW_HOME'], 'dags')
+ENV = os.environ.get('ENV', 'local')
 
 ## Logging config
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
