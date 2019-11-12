@@ -1,8 +1,8 @@
-from acirc.pipeline.pipeline import Pipeline
+import acirc.pipeline.pipeline
 from acirc.pipeline.task import Task
 from acirc.pipeline.io import IO
 
-from abc import ABC, abstractmethod
+from abc import ABC
 import sys
 import logging
 _logger = logging.getLogger('graph')
@@ -14,6 +14,7 @@ class Node(ABC):
         self._name = name_to_show if name_to_show else node_id
         self._parents = set()
         self._children = set()
+        self._attributes = {}
 
         self._obj = obj
 
@@ -24,8 +25,12 @@ class Node(ABC):
             \tchildren: {children}
         """.format(
             node_id=self._name,
-            parents = ', '.join(list(self._parents)),
-            children =', '.join(list(self._children)))
+            parents=', '.join(list(self._parents)),
+            children=', '.join(list(self._children)))
+
+    @property
+    def name(self):
+        return self._name
 
     @property
     def parents(self):
@@ -34,6 +39,19 @@ class Node(ABC):
     @property
     def children(self):
         return self._children
+
+    @property
+    def attributes(self):
+        return self._attributes
+
+    @attributes.setter
+    def attributes(self, t_key_value):
+        key, value = t_key_value
+        self._attributes[key] = value
+
+    @property
+    def obj(self):
+        return self._obj
 
     def add_parent(self, parent_id):
         self._parents.add(parent_id)
@@ -50,7 +68,8 @@ class Graph(object):
     def _node_exists(self, node_id):
         return self._node2type.get(node_id, None) is not None
 
-    def add_node(self, node_type: str, node_id: str, name_to_show: str = None, obj: object = None, overwrite: bool = False):
+    def add_node(self, node_type: str, node_id: str, name_to_show: str = None,
+                 obj: object = None, overwrite: bool = False):
         if self._nodes.get(node_type, None) is None:
             self._nodes[node_type] = {}
 
@@ -79,7 +98,10 @@ class Graph(object):
         to_node = self.get_node(to_node_id)
 
         if from_node is None:
-            _logger.exception("Adding edge (%s, %s), %s does not exist in graph", from_node_id, to_node_id, from_node_id)
+            _logger.exception("Adding edge (%s, %s), %s does not exist in graph",
+                              from_node_id,
+                              to_node_id,
+                              from_node_id)
 
         if to_node is None:
             _logger.exception("Adding edge (%s, %s), %s does not exist in graph", from_node_id, to_node_id, to_node_id)
@@ -87,16 +109,22 @@ class Graph(object):
         from_node.add_child(to_node_id)
         to_node.add_parent(from_node_id)
 
+    def get_type(self, node_id):
+        if not self._node_exists(node_id):
+            return None
+
+        return self._node2type[node_id]
+
 
 class TaskGraph:
-    NODE_TYPE_PIPELINE= 'pipeline'
-    NODE_TYPE_TASK= 'task'
-    NODE_TYPE_DATASET= 'dataset'
+    NODE_TYPE_PIPELINE = 'pipeline'
+    NODE_TYPE_TASK = 'task'
+    NODE_TYPE_DATASET = 'dataset'
 
     def __init__(self):
         self._graph = Graph()
 
-    def add_pipeline(self, pipeline: Pipeline):
+    def add_pipeline(self, pipeline: acirc.pipeline.pipeline.Pipeline):
         self._graph.add_node(node_type=self.NODE_TYPE_PIPELINE, node_id=pipeline.name, obj=pipeline)
 
         for task in pipeline.tasks:
@@ -121,45 +149,8 @@ class TaskGraph:
         fs = open(out_file, "w") if out_file else sys.stdout
         for pipe_id, node in self._graph.get_nodes(self.NODE_TYPE_PIPELINE).items():
             fs.write("Pipeline: {}\n".format(pipe_id))
-            #fs.write(str(node))
             fs.write("Tasks:")
             for node_id in list(node.children):
                 child_node = self._graph.get_node(node_id)
                 fs.write("\t" + str(child_node))
             fs.write("\n")
-
-    # def draw_graph(self):
-    #     node_color = []
-    #     for node in self._graph.nodes(data=True):
-    #         print(node[1]['color'])
-    #         if node[1]['type'] == 'pipeline':
-    #             node_color.append('purple')
-    #         elif node[1]['type'] == 'task':
-    #             node_color.append('blue')
-    #         else:
-    #             node_color.append('red')
-    #
-    #     g = Network(height=800, width=800)
-    #     g.barnes_hut()
-    #     g.from_nx(self._graph)
-    #     print("Drawing graph")
-    #     g.show("graph.html")
-
-    # def add_pipeline(self, pipeline: Pipeline):
-    #     if pipeline.name in self._pipelines:
-    #         assert "Pipeline is already existing"
-    #
-    #     self._pipelines[pipeline.name] = Node(pipeline)
-    #     self._route[pipeline.name] = self._pipelines
-    #
-    # def add_task(self, task: Task):
-    #     if task.uniq_name in self._task_nodes:
-    #         assert "Task is already existing"
-    #     self._task_nodes[task.uniq_name] = task
-    #     self._route[task.uniq_name] = self._task_nodes
-    #
-    # def add_dataset(self, io: IO):
-    #     if io.alias() in self._dataset_nodes:
-    #         assert "Dataset is already existing"
-    #     self._dataset_nodes[io.alias()] = io
-    #     self._route[io.alias()] = self._dataset_nodes

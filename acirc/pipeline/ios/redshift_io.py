@@ -18,4 +18,3 @@ class RedshiftIO(IO):
                 schema=self._schema,
                 table=self._table
             )
-
