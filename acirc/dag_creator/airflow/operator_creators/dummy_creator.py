@@ -8,5 +8,5 @@ class DummyCreator(OperatorCreator):
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
-    def create_operator(self):
+    def _create_operator(self):
         return DummyOperator(dag=self._dag, task_id=self._task.name)

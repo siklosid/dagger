@@ -18,3 +18,11 @@ class RedshiftIO(IO):
                 schema=self._schema,
                 table=self._table
             )
+
+    @property
+    def rendered_name(self):
+        return "{schema}.{table}"\
+            .format(
+                schema=self._schema,
+                table=self._table
+            )

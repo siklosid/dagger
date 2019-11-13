@@ -12,3 +12,7 @@ class S3IO(IO):
 
     def alias(self):
         return "s3://{bucket}/{path}".format(bucket=self._bucket, path=self._path)
+
+    @property
+    def rendered_name(self):
+        return self.alias()

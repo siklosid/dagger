@@ -13,5 +13,5 @@ class TaskFactory:
         for cls in Task.__subclasses__():
             self.factory[cls.ref_name] = cls
 
-    def create_task(self, ref_name, task_name, pipeline_name, task_config):
-        return self.factory[ref_name](task_name, pipeline_name, task_config)
+    def create_task(self, ref_name, task_name, pipeline_name, pipeline, task_config):
+        return self.factory[ref_name](task_name, pipeline_name, pipeline, task_config)
