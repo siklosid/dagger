@@ -1,9 +1,15 @@
 from acirc.pipeline.task import Task
 from datetime import datetime
+from acirc import conf
+
+from os.path import (
+    relpath,
+)
 
 class Pipeline:
-    def __init__(self, name: str, config: dict):
-        self._name = name
+    def __init__(self, directory: str, config: dict):
+        self._directory = directory
+        self._name = relpath(directory, conf.DAGS_DIR).replace('/', '-')
         self._owner = config['owner']
         self._description = config['description']
         self._default_args = config.get('default_args', {})
@@ -12,6 +18,10 @@ class Pipeline:
         self._parameters = config['parameters']
 
         self._tasks = []
+
+    @property
+    def directory(self):
+        return self._directory
 
     @property
     def name(self):

@@ -8,9 +8,10 @@ _logger = logging.getLogger('configFinder')
 class Task:
     ref_name = None
 
-    def __init__(self, name: str, pipeline_name, config: dict):
+    def __init__(self, name: str, pipeline_name, pipeline, config: dict):
         self._name = name
         self._pipeline_name = pipeline_name
+        self._pipeline = pipeline
         self._parameters = config['parameters']
         self._io_factory = IOFactory()
 
@@ -26,6 +27,10 @@ class Task:
     @property
     def pipeline_name(self):
         return self._pipeline_name
+
+    @property
+    def pipeline(self):
+        return self._pipeline
 
     @property
     def uniq_name(self):

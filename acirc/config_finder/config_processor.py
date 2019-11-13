@@ -36,7 +36,7 @@ class ConfigProcessor:
             config_path = join(pipeline_config.directory, pipeline_config.config)
 
             _logger.info("Processing config: %s", config_path)
-            pipeline = Pipeline(pipeline_name, self._load_yaml(config_path))
+            pipeline = Pipeline(pipeline_config.directory, self._load_yaml(config_path))
 
             for task_config in pipeline_config.job_configs:
                 task_name = splitext(task_config.config)[0]
@@ -50,6 +50,7 @@ class ConfigProcessor:
                         task_type,
                         task_name,
                         pipeline_name,
+                        pipeline,
                         task_config
                     )
                 )
