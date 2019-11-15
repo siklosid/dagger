@@ -22,6 +22,10 @@ class DagCreator:
             "retry_delay": timedelta(minutes=5),
         }
 
+    @staticmethod
+    def _get_control_flow_task_id(pipe_id):
+        return 'control_flow:{}'.format(pipe_id)
+
     def _create_dag(self, pipeline: Pipeline):
         default_args = self._get_default_args()
         default_args.update(pipeline.default_args)
@@ -40,14 +44,20 @@ class DagCreator:
 
     def _create_dags(self):
         dags = {}
+        tasks = {}
         for pipe_id, node in self._task_graph.get_nodes(TaskGraph.NODE_TYPE_PIPELINE).items():
             dag = self._create_dag(node.obj)
-
-            control_flow = make_control_flow(conf.ENV, dag)
-            node.attributes = ('control_flow', control_flow)
-
             dags[pipe_id] = dag
+
         return dags
+
+    def _create_control_flow_tasks(self, dags):
+        tasks = {}
+        for pipe_id, node in self._task_graph.get_nodes(TaskGraph.NODE_TYPE_PIPELINE).items():
+            control_flow_task_id = self._get_control_flow_task_id(pipe_id)
+            tasks[control_flow_task_id] = make_control_flow(conf.ENV, dags[pipe_id])
+
+        return tasks
 
     def _create_tasks(self, dags):
         tasks = {}
@@ -60,14 +70,14 @@ class DagCreator:
     def _create_edge(self, from_task_id, to_task_id, tasks):
         if from_task_id is None:
             pipe_id = self._task_graph.get_node(to_task_id).obj.pipeline_name
-            self._task_graph.get_node(pipe_id).attributes['control_flow'] >> tasks[to_task_id]
+            tasks[self._get_control_flow_task_id(pipe_id)] >> tasks[to_task_id]
         else:
             from_pipe = self._task_graph.get_node(from_task_id).obj.pipeline_name
             to_pipe = self._task_graph.get_node(to_task_id).obj.pipeline_name
             if from_pipe == to_pipe:
                 tasks[from_task_id] >> tasks[to_task_id]
             else:
-                self._graph.get_node(to_pipe).attributes['control_flow'] >> tasks[to_task_id]
+                tasks[self._get_control_flow_task_id(to_pipe)] >> tasks[to_task_id]
 
     def _create_edges(self, dags, tasks):
         for node_id, node in self._task_graph.get_nodes(TaskGraph.NODE_TYPE_DATASET).items():
@@ -79,7 +89,8 @@ class DagCreator:
 
     def create_dags(self):
         dags = self._create_dags()
-        tasks = self._create_tasks(dags)
+        tasks = self._create_control_flow_tasks(dags)
+        tasks.update(self._create_tasks(dags))
         self._create_edges(dags, tasks)
 
         return dags
