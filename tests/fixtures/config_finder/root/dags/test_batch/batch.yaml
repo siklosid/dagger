@@ -1,0 +1,24 @@
+type: batch
+description: |
+  Joining data1 and data2 to calculate
+inputs:
+  - type: s3
+    name: data1
+    bucket: datalake
+    path: path/{{ds}}/data1.parquet
+outputs:
+  - type: redshift
+    name: batch_table
+    schema: dwh
+    table: batch_table
+task_parameters:
+    executable: batch.py
+    executable_prefix: python
+    job_name: papershift
+    aws_conn_id:
+    job_queue:
+    region_name:
+    max_retries:
+airflow_parameters:
+template_parameters:
+  const: 13
