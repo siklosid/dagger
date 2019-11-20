@@ -10,3 +10,4 @@ Sphinx==1.8.1
 twine==1.12.1
 sphinx-rtd-theme==0.4.3
 numpydoc==0.9.1
+git+ssh://git@gitlab.com/goflash1/data/tooling/airflow_plugins.git

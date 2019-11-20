@@ -12,8 +12,12 @@ class Task:
         self._name = name
         self._pipeline_name = pipeline_name
         self._pipeline = pipeline
-        self._parameters = config['parameters']
+        self._parameters = config['task_parameters']
         self._io_factory = IOFactory()
+        airflow_parameters = config['airflow_parameters']
+        self._airflow_parameters = airflow_parameters if airflow_parameters else {}
+        template_parameters = config['template_parameters']
+        self._template_parameters = template_parameters if template_parameters else {}
 
         self._inputs = []
         self._outputs = []
@@ -35,6 +39,14 @@ class Task:
     @property
     def uniq_name(self):
         return "{}:{}".format(self.name, self.pipeline_name)
+
+    @property
+    def airflow_parameters(self):
+        return self._airflow_parameters
+
+    @property
+    def template_parameters(self):
+        return self._template_parameters
 
     @property
     def inputs(self):

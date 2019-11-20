@@ -30,6 +30,7 @@ class RedshiftTransformCreator(OperatorCreator):
             pool='redshift',
             postgres_conn_id=self.CONN_ID_DEFAULT_REDSHIFT,
             params=self._template_parameters,
+            **self._task.airflow_parameters,
         )
 
         return redshift_op

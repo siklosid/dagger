@@ -16,6 +16,7 @@ class OperatorCreator(ABC):
             self._template_parameters[io.name] = io.rendered_name
 
     def create_operator(self):
+        self._template_parameters.update(self._task.template_parameters)
         self._update_template_with_ios(self._task.inputs)
         self._update_template_with_ios(self._task.outputs)
 
