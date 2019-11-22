@@ -12,9 +12,9 @@ from os.path import (
 
 class Pipeline(ConfigValidator):
 
-    @staticmethod
-    def init_attributes():
-        Pipeline.s_attributes = [
+    @classmethod
+    def init_attributes(cls):
+        cls.add_config_attributes([
             Attribute(attribute_name='owner', validator=str, format_help="team/person@circ.com"),
             Attribute(attribute_name='description', validator=str),
             Attribute(attribute_name='schedule', format_help="crontab e.g.: 0 3 * * *"),
@@ -25,10 +25,9 @@ class Pipeline(ConfigValidator):
                       parent_fields=['airflow_parameters'], default={}, format_help="dictionary"),
             Attribute(attribute_name='dag_parameters', required=False, validator=dict,
                       parent_fields=['airflow_parameters'], default={}, format_help="dictionary")
-        ]
+        ])
 
     def __init__(self, directory: str, config: dict):
-        self.init_attributes()
         super().__init__(join(directory, 'pipeline.yaml'), config)
 
         self._directory = directory

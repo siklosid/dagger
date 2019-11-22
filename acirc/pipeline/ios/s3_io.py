@@ -6,22 +6,12 @@ from os.path import join
 class S3IO(IO):
     ref_name = "s3"
 
-    s_attributes = []
     @classmethod
-    def init_attributes_once(cls):
-        if len(S3IO.s_attributes):
-            return
-
-        IO.init_attributes_once()
-        S3IO.init_attributes()
-        S3IO.s_attributes = IO.s_attributes + S3IO.s_attributes
-
-    @staticmethod
-    def init_attributes():
-        S3IO.s_attributes = [
+    def init_attributes(cls):
+        cls.add_config_attributes([
             Attribute(attribute_name='bucket'),
             Attribute(attribute_name='path')
-        ]
+        ])
 
     def __init__(self, io_config):
         S3IO.init_attributes_once()

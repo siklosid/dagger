@@ -11,17 +11,9 @@ _logger = logging.getLogger('configFinder')
 class Task(ConfigValidator):
     ref_name = None
 
-    s_attributes = []
     @classmethod
-    def init_attributes_once(cls):
-        if len(Task.s_attributes) > 0:
-            return
-
-        Task.init_attributes()
-
-    @staticmethod
-    def init_attributes():
-        Task.s_attributes = [
+    def init_attributes(cls):
+        cls.add_config_attributes([
             Attribute(attribute_name='type'),
             Attribute(attribute_name='description'),
             Attribute(attribute_name='inputs', format_help='list',
@@ -31,10 +23,9 @@ class Task(ConfigValidator):
             Attribute(attribute_name='airflow_parameters', required=False, format_help="dictionary"),
             Attribute(attribute_name='template_parameters', required=False, format_help="dictionary"),
             Attribute(attribute_name='task_parameters'),
-        ]
+        ])
 
     def __init__(self, name: str, pipeline_name, pipeline, config: dict):
-        Task.init_attributes_once()
         super().__init__(join(pipeline.directory, name + '.yaml'), config)
 
         self._io_factory = IOFactory()

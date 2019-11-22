@@ -5,19 +5,9 @@ from acirc.pipeline.task import Task
 class BatchTask(Task):
     ref_name = "batch"
 
-    s_attributes = []
     @classmethod
-    def init_attributes_once(cls):
-        if len(BatchTask.s_attributes) > 0:
-            return
-
-        Task.init_attributes_once()
-        BatchTask.init_attributes()
-        BatchTask.s_attributes = Task.s_attributes + cls.s_attributes
-
-    @staticmethod
-    def init_attributes():
-        BatchTask.s_attributes = [
+    def init_attributes(cls):
+        cls.add_config_attributes([
             Attribute(attribute_name='executable', parent_fields=['task_parameters'], comment="E.g.: my_code.py"),
             Attribute(attribute_name='executable_prefix', parent_fields=['task_parameters'],
                       default="", comment="E.g.: python"),
@@ -29,10 +19,9 @@ class BatchTask(Task):
                       required=False, default='airflow-prio1'),
             Attribute(attribute_name='max_retries', parent_fields=['task_parameters'],
                       required=False, default=4200),
-        ]
+        ])
 
     def __init__(self, name, pipeline_name, pipeline, job_config):
-        BatchTask.init_attributes_once()
         super().__init__(name, pipeline_name, pipeline, job_config)
 
         self._executable = self.parse_attribute('executable')
