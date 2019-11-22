@@ -1,20 +1,48 @@
+from acirc.utilities.config_validator import Attribute
 from acirc.pipeline.task import Task
 
 
 class BatchTask(Task):
     ref_name = "batch"
 
+    s_attributes = []
+    @classmethod
+    def init_attributes_once(cls):
+        if len(BatchTask.s_attributes) > 0:
+            return
+
+        Task.init_attributes_once()
+        BatchTask.init_attributes()
+        BatchTask.s_attributes = Task.s_attributes + cls.s_attributes
+
+    @staticmethod
+    def init_attributes():
+        BatchTask.s_attributes = [
+            Attribute(attribute_name='executable', parent_fields=['task_parameters'], comment="E.g.: my_code.py"),
+            Attribute(attribute_name='executable_prefix', parent_fields=['task_parameters'],
+                      default="", comment="E.g.: python"),
+            Attribute(attribute_name='job_name', parent_fields=['task_parameters']),
+            Attribute(attribute_name='aws_conn_id', parent_fields=['task_parameters'], required=False),
+            Attribute(attribute_name='region_name', parent_fields=['task_parameters'],
+                      required=False, default='eu-central-1'),
+            Attribute(attribute_name='job_queue', parent_fields=['task_parameters'],
+                      required=False, default='airflow-prio1'),
+            Attribute(attribute_name='max_retries', parent_fields=['task_parameters'],
+                      required=False, default=4200),
+        ]
+
     def __init__(self, name, pipeline_name, pipeline, job_config):
+        BatchTask.init_attributes_once()
         super().__init__(name, pipeline_name, pipeline, job_config)
 
-        self._executable = job_config['task_parameters']['executable']
-        self._executable_prefix = job_config['task_parameters']['executable_prefix'] or ""
-        job_name = "{}-{}".format(pipeline.name, job_config['task_parameters']['job_name'])
+        self._executable = self.parse_attribute('executable')
+        self._executable_prefix = self.parse_attribute('executable_prefix')
+        job_name = "{}-{}".format(pipeline.name, self.parse_attribute('job_name'))
         self._job_name = job_name
-        self._aws_conn_id = job_config['task_parameters']['aws_conn_id']
-        self._region_name = job_config['task_parameters']['region_name'] or 'eu-central-1'
-        self._job_queue = job_config['task_parameters']['job_queue'] or 'airflow-prio1'
-        self._max_retries = job_config['task_parameters']['max_retries'] or 4200
+        self._aws_conn_id = self.parse_attribute('aws_conn_id')
+        self._region_name = self.parse_attribute('region_name')
+        self._job_queue = self.parse_attribute('job_queue')
+        self._max_retries = self.parse_attribute('max_retries')
 
     @property
     def executable(self):

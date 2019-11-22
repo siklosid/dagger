@@ -1,23 +1,51 @@
+from acirc.utilities.config_validator import ConfigValidator, Attribute
 from acirc.pipeline.io import IO
 from acirc.pipeline.io_factory import IOFactory
-
 import logging
+
+from os.path import join
+
 _logger = logging.getLogger('configFinder')
 
 
-class Task:
+class Task(ConfigValidator):
     ref_name = None
 
+    s_attributes = []
+    @classmethod
+    def init_attributes_once(cls):
+        if len(Task.s_attributes) > 0:
+            return
+
+        Task.init_attributes()
+
+    @staticmethod
+    def init_attributes():
+        Task.s_attributes = [
+            Attribute(attribute_name='type'),
+            Attribute(attribute_name='description'),
+            Attribute(attribute_name='inputs', format_help='list',
+                      comment='Use acirc init_input cli', default=[]),
+            Attribute(attribute_name='outputs', format_help='list',
+                      comment='Use acirc init_input cli', default=[]),
+            Attribute(attribute_name='airflow_parameters', required=False, format_help="dictionary"),
+            Attribute(attribute_name='template_parameters', required=False, format_help="dictionary"),
+            Attribute(attribute_name='task_parameters'),
+        ]
+
     def __init__(self, name: str, pipeline_name, pipeline, config: dict):
+        Task.init_attributes_once()
+        super().__init__(join(pipeline.directory, name + '.yaml'), config)
+
+        self._io_factory = IOFactory()
+
         self._name = name
         self._pipeline_name = pipeline_name
         self._pipeline = pipeline
-        self._parameters = config['task_parameters']
-        self._io_factory = IOFactory()
-        airflow_parameters = config['airflow_parameters']
-        self._airflow_parameters = airflow_parameters if airflow_parameters else {}
-        template_parameters = config['template_parameters']
-        self._template_parameters = template_parameters if template_parameters else {}
+        self._description = self.parse_attribute('description')
+        self._parameters = self.parse_attribute('task_parameters')
+        self._airflow_parameters = self.parse_attribute('airflow_parameters') or {}
+        self._template_parameters = self.parse_attribute('template_parameters') or {}
 
         self._inputs = []
         self._outputs = []
