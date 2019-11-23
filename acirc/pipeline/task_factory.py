@@ -4,6 +4,7 @@ from acirc.pipeline.tasks import (
     batch_task,
     redshift_load_task,
     redshift_transform_task,
+    redshift_unload_task,
 )
 
 

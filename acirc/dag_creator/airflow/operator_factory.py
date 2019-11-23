@@ -3,6 +3,7 @@ from acirc.dag_creator.airflow.operator_creators import (
     batch_creator,
     dummy_creator,
     redshift_transform_creator,
+    redshift_unload_creator,
 )
 
 
