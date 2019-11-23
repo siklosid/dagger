@@ -1,4 +1,8 @@
 import logging
+from acirc.utilities.exceptions import (
+    AcircMissingFieldException,
+    AcircFieldFormatException,
+)
 
 _logger = logging.getLogger('configFinder')
 
@@ -78,15 +82,22 @@ class ConfigValidator:
     def parse_attribute(self, attribute_name):
         attr = self.config_attributes[self.__class__.__name__][self._attributes[attribute_name]]
         parsed_value = self._config
-        for i in range(len(attr.parent_fields)):
-            parsed_value = parsed_value[attr.parent_fields[i]]
-        parsed_value = parsed_value[attribute_name] or attr.default
+        try:
+            for i in range(len(attr.parent_fields)):
+                parsed_value = parsed_value[attr.parent_fields[i]]
+            parsed_value = parsed_value[attribute_name] or attr.default
+        except KeyError:
+            msg = "Required field: {} is missing in {}".format(attribute_name, self._location)
+            _logger.error(msg)
+            raise AcircMissingFieldException(msg)
 
         try:
             if attr.validator:
                 parsed_value = attr.validator(parsed_value)
-        except:
-            _logger.error("Error in {} with attribute {}", self._location, attribute_name)
+        except Exception as e:
+            msg = "Wrong format for field: {} in {} with error: {}".format(attribute_name, self._location, str(e))
+            _logger.error(msg)
+            raise AcircFieldFormatException(msg)
 
         return parsed_value
 

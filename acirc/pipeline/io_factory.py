@@ -12,5 +12,5 @@ class IOFactory:
         for cls in IO.__subclasses__():
             self.factory[cls.ref_name] = cls
 
-    def create_io(self, ref_name, io_config):
-        return self.factory[ref_name](io_config=io_config)
+    def create_io(self, ref_name, io_config, task):
+        return self.factory[ref_name](io_config=io_config, task=task)

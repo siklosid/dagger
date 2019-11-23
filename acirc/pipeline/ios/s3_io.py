@@ -13,9 +13,8 @@ class S3IO(IO):
             Attribute(attribute_name='path')
         ])
 
-    def __init__(self, io_config):
-        S3IO.init_attributes_once()
-        super().__init__(io_config)
+    def __init__(self, io_config, task):
+        super().__init__(io_config, task)
 
         self._bucket = self.parse_attribute('bucket')
         self._path = self.parse_attribute('path')

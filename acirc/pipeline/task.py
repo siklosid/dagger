@@ -86,9 +86,9 @@ class Task(ConfigValidator):
     def process_inputs(self, inputs: dict):
         for io_config in inputs:
             io_type = io_config['type']
-            self.add_input(self._io_factory.create_io(io_type, io_config))
+            self.add_input(self._io_factory.create_io(io_type, io_config, self))
 
     def process_outputs(self, outputs: dict):
         for io_config in outputs:
             io_type = io_config['type']
-            self.add_output(self._io_factory.create_io(io_type, io_config))
+            self.add_output(self._io_factory.create_io(io_type, io_config, self))

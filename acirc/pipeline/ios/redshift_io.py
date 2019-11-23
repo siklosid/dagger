@@ -12,8 +12,8 @@ class RedshiftIO(IO):
             Attribute(attribute_name='table'),
         ])
 
-    def __init__(self, io_config):
-        super().__init__(io_config)
+    def __init__(self, io_config, task):
+        super().__init__(io_config, task)
 
         self._schema = self.parse_attribute('schema')
         self._table = self.parse_attribute('table')
