@@ -1,6 +1,5 @@
 type: batch
-description: |
-  Joining data1 and data2 to calculate
+description: Joining data1 and data2 to calculate
 inputs:
   - type: s3
     name: data1

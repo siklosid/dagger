@@ -4,10 +4,9 @@
 
 import click
 
-from acirc.cli.ls import ls
-from acirc.cli.mv import mv
-from acirc.cli.head import head
-from acirc.cli.cat import cat
+from acirc.cli.init_pipeline import init_pipeline
+from acirc.cli.init_task import init_task, list_tasks
+from acirc.cli.init_io import init_io, list_ios
 from acirc.utils import setup_logging
 
 
@@ -27,7 +26,9 @@ def cli(context, verbose):
     setup_logging(verbose)
 
 
-cli.add_command(ls)
-cli.add_command(mv)
-cli.add_command(head)
-cli.add_command(cat)
+cli.add_command(init_pipeline)
+cli.add_command(init_task)
+cli.add_command(list_tasks)
+cli.add_command(init_io)
+cli.add_command(list_ios)
+cli.add_command(init_io)
