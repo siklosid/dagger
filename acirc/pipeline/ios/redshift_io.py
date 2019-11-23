@@ -6,7 +6,7 @@ class RedshiftIO(IO):
     ref_name = "redshift"
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
             Attribute(attribute_name='schema'),
             Attribute(attribute_name='table'),

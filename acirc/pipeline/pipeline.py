@@ -13,9 +13,9 @@ from os.path import (
 class Pipeline(ConfigValidator):
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='owner', validator=str, format_help="team/person@circ.com"),
+            Attribute(attribute_name='owner', validator=str, format_help="<team|person>@circ.com"),
             Attribute(attribute_name='description', validator=str),
             Attribute(attribute_name='schedule', format_help="crontab e.g.: 0 3 * * *"),
             Attribute(attribute_name='start_date', format_help="2019-11-01T03:00",

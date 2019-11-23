@@ -26,9 +26,9 @@ class Attribute:
         if self._comment:
             comment.append(self._comment)
 
-        return "{indent}{attribute_name:<30} # {comment}".format(
+        return "{indent}{attribute_value:<30} # {comment}".format(
             indent="  " * len(self._parent_fields),
-            attribute_name=self._name + ":",
+            attribute_value="{}: {}".format(self._name, self._default or ""),
             comment=" / ".join(comment)
         )
 
@@ -52,15 +52,15 @@ class Attribute:
 class ConfigValidator:
     config_attributes = {}
     @classmethod
-    def init_attributes_once(cls):
+    def init_attributes_once(cls, orig_cls):
         if cls.config_attributes.get(cls.__name__, None):
             return
 
         parent_class = cls.__mro__[1]
         if parent_class.__name__ != 'ConfigValidator':
-            parent_class.init_attributes_once()
+            parent_class.init_attributes_once(orig_cls)
 
-        cls.init_attributes()
+        cls.init_attributes(orig_cls)
         if parent_class.__name__ != 'ConfigValidator':
             cls.config_attributes[cls.__name__] =\
                 cls.config_attributes[parent_class.__name__] + cls.config_attributes[cls.__name__]
@@ -73,7 +73,7 @@ class ConfigValidator:
         self._location = location
         self._config = config
 
-        self.init_attributes_once()
+        self.init_attributes_once(self.__class__)
 
         self._attributes = {}
         for i, attr in enumerate(self.config_attributes[self.__class__.__name__]):
@@ -108,7 +108,7 @@ class ConfigValidator:
     @classmethod
     def sample(cls):
         if cls.config_attributes.get(cls.__name__, None) is None:
-            cls.init_attributes_once()
+            cls.init_attributes_once(cls)
 
         yaml_str = []
         for attribute in cls.config_attributes[cls.__name__]:

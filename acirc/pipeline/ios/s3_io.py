@@ -7,7 +7,7 @@ class S3IO(IO):
     ref_name = "s3"
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
             Attribute(attribute_name='bucket'),
             Attribute(attribute_name='path')

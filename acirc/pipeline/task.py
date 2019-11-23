@@ -12,9 +12,9 @@ class Task(ConfigValidator):
     ref_name = None
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='type'),
+            Attribute(attribute_name='type', default=orig_cls.ref_name),
             Attribute(attribute_name='description'),
             Attribute(attribute_name='inputs', format_help='list',
                       comment='Use acirc init_input cli', default=[]),

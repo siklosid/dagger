@@ -6,7 +6,7 @@ class BatchTask(Task):
     ref_name = "batch"
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
             Attribute(attribute_name='executable', parent_fields=['task_parameters'], comment="E.g.: my_code.py"),
             Attribute(attribute_name='executable_prefix', parent_fields=['task_parameters'],

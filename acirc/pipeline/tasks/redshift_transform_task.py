@@ -6,7 +6,7 @@ class RedshiftTransformTask(Task):
     ref_name = "redshift_transform"
 
     @classmethod
-    def init_attributes(cls):
+    def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
             Attribute(attribute_name='sql', parent_fields=['task_parameters'], comment="Relative path to sql file"),
         ])
