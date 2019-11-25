@@ -7,8 +7,6 @@ from os.path import join
 class RedshiftTransformCreator(OperatorCreator):
     ref_name = 'redshift_transform'
 
-    CONN_ID_DEFAULT_REDSHIFT = 'redshift_default'
-
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
@@ -28,7 +26,7 @@ class RedshiftTransformCreator(OperatorCreator):
             task_id=self._task.name,
             sql=sql_string,
             pool='redshift',
-            postgres_conn_id=self.CONN_ID_DEFAULT_REDSHIFT,
+            postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
             **self._task.airflow_parameters,
         )
