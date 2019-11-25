@@ -16,8 +16,6 @@ iam_role '{iam_role}'
 class RedshiftUnloadCreator(OperatorCreator):
     ref_name = 'redshift_unload'
 
-    CONN_ID_DEFAULT_REDSHIFT = 'redshift_default'
-
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
@@ -60,7 +58,7 @@ class RedshiftUnloadCreator(OperatorCreator):
             task_id=self._task.name,
             sql=unload_cmd,
             pool='redshift',
-            postgres_conn_id=self.CONN_ID_DEFAULT_REDSHIFT,
+            postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
             **self._task.airflow_parameters,
         )

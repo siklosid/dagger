@@ -6,6 +6,7 @@ from os.path import join
 
 REDSHIFT_LOAD_CMD = \
 """
+{delete_cmd};
 copy {table_name}{columns}  
 from '{input_path}' 
 iam_role '{iam_role}'
@@ -16,22 +17,29 @@ iam_role '{iam_role}'
 class RedshiftLoadCreator(OperatorCreator):
     ref_name = 'redshift_load'
 
-    CONN_ID_DEFAULT_REDSHIFT = 'redshift_default'
-
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
+        self._input_path = self._task.inputs[0].rendered_name
+        self._table_to = self._task.outputs[0].rendered_name
+
+    def _get_delete_cmd(self):
+        if self._task.incremental:
+            return "DELETE FROM {table} WHERE {condition}"\
+                .format(table=self._table_to, condition=self._task.delete_condition)
+        else:
+            return "TRUNCATE TABLE {table}".format(table=self._table_to)
+
     def _get_load_command(self):
-        input_path = self._task.inputs[0].rendered_name
-        table_to = self._task.outputs[0].rendered_name
 
         extra_parameters =\
             "\n".join(["{} {}".format(key, value) for key, value in self._task.extra_parameters.items()])
 
         unload_cmd = REDSHIFT_LOAD_CMD.format(
-            table_name=table_to,
+            delete_cmd=self._get_delete_cmd(),
+            table_name=self._table_to,
             columns="({})".format(self._task.columns) if self._task.columns else "",
-            input_path=input_path,
+            input_path=self._input_path,
             iam_role=self._task.iam_role,
             extra_parameters=extra_parameters,
         )
@@ -45,7 +53,7 @@ class RedshiftLoadCreator(OperatorCreator):
             task_id=self._task.name,
             sql=load_cmd,
             pool='redshift',
-            postgres_conn_id=self.CONN_ID_DEFAULT_REDSHIFT,
+            postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
             **self._task.airflow_parameters,
         )

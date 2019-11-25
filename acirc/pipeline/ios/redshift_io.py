@@ -8,7 +8,7 @@ class RedshiftIO(IO):
     @classmethod
     def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='schema'),
+            Attribute(attribute_name='schema', comment="Leave it empty for system tables"),
             Attribute(attribute_name='table'),
         ])
 
@@ -19,16 +19,8 @@ class RedshiftIO(IO):
         self._table = self.parse_attribute('table')
 
     def alias(self):
-        return "redshift://{schema}/{table}"\
-            .format(
-                schema=self._schema,
-                table=self._table
-            )
+        return "redshift://" + '/'.join([x for x in [self._schema, self._table] if x is not None])
 
     @property
     def rendered_name(self):
-        return "{schema}.{table}"\
-            .format(
-                schema=self._schema,
-                table=self._table
-            )
+        return '.'.join([x for x in [self._schema, self._table] if x is not None])
