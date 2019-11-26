@@ -20,7 +20,7 @@ class Task(ConfigValidator):
                       comment='Use acirc init_input cli', default=[]),
             Attribute(attribute_name='outputs', format_help='list',
                       comment='Use acirc init_input cli', default=[]),
-            Attribute(attribute_name='airflow_parameters', required=False, format_help="dictionary"),
+            Attribute(attribute_name='airflow_task_parameters', required=False, format_help="dictionary"),
             Attribute(attribute_name='template_parameters', required=False, format_help="dictionary"),
             Attribute(attribute_name='task_parameters'),
         ])
@@ -35,7 +35,7 @@ class Task(ConfigValidator):
         self._pipeline = pipeline
         self._description = self.parse_attribute('description')
         self._parameters = self.parse_attribute('task_parameters')
-        self._airflow_parameters = self.parse_attribute('airflow_parameters') or {}
+        self._airflow_parameters = self.parse_attribute('airflow_task_parameters') or {}
         self._template_parameters = self.parse_attribute('template_parameters') or {}
 
         self._inputs = []
