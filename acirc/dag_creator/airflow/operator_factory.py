@@ -5,6 +5,7 @@ from acirc.dag_creator.airflow.operator_creators import (
     redshift_load_creator,
     redshift_transform_creator,
     redshift_unload_creator,
+    spark_creator,
 )
 
 
