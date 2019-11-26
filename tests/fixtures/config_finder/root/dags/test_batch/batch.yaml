@@ -18,6 +18,6 @@ task_parameters:
     job_queue:
     region_name:
     max_retries:
-airflow_parameters:
+airflow_task_parameters:
 template_parameters:
   const: 13
