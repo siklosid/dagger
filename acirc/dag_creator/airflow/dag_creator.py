@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 from circ.utils.operator_factories import make_control_flow
+from circ.utils.slack_alerts import task_fail_slack_alert
 
 
 class DagCreator:
@@ -18,7 +19,7 @@ class DagCreator:
     def _get_default_args():
         return {
             "depends_on_past": True,
-            "retries": 2,
+            "retries": 0,
             "retry_delay": timedelta(minutes=5),
         }
 
@@ -29,7 +30,9 @@ class DagCreator:
     def _create_dag(self, pipeline: Pipeline):
         default_args = self._get_default_args()
         default_args.update(pipeline.default_args)
-        default_args['owner'] = pipeline.owner
+        default_args["owner"] = pipeline.owner.split('@')[0]
+        if pipeline.slack_alert:
+            default_args["on_failure_callback"] = task_fail_slack_alert
 
         dag = DAG(
             pipeline.name,
@@ -44,7 +47,6 @@ class DagCreator:
 
     def _create_dags(self):
         dags = {}
-        tasks = {}
         for pipe_id, node in self._task_graph.get_nodes(TaskGraph.NODE_TYPE_PIPELINE).items():
             dag = self._create_dag(node.obj)
             dags[pipe_id] = dag

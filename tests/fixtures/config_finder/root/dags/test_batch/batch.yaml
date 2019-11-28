@@ -14,10 +14,6 @@ task_parameters:
     executable: batch.py
     executable_prefix: python
     job_name: papershift
-    aws_conn_id:
-    job_queue:
-    region_name:
-    max_retries:
 airflow_task_parameters:
 template_parameters:
   const: 13

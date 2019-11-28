@@ -8,28 +8,34 @@ _logger = logging.getLogger('configFinder')
 
 
 class Attribute:
-    def __init__(self, attribute_name: str, parent_fields: list = None, required: bool = True, validator=None,
-                 default=None, format_help: str = None, comment: str = None):
+    def __init__(self, attribute_name: str, parent_fields: list = None,
+                 required: bool = True, nullable: bool = False,
+                 validator=None, auto_value=None,
+                 format_help: str = None, comment: str = None):
 
         self._name = attribute_name
-        self._required = required
         self._parent_fields = parent_fields or []
+        self._required = required
+        self._nullable = nullable
         self._validator = validator
-        self._default = default
+        self._auto_value = auto_value
         self._format = format_help
         self._comment = comment
+        self._is_parent = False
 
     def __repr__(self):
-        comment = ["(required)" if self._required else "(optional)"]
+        comment = []
+        if self._required and self.nullable and not self.is_parent:
+            comment.append("[Can be empty]")
         if self._format:
             comment.append("format: " + self._format)
         if self._comment:
             comment.append(self._comment)
 
-        return "{indent}{attribute_value:<30} # {comment}".format(
+        return "{indent}{attribute_value:<30} {comment}".format(
             indent="  " * len(self._parent_fields),
-            attribute_value="{}: {}".format(self._name, self._default or ""),
-            comment=" / ".join(comment)
+            attribute_value="{}: {}".format(self._name, self._auto_value or ""),
+            comment="# " + " | ".join(comment) if len(comment) > 0 else ""
         )
 
     @property
@@ -41,16 +47,33 @@ class Attribute:
         return self._parent_fields
 
     @property
+    def required(self):
+        return self._required
+
+    @property
+    def nullable(self):
+        return self._nullable
+
+    @property
     def validator(self):
         return self._validator
 
     @property
-    def default(self):
-        return self._default
+    def auto_value(self):
+        return self._auto_value
+
+    @property
+    def is_parent(self):
+        return self._is_parent
+
+    @is_parent.setter
+    def is_parent(self, value):
+        self._is_parent = value
 
 
 class ConfigValidator:
     config_attributes = {}
+
     @classmethod
     def init_attributes_once(cls, orig_cls):
         if cls.config_attributes.get(cls.__name__, None):
@@ -64,6 +87,14 @@ class ConfigValidator:
         if parent_class.__name__ != 'ConfigValidator':
             cls.config_attributes[cls.__name__] =\
                 cls.config_attributes[parent_class.__name__] + cls.config_attributes[cls.__name__]
+
+        attributes_lookup = {}
+        for index, attribute in enumerate(cls.config_attributes[cls.__name__]):
+            attributes_lookup[attribute.name] = index
+
+        for attribute in cls.config_attributes[cls.__name__]:
+            for parent_attribute in attribute.parent_fields:
+                cls.config_attributes[cls.__name__][attributes_lookup[parent_attribute]].is_parent = True
 
     @classmethod
     def add_config_attributes(cls, attributes: list):
@@ -85,14 +116,22 @@ class ConfigValidator:
         try:
             for i in range(len(attr.parent_fields)):
                 parsed_value = parsed_value[attr.parent_fields[i]]
-            parsed_value = parsed_value[attribute_name] or attr.default
+            parsed_value = parsed_value[attribute_name]
         except KeyError:
-            msg = "Required field: {} is missing in {}".format(attribute_name, self._location)
+            if attr.required:
+                msg = "Required field: {} is missing in {}".format(attribute_name, self._location)
+                _logger.error(msg)
+                raise AcircMissingFieldException(msg)
+            else:
+                return None
+
+        if parsed_value is None and not attr.nullable:
+            msg = "Field {} cannot be empty in {}".format(attribute_name, self._location)
             _logger.error(msg)
-            raise AcircMissingFieldException(msg)
+            raise AcircFieldFormatException(msg)
 
         try:
-            if attr.validator:
+            if attr.validator and parsed_value:
                 parsed_value = attr.validator(parsed_value)
         except Exception as e:
             msg = "Wrong format for field: {} in {} with error: {}".format(attribute_name, self._location, str(e))
@@ -101,10 +140,6 @@ class ConfigValidator:
 
         return parsed_value
 
-    # @property
-    # def attributes(self):
-    #     return self.config_attributes
-
     @classmethod
     def sample(cls):
         if cls.config_attributes.get(cls.__name__, None) is None:
@@ -112,6 +147,12 @@ class ConfigValidator:
 
         yaml_str = []
         for attribute in cls.config_attributes[cls.__name__]:
-            yaml_str.append(str(attribute))
+            if attribute.required:
+                yaml_str.append(str(attribute))
+
+        yaml_str.append("\n\n\n# Other attributes:\n")
+        for attribute in cls.config_attributes[cls.__name__]:
+            if not attribute.required or attribute.is_parent:
+                yaml_str.append("# " + str(attribute))
 
         return "\n".join(yaml_str)

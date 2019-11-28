@@ -19,8 +19,8 @@ class RedshiftIO(IO):
         self._table = self.parse_attribute('table')
 
     def alias(self):
-        return "redshift://" + '/'.join([x for x in [self._schema, self._table] if x is not None])
+        return "redshift://{}/{}".format(self._schema, self._table)
 
     @property
     def rendered_name(self):
-        return '.'.join([x for x in [self._schema, self._table] if x is not None])
+        return "{}.{}".format(self._schema, self._table)

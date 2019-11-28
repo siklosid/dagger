@@ -14,15 +14,15 @@ class Task(ConfigValidator):
     @classmethod
     def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='type', default=orig_cls.ref_name),
+            Attribute(attribute_name='type', auto_value=orig_cls.ref_name),
             Attribute(attribute_name='description'),
             Attribute(attribute_name='inputs', format_help='list',
-                      comment='Use acirc init_input cli', default=[]),
+                      comment='Use acirc init-io cli'),
             Attribute(attribute_name='outputs', format_help='list',
-                      comment='Use acirc init_input cli', default=[]),
-            Attribute(attribute_name='airflow_task_parameters', required=False, format_help="dictionary"),
-            Attribute(attribute_name='template_parameters', required=False, format_help="dictionary"),
-            Attribute(attribute_name='task_parameters'),
+                      comment='Use acirc init-io cli'),
+            Attribute(attribute_name='airflow_task_parameters', nullable=True, format_help="dictionary"),
+            Attribute(attribute_name='template_parameters', nullable=True, format_help="dictionary"),
+            Attribute(attribute_name='task_parameters', nullable=True),
         ])
 
     def __init__(self, name: str, pipeline_name, pipeline, config: dict):

@@ -15,14 +15,14 @@ class RedshiftUnloadTask(Task):
     @classmethod
     def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='sql', required=False, parent_fields=['task_parameters'],
+            Attribute(attribute_name='sql', nullable=True, parent_fields=['task_parameters'],
                       comment="Relative path to sql file. If not present default is SELECT * FROM <input_table>"),
             Attribute(attribute_name='iam_role', required=False, parent_fields=['task_parameters']),
-            Attribute(attribute_name='allow_overwrite', required=False, parent_fields=['task_parameters'],
-                      format_help="on/off",
+            Attribute(attribute_name='allow_overwrite', required=False, nullable=True,
+                      parent_fields=['task_parameters'], format_help="on/off",
                       comment="Default is on"),
             Attribute(attribute_name='postgres_conn_id', required=False, parent_fields=['task_parameters']),
-            Attribute(attribute_name='extra_unload_parameters', required=False, parent_fields=['task_parameters'],
+            Attribute(attribute_name='extra_unload_parameters', required=True, nullable=True, parent_fields=['task_parameters'],
                       format_help="dictionary",
                       comment="Any additional parameter will be added like <key value> \
                       Check https://docs.aws.amazon.com/redshift/latest/dg/t_Unloading_tables.html")
