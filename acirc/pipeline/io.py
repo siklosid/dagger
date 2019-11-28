@@ -8,7 +8,7 @@ class IO(ConfigValidator, ABC):
     @classmethod
     def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
-            Attribute(attribute_name='type', default=orig_cls.ref_name),
+            Attribute(attribute_name='type', auto_value=orig_cls.ref_name),
             Attribute(attribute_name='name'),
         ])
 
