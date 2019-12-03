@@ -46,16 +46,15 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return unload_cmd
 
-    def _create_operator(self):
+    def _create_operator(self, **kwargs):
         load_cmd = self._get_load_command()
 
         redshift_op = PostgresOperator(
             task_id=self._task.name,
             sql=load_cmd,
-            pool='redshift',
             postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
-            **self._task.airflow_parameters,
+            **kwargs,
         )
 
         return redshift_op

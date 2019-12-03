@@ -24,3 +24,7 @@ class RedshiftIO(IO):
     @property
     def rendered_name(self):
         return "{}.{}".format(self._schema, self._table)
+
+    @property
+    def airflow_name(self):
+        return "redshift-{}-{}".format(self._schema, self._table)

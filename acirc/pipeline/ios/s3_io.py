@@ -25,3 +25,7 @@ class S3IO(IO):
     @property
     def rendered_name(self):
         return self.alias()
+
+    @property
+    def airflow_name(self):
+        return "s3-{}".format(join(self._bucket, self._path).replace('/', '-'))

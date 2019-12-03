@@ -19,16 +19,15 @@ class RedshiftTransformCreator(OperatorCreator):
 
         return sql_string
 
-    def _create_operator(self):
+    def _create_operator(self, **kwargs):
         sql_string = self._read_sql(self._task.pipeline.directory, self._task.sql_file)
 
         redshift_op = PostgresOperator(
             task_id=self._task.name,
             sql=sql_string,
-            pool='redshift',
             postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
-            **self._task.airflow_parameters,
+            **kwargs,
         )
 
         return redshift_op

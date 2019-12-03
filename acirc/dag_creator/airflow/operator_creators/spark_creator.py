@@ -22,7 +22,7 @@ class SparkCreator(OperatorCreator):
 
         return args
 
-    def _create_operator(self):
+    def _create_operator(self, **kwargs):
         batch_op = SparkSubmitOperator(
             task_id=self._task.name,
             job_file=self._task.job_file,
@@ -31,7 +31,7 @@ class SparkCreator(OperatorCreator):
             s3_files_bucket=self._task.s3_files_bucket,
             extra_py_files=self._task.extra_py_files,
             emr_master=self._task.emr_master,
-            **self._task.airflow_parameters,
+            **kwargs,
         )
 
         return batch_op

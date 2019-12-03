@@ -46,7 +46,7 @@ class RedshiftUnloadCreator(OperatorCreator):
 
         return unload_cmd
 
-    def _create_operator(self):
+    def _create_operator(self, **kwargs):
         if self._task.sql_file:
             sql_string = self._read_sql(self._task.pipeline.directory, self._task.sql_file)
         else:
@@ -57,10 +57,9 @@ class RedshiftUnloadCreator(OperatorCreator):
         redshift_op = PostgresOperator(
             task_id=self._task.name,
             sql=unload_cmd,
-            pool='redshift',
             postgres_conn_id=self._task.postgres_conn_id,
             params=self._template_parameters,
-            **self._task.airflow_parameters,
+            **kwargs,
         )
 
         return redshift_op

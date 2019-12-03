@@ -8,6 +8,17 @@ from acirc.dag_creator.airflow.operator_creators import (
     spark_creator,
 )
 
+from airflow.operators.dummy_operator import DummyOperator
+
+from circ.utils.operator_factories import make_control_flow
+
+
+class DataOperator(DummyOperator):
+    ui_color = '#e8f7e4'
+
+    def __init__(self, *args, **kwargs):
+        super(DataOperator, self).__init__(*args, **kwargs)
+
 
 class OperatorFactory:
     def __init__(self):
@@ -20,3 +31,12 @@ class OperatorFactory:
         cls = self.factory.get(task.ref_name, dummy_creator.DummyCreator)
 
         return cls(task, dag).create_operator()
+
+    @staticmethod
+    def create_control_flow_operator(env, dag):
+        return make_control_flow(env, dag)
+
+    @staticmethod
+    def create_dataset_operator(data_id, dag):
+        return DataOperator(dag=dag, task_id=data_id)
+

@@ -56,6 +56,10 @@ class Pipeline(ConfigValidator):
         return self._owner
 
     @property
+    def description(self):
+        return self._description
+
+    @property
     def schedule(self):
         return self._schedule
 

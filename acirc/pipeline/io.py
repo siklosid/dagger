@@ -33,5 +33,9 @@ class IO(ConfigValidator, ABC):
         raise NotImplementedError
 
     @property
+    def airflow_name(self):
+        raise NotImplementedError
+
+    @property
     def task(self):
         return self._task

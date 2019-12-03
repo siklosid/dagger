@@ -16,7 +16,7 @@ class BatchCreator(OperatorCreator):
 
         return command
 
-    def _create_operator(self):
+    def _create_operator(self, **kwargs):
         overrides = {
             "command": self._generate_command()
         }
@@ -27,7 +27,7 @@ class BatchCreator(OperatorCreator):
             region_name=self._task.region_name,
             job_queue=self._task.job_queue,
             overrides=overrides,
-            **self._task.airflow_parameters,
+            **kwargs,
         )
 
         return batch_op

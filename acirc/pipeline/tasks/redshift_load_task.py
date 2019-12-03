@@ -5,6 +5,7 @@ from acirc import conf
 
 class RedshiftLoadTask(Task):
     ref_name = "redshift_load"
+    default_pool = "redshift"
 
     @staticmethod
     def _get_default_load_params():
