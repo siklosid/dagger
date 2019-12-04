@@ -10,6 +10,7 @@ _logger = logging.getLogger('configFinder')
 
 class Task(ConfigValidator):
     ref_name = None
+    default_pool = None
 
     @classmethod
     def init_attributes(cls, orig_cls):
@@ -20,6 +21,7 @@ class Task(ConfigValidator):
                       comment='Use acirc init-io cli'),
             Attribute(attribute_name='outputs', format_help='list',
                       comment='Use acirc init-io cli'),
+            Attribute(attribute_name='pool', required=False),
             Attribute(attribute_name='airflow_task_parameters', nullable=True, format_help="dictionary"),
             Attribute(attribute_name='template_parameters', nullable=True, format_help="dictionary"),
             Attribute(attribute_name='task_parameters', nullable=True),
@@ -40,12 +42,17 @@ class Task(ConfigValidator):
 
         self._inputs = []
         self._outputs = []
+        self._pool = self.parse_attribute('pool') or self.default_pool
         self.process_inputs(config['inputs'])
         self.process_outputs(config['outputs'])
 
     @property
     def name(self):
         return self._name
+
+    @property
+    def description(self):
+        return self._description
 
     @property
     def pipeline_name(self):
@@ -74,6 +81,10 @@ class Task(ConfigValidator):
     @property
     def outputs(self):
         return self._outputs
+
+    @property
+    def pool(self):
+        return self._pool
 
     def add_input(self, task_input: IO):
         _logger.info("Adding input: %s to task: %s", task_input.name, self._name)

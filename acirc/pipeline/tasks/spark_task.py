@@ -7,6 +7,7 @@ from os.path import join, relpath
 
 class SparkTask(Task):
     ref_name = "spark"
+    default_pool = "spark"
 
     @classmethod
     def init_attributes(cls, orig_cls):

@@ -10,6 +10,7 @@ AIRFLOW_HOME = os.environ.get('AIRFLOW_HOME', '/usr/local/airflow/')
 DAGS_DIR = os.path.join(AIRFLOW_HOME, 'dags')
 ENV = os.environ.get('ENV', 'local')
 ENV_SUFFIX = "-dev" if ENV == "local" else ""
+WITH_DATA_NODES = True
 
 ## Logging config
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

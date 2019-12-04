@@ -5,6 +5,7 @@ from acirc import conf
 
 class RedshiftUnloadTask(Task):
     ref_name = "redshift_unload"
+    default_pool = "redshift"
 
     @staticmethod
     def _get_default_unload_params():

@@ -5,6 +5,7 @@ from acirc import conf
 
 class RedshiftTransformTask(Task):
     ref_name = "redshift_transform"
+    default_pool = "redshift"
 
     @classmethod
     def init_attributes(cls, orig_cls):
