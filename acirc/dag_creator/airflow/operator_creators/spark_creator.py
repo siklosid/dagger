@@ -24,6 +24,7 @@ class SparkCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
         batch_op = SparkSubmitOperator(
+            dag=self._dag,
             task_id=self._task.name,
             job_file=self._task.job_file,
             job_args=self._generate_command(),

@@ -2,10 +2,11 @@ from acirc.graph.task_graph import Graph, TaskGraph
 from acirc.pipeline.pipeline import Pipeline
 from acirc import conf
 from acirc.dag_creator.airflow.operator_factory import OperatorFactory
-
-import re
-
+from circ.utils.slack_alerts import task_fail_slack_alert
 from airflow import DAG
+
+from datetime import timedelta
+import re
 
 
 class DagCreator:
@@ -18,10 +19,24 @@ class DagCreator:
         return 'control_flow:{}'.format(pipe_id)
 
     @staticmethod
+    def _get_default_args():
+        return {
+            "depends_on_past": True,
+            "retries": 0,
+            "retry_delay": timedelta(minutes=5),
+        }
+
+    @staticmethod
     def _create_dag(pipeline: Pipeline):
+        default_args = DagCreator._get_default_args()
+        default_args['owner'] = pipeline.owner.split('@')[0]
+        if pipeline.slack_alert:
+            default_args['on_failure_callback'] = task_fail_slack_alert
+
         dag = DAG(
             pipeline.name,
             description=pipeline.description,
+            default_args=default_args,
             catchup=False,
             start_date=pipeline.start_date,
             schedule_interval=pipeline.schedule,

@@ -23,6 +23,7 @@ class RedshiftTransformCreator(OperatorCreator):
         sql_string = self._read_sql(self._task.pipeline.directory, self._task.sql_file)
 
         redshift_op = PostgresOperator(
+            dag=self._dag,
             task_id=self._task.name,
             sql=sql_string,
             postgres_conn_id=self._task.postgres_conn_id,
