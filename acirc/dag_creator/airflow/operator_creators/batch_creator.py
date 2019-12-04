@@ -22,6 +22,7 @@ class BatchCreator(OperatorCreator):
         }
 
         batch_op = AWSBatchOperator(
+            dag=self._dag,
             task_id=self._task.name,
             job_name=self._task.job_name,
             region_name=self._task.region_name,

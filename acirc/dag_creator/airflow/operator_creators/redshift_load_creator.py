@@ -50,6 +50,7 @@ class RedshiftLoadCreator(OperatorCreator):
         load_cmd = self._get_load_command()
 
         redshift_op = PostgresOperator(
+            dag=self._dag,
             task_id=self._task.name,
             sql=load_cmd,
             postgres_conn_id=self._task.postgres_conn_id,

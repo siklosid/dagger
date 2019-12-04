@@ -55,6 +55,7 @@ class RedshiftUnloadCreator(OperatorCreator):
         unload_cmd = self._get_unload_command(sql_string)
 
         redshift_op = PostgresOperator(
+            dag=self._dag,
             task_id=self._task.name,
             sql=unload_cmd,
             postgres_conn_id=self._task.postgres_conn_id,
