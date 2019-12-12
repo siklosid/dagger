@@ -10,6 +10,10 @@ outputs:
     name: batch_table
     schema: dwh
     table: batch_table
+  - type: gdrive
+    folder: "1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL"
+    file_name: report.csv
+
 task_parameters:
     executable: batch.py
     executable_prefix: python
