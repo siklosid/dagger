@@ -1,7 +1,8 @@
 from acirc.pipeline.io import IO
 from acirc.pipeline.ios import (
     s3_io,
-    redshift_io
+    redshift_io,
+    gdrive_io
 )
 
 
