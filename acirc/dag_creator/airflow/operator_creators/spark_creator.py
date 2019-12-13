@@ -17,8 +17,8 @@ class SparkCreator(OperatorCreator):
 
     def _generate_spark_args(self):
         args = []
-        for param, value in self._task.spark_args.items():
-            args.append("--conf {}={}".format(param, value))
+        for spark_arg in self._task.spark_args:
+            args.append("--{}".format(spark_arg))
 
         return args
 
