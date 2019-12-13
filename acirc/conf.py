@@ -9,7 +9,7 @@ EXTRAS_DIR = os.path.join(BASE_PATH, 'extras')
 AIRFLOW_HOME = os.environ.get('AIRFLOW_HOME', '/usr/local/airflow/')
 DAGS_DIR = os.path.join(AIRFLOW_HOME, 'dags')
 ENV = os.environ.get('ENV', 'local')
-ENV_SUFFIX = "-dev" if ENV == "local" else ""
+ENV_SUFFIX = "dev" if ENV == "local" else ""
 WITH_DATA_NODES = True
 
 ## Logging config
@@ -34,5 +34,5 @@ _logger.addHandler(ch)
 REDSHIFT_CONN_ID = 'redshift_default'
 REDSHIFT_IAM_ROLE = "arn:aws:iam::120444018371:role/redshift"
 
-SPARK_S3_FILES_BUCKET = f"circdata-files{ENV_SUFFIX}"
+SPARK_S3_FILES_BUCKET = f"circdata-files"
 SPARK_EMR_MASTER = "spark-jobs.data.circ"

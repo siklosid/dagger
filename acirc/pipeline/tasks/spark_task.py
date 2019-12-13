@@ -24,9 +24,9 @@ class SparkTask(Task):
         super().__init__(name, pipeline_name, pipeline, job_config)
 
         self._job_file = relpath(join(self.pipeline.directory, self.parse_attribute('job_file')), conf.DAGS_DIR)
-        spark_args = self.parse_attribute('spark_args') or {}
+        spark_args = self.parse_attribute('spark_args') or []
         self._spark_args = self._get_default_spark_args()
-        self._spark_args.update(spark_args)
+        self._spark_args += spark_args
         self._s3_files_bucket = self.parse_attribute('s3_files_bucket') or conf.SPARK_S3_FILES_BUCKET
         self._extra_py_files = self.parse_attribute('extra_py_files') or []
         self._emr_master = self.parse_attribute('emr_master') or conf.SPARK_EMR_MASTER
@@ -53,10 +53,9 @@ class SparkTask(Task):
 
     @staticmethod
     def _get_default_spark_args():
-        return {
-            'spark.driver.memo': '512m',
-            'spark.driver.memory': '512m',
-            'spark.executor.memory': '512m',
-            'spark.cores.max': 1,
-            'spark.scheduler.pool': conf.ENV,
-        }
+        return [
+            'conf spark.driver.memory=512m',
+            'conf spark.executor.memory=512m',
+            'conf spark.cores.max=1',
+            'conf spark.scheduler.pool={}'.format(conf.ENV),
+        ]
