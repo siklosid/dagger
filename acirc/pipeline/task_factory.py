@@ -6,6 +6,7 @@ from acirc.pipeline.tasks import (
     redshift_transform_task,
     redshift_unload_task,
     spark_task,
+    sqoop_task,
 )
 
 

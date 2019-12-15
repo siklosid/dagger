@@ -6,6 +6,7 @@ from acirc.dag_creator.airflow.operator_creators import (
     redshift_transform_creator,
     redshift_unload_creator,
     spark_creator,
+    sqoop_creator,
 )
 
 from airflow.operators.dummy_operator import DummyOperator
