@@ -117,7 +117,7 @@ class ConfigValidator:
             for i in range(len(attr.parent_fields)):
                 parsed_value = parsed_value[attr.parent_fields[i]]
             parsed_value = parsed_value[attribute_name]
-        except KeyError:
+        except (TypeError, KeyError):
             if attr.required:
                 msg = "Required field: {} is missing in {}".format(attribute_name, self._location)
                 _logger.error(msg)

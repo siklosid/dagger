@@ -36,3 +36,5 @@ REDSHIFT_IAM_ROLE = "arn:aws:iam::120444018371:role/redshift"
 
 SPARK_S3_FILES_BUCKET = f"circdata-files"
 SPARK_EMR_MASTER = "spark-jobs.data.circ"
+
+SQOOP_DEFAULT_FORMAT = "avro"
