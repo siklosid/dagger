@@ -1,7 +1,7 @@
 from acirc.pipeline.task import Task
 from acirc.pipeline.tasks import (
-    bash_task,
     batch_task,
+    python_task,
     redshift_load_task,
     redshift_transform_task,
     redshift_unload_task,
