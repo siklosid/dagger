@@ -9,11 +9,6 @@ import click
 def init_pipeline() -> None:
     """
     Printing pipeline template config
-
-    Returns
-    -------
-    Pipeline yaml string
-
     """
 
     Printer.print_success(Pipeline.sample())
