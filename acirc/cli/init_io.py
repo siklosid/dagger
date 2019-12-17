@@ -13,15 +13,6 @@ valid_tasks = io_factory.factory.keys()
 def init_io(type: str) -> None:
     """
     Printing io template config
-
-    Parameters
-    ----------
-    type: str
-
-    Returns
-    -------
-    Nonedd
-
     """
 
     Printer.print_success(io_factory.factory[type].sample())
@@ -31,9 +22,6 @@ def init_io(type: str) -> None:
 def list_ios() -> None:
     """
     Printing valid io types
-
-    Returns
-    -------
     """
 
     Printer.print_success("\n".join(valid_tasks))

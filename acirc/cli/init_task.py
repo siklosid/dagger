@@ -13,16 +13,6 @@ valid_tasks = task_factory.factory.keys()
 def init_task(type: str) -> None:
     """
     Printing task template config
-    Valid task types: {}
-
-    Parameters
-    ----------
-    type: str
-
-    Returns
-    -------
-    Nonedd
-
     """
 
     Printer.print_success(task_factory.factory[type].sample())
@@ -32,9 +22,6 @@ def init_task(type: str) -> None:
 def list_tasks() -> None:
     """
     Printing valid task types
-
-    Returns
-    -------
     """
 
     Printer.print_success("\n".join(valid_tasks))
