@@ -8,7 +8,7 @@ _logger = logging.getLogger('root')
 class Module:
     def __init__(self, directory, path_to_config):
         self._directory = directory
-        config = self.read_yaml(self.read_task_config(path_to_config))
+        config = self.read_yaml(self.read_task_config(path.splitext(path_to_config)[0]))
 
         self._tasks = {}
         for task in config['tasks']:
@@ -16,6 +16,7 @@ class Module:
 
         self._branches_to_generate = config['branches_to_generate']
         self._override_parameters = config.get('override_parameters', {})
+        self._default_parameters = config.get('default_parameters', {})
 
     @staticmethod
     def read_yaml(yaml_str):
@@ -50,12 +51,16 @@ class Module:
 
     def generate_task_configs(self):
         for branch_name, attrs in self._branches_to_generate.items():
+            attrs = {} if attrs is None else attrs
             _logger.info(f"Generating tasks for branch {branch_name}")
+            template_parameters = {}
+            template_parameters.update(self._default_parameters)
+            template_parameters.update(attrs)
 
             for task, task_yaml in self._tasks.items():
                 task_name = f"{task}_{branch_name}"
                 _logger.info(f"Generating task {task_name}")
-                task_str = self.replace_template_parameters(task_yaml, attrs)
+                task_str = self.replace_template_parameters(task_yaml, template_parameters)
                 task_dict = yaml.safe_load(task_str)
 
                 for override_parameter in self._override_parameters.get(branch_name, {}).get(task, []):
@@ -67,17 +72,29 @@ class Module:
     @staticmethod
     def module_config_template():
         return """
+# The list of tasks that are used as a template for generating new tasks
 tasks:
-  - task1 # Name of the template task file in module directory
+  - task1 # Name of the template task file in module directory (without yaml)
   - task2
-branches_to_generate:
-  branch_name1: # Name of the branch (tasks are going to be named as <task-name>_<branch-name>)
-    template_parameter_name1: template_parameter_value1
-    template_parameter_name2: template_parameter_value2
-  branch_name2:
-    template_parameter_name1: template_parameter_value1
-    template_parameter_name2: template_parameter_value2
 
+## Optional: the list of default template parameters that going to be replaced in the task files for all branches
+## E.g.: {template_parameter_name1} is going to be replaced with template_parameter_value1
+## Default parameters can be overwritten in the branches_to_generate part
+#
+# default_parameters:
+#     template_parameter_name1: template_parameter_value1
+#     template_parameter_name2: template_parameter_value2
+
+# The list of pipelines or branches of pipelines, going to be generated based on the above task list
+# You can also define the branch specific parameters here which overrides the default parameters 
+# For each branch and for each task the <task-name>_<branch-name>
+branches_to_generate:
+  branch_name1: # branch_name1 uses only the default parameters
+  branch_name2:
+    template_parameter_name2: template_parameter_value2 # in branch_name2 the template_parameter_name2 is overwritten 
+
+## You can overwrite non-templated parameters of a task config for specific branches and tasks
+#
 #override_parameters:
 #  branch_name1:
 #    task1:
