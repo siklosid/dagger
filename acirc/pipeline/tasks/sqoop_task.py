@@ -10,6 +10,7 @@ class SqoopTask(Task):
     @classmethod
     def init_attributes(cls, orig_cls):
         cls.add_config_attributes([
+            Attribute(attribute_name='sql', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='where', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='columns', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='num_mappers', parent_fields=['task_parameters'], required=False),
@@ -26,6 +27,9 @@ class SqoopTask(Task):
         db_input = self._inputs[0]
         self._conn_id = db_input.conn_id
         self._table = db_input.table
+        self._sql = self.parse_attribute('sql')
+        if self._sql:
+            self._table = None
         self._where = self.parse_attribute('where')
         self._columns = self.parse_attribute('columns')
         self._num_mappers = self.parse_attribute('num_mappers')
@@ -42,6 +46,10 @@ class SqoopTask(Task):
     @property
     def table(self):
         return self._table
+
+    @property
+    def sql(self):
+        return self._sql
 
     @property
     def where(self):
