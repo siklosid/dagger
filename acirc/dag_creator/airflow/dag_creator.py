@@ -29,6 +29,7 @@ class DagCreator:
     @staticmethod
     def _create_dag(pipeline: Pipeline):
         default_args = DagCreator._get_default_args()
+        default_args.update(pipeline.default_args)
         default_args['owner'] = pipeline.owner.split('@')[0]
         if pipeline.slack_alert:
             default_args['on_failure_callback'] = task_fail_slack_alert

@@ -18,7 +18,6 @@ class OperatorCreator(ABC):
             self._template_parameters[io.name] = io.rendered_name
 
     def _update_airflow_parameters(self):
-        self._airflow_parameters.update(self._task.pipeline.default_args)
         self._airflow_parameters.update(self._task.airflow_parameters)
 
         self._airflow_parameters.update({
