@@ -1,5 +1,6 @@
 from acirc.dag_creator.airflow.operator_creator import OperatorCreator
 from acirc.dag_creator.airflow.operator_creators import (
+    airflow_op_creator,
     batch_creator,
     dummy_creator,
     python_creator,

@@ -1,6 +1,6 @@
 from acirc.utilities.config_validator import Attribute
 from acirc.pipeline.io import IO
-from os.path import join
+from os.path import join, normpath
 
 
 class S3IO(IO):
@@ -16,8 +16,8 @@ class S3IO(IO):
     def __init__(self, io_config, task):
         super().__init__(io_config, task)
 
-        self._bucket = self.parse_attribute('bucket')
-        self._path = self.parse_attribute('path')
+        self._bucket = normpath(self.parse_attribute('bucket'))
+        self._path = normpath(self.parse_attribute('path'))
 
     def alias(self):
         return "s3://{path}".format(path=join(self._bucket, self._path))
