@@ -1,5 +1,6 @@
 from acirc.pipeline.task import Task
 from acirc.pipeline.tasks import (
+    airflow_op_task,
     batch_task,
     python_task,
     redshift_load_task,
