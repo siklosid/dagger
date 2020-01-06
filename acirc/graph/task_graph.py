@@ -136,11 +136,13 @@ class TaskGraph:
 
         for task_input in task.inputs:
             self.add_dataset(task_input)
-            self._graph.add_edge(task_input.alias(), task.uniq_name)
+            if task_input.has_dependency:
+                self._graph.add_edge(task_input.alias(), task.uniq_name)
 
         for task_output in task.outputs:
             self.add_dataset(task_output)
-            self._graph.add_edge(task.uniq_name, task_output.alias())
+            if task_output.has_dependency:
+                self._graph.add_edge(task.uniq_name, task_output.alias())
 
     def add_dataset(self, io: IO):
         self._graph.add_node(node_type=self.NODE_TYPE_DATASET, node_id=io.alias(), obj=io)

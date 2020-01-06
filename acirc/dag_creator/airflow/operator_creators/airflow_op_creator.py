@@ -18,7 +18,6 @@ class AirflowOpCreator(OperatorCreator):
         airflow_operator_module = importlib.import_module(self._task.module)
         operator_class = getattr(airflow_operator_module, self._task.class_name)
 
-        print("XXX_TP", self._template_parameters)
         if self._task.python:
             python_file = path.relpath(path.join(self._task.pipeline.directory, self._task.python), conf.AIRFLOW_HOME)
             python_module = path.splitext(python_file)[0].replace('/', '.')
@@ -26,8 +25,6 @@ class AirflowOpCreator(OperatorCreator):
             params['python_callable'] = python_function
             params['provide_context'] = True
             params['op_kwargs'] = self._template_parameters
-
-        print("XXX_P", params)
 
         batch_op = operator_class(
             dag=self._dag,
