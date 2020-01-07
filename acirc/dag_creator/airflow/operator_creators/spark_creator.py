@@ -44,7 +44,7 @@ class SparkCreator(OperatorCreator):
             executable = basename(self._task.job_file)
 
             command = []
-            command += ["spark_submit"] + self._generate_spark_args()
+            command += ["spark-submit"] + self._generate_spark_args()
             command += [executable] + self._generate_command()
 
             overrides = {
