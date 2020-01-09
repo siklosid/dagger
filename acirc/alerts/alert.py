@@ -1,7 +1,9 @@
 from airflow.models import Variable
 from acirc.utilities.config_validator import ConfigValidator, Attribute
+from acirc import conf
 from abc import ABC, abstractmethod
 from typing import List
+
 import slack
 
 
@@ -76,6 +78,13 @@ def get_task_run_time(task_instance):
 
 
 def airflow_task_fail_alerts(alerts: List[AlertBase], context):
+    if conf.ENV != "data":
+        return
+    if context["dag_run"].external_trigger is True:
+        return
+    if context["dag"].is_paused is True:
+        return
+
     task_instance = context["task_instance"]
     run_time = (task_instance.end_date - task_instance.start_date).total_seconds()
 

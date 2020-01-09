@@ -20,7 +20,6 @@ class Pipeline(ConfigValidator):
             Attribute(attribute_name='schedule', format_help="crontab e.g.: 0 3 * * *"),
             Attribute(attribute_name='start_date', format_help="2019-11-01T03:00",
                       validator=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M')),
-            Attribute(attribute_name='slack_alert', auto_value='off', validator=bool),
             Attribute(attribute_name='airflow_parameters'),
             Attribute(attribute_name='default_args', required=True, nullable=True, validator=dict,
                       parent_fields=['airflow_parameters'], format_help="dictionary"),
@@ -41,15 +40,13 @@ class Pipeline(ConfigValidator):
         self._default_args = self.parse_attribute(attribute_name='default_args') or {}
         self._schedule = self.parse_attribute(attribute_name='schedule')
         self._start_date = self.parse_attribute(attribute_name='start_date')
-        self._slack_alert = self.parse_attribute('slack_alert')
         self._parameters = self.parse_attribute(attribute_name='dag_parameters') or {}
 
         self._tasks = []
 
         self._alerts = []
         self._alert_factory = AlertFactory()
-        self.process_alerts(config['alerts'])
-        print('XXX', self._alerts)
+        self.process_alerts(config['alerts'] or [])
 
     @property
     def directory(self):
@@ -80,10 +77,6 @@ class Pipeline(ConfigValidator):
         return self._default_args
 
     @property
-    def slack_alert(self):
-        return self._slack_alert
-
-    @property
     def parameters(self):
         return self._parameters
 
@@ -102,7 +95,9 @@ class Pipeline(ConfigValidator):
         self._alerts.append(alert)
 
     def process_alerts(self, alert_configs):
-        if alert_configs:
+        if alert_configs is not None:
+            if len(alert_configs) == 0:
+                alert_configs.append(conf.DEFAULT_ALERT)
             for alert_config in alert_configs:
                 alert_type = alert_config['type']
                 self.add_alert(self._alert_factory.create_alert(
@@ -110,7 +105,3 @@ class Pipeline(ConfigValidator):
                     join(self.directory, 'pipeline.yaml'),
                     alert_config)
                 )
-
-        if len(self._alerts) == 0:
-            self.add_alert(conf.DEFAULT_ALERT)
-
