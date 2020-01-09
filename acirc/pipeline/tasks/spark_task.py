@@ -33,7 +33,6 @@ class SparkTask(Task):
         self._job_file = relpath(join(self.pipeline.directory, self.parse_attribute('job_file')), conf.DAGS_DIR)
         spark_args = self.parse_attribute('spark_args') or {}
         self._spark_args = self._get_default_spark_args()
-        print('XXX', self._spark_args, spark_args)
         self._spark_args.update(spark_args)
         self._s3_files_bucket = self.parse_attribute('s3_files_bucket') or conf.SPARK_S3_FILES_BUCKET
         self._extra_py_files = self.parse_attribute('extra_py_files') or []
