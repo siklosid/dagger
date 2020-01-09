@@ -1,5 +1,6 @@
 from acirc.pipeline.task import Task
 from acirc.utilities.config_validator import ConfigValidator, Attribute
+from acirc.alerts.alert import AlertBase, AlertFactory
 from acirc import conf
 
 from datetime import datetime
@@ -24,7 +25,9 @@ class Pipeline(ConfigValidator):
             Attribute(attribute_name='default_args', required=True, nullable=True, validator=dict,
                       parent_fields=['airflow_parameters'], format_help="dictionary"),
             Attribute(attribute_name='dag_parameters', required=True, nullable=True, validator=dict,
-                      parent_fields=['airflow_parameters'], format_help="dictionary")
+                      parent_fields=['airflow_parameters'], format_help="dictionary"),
+            Attribute(attribute_name='alerts', required=True, nullable=True, validator=list,
+                      format_help="list")
         ])
 
     def __init__(self, directory: str, config: dict):
@@ -42,6 +45,11 @@ class Pipeline(ConfigValidator):
         self._parameters = self.parse_attribute(attribute_name='dag_parameters') or {}
 
         self._tasks = []
+
+        self._alerts = []
+        self._alert_factory = AlertFactory()
+        self.process_alerts(config['alerts'])
+        print('XXX', self._alerts)
 
     @property
     def directory(self):
@@ -83,5 +91,26 @@ class Pipeline(ConfigValidator):
     def tasks(self):
         return self._tasks
 
+    @property
+    def alerts(self):
+        return self._alerts
+
     def add_task(self, task: Task):
         self._tasks.append(task)
+
+    def add_alert(self, alert: AlertBase):
+        self._alerts.append(alert)
+
+    def process_alerts(self, alert_configs):
+        if alert_configs:
+            for alert_config in alert_configs:
+                alert_type = alert_config['type']
+                self.add_alert(self._alert_factory.create_alert(
+                    alert_type,
+                    join(self.directory, 'pipeline.yaml'),
+                    alert_config)
+                )
+
+        if len(self._alerts) == 0:
+            self.add_alert(conf.DEFAULT_ALERT)
+

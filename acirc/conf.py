@@ -1,4 +1,5 @@
 import logging
+from acirc.alerts.alert import SlackAlert
 
 import os
 
@@ -11,6 +12,10 @@ DAGS_DIR = os.path.join(AIRFLOW_HOME, 'dags')
 ENV = os.environ.get('ENV', 'local')
 ENV_SUFFIX = "dev" if ENV == "local" else ""
 WITH_DATA_NODES = True
+DEFAULT_ALERT = SlackAlert('conf.py', {
+    'channel': '#airflow-jobs',
+    'mentions': None
+})
 
 ## Logging config
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

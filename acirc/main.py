@@ -7,6 +7,7 @@ import click
 from acirc.cli.init_pipeline import init_pipeline
 from acirc.cli.init_task import init_task, list_tasks
 from acirc.cli.init_io import init_io, list_ios
+from acirc.cli.init_alert import init_alert, list_alerts
 from acirc.cli.module import generate_tasks, module_config
 from acirc.utils import setup_logging
 
@@ -35,3 +36,5 @@ cli.add_command(list_ios)
 cli.add_command(init_io)
 cli.add_command(generate_tasks)
 cli.add_command(module_config)
+cli.add_command(init_alert)
+cli.add_command(list_alerts)
