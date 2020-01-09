@@ -111,3 +111,6 @@ class Pipeline(ConfigValidator):
                     alert_config)
                 )
 
+        if len(self._alerts) == 0:
+            self.add_alert(conf.DEFAULT_ALERT)
+

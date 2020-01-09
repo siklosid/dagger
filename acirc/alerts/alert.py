@@ -87,4 +87,3 @@ def airflow_task_fail_alerts(alerts: List[AlertBase], context):
             run_time,
             task_instance.log_url
         )
-
