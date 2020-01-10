@@ -3,7 +3,6 @@ from acirc.pipeline.pipeline import Pipeline
 from acirc import conf
 from acirc.dag_creator.airflow.operator_factory import OperatorFactory
 from acirc.alerts.alert import airflow_task_fail_alerts
-from circ.utils.slack_alerts import task_fail_slack_alerter
 from airflow import DAG
 
 from datetime import timedelta
