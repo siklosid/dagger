@@ -36,6 +36,13 @@ ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
 _logger.addHandler(ch)
 
+_logger = logging.getLogger('alerts')
+_logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+ch.setFormatter(formatter)
+_logger.addHandler(ch)
+
 # Default task parameters
 REDSHIFT_CONN_ID = 'redshift_default'
 REDSHIFT_IAM_ROLE = "arn:aws:iam::120444018371:role/redshift"

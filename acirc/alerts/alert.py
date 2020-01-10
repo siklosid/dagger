@@ -6,6 +6,9 @@ from typing import List
 
 import slack
 
+import logging
+_logger = logging.getLogger('alerts')
+
 
 class AlertBase(ConfigValidator, ABC):
     ref_name = None
@@ -40,7 +43,14 @@ class SlackAlert(AlertBase):
         self._channel = self.parse_attribute('channel')
         self._mentions = self.parse_attribute('mentions') or []
 
-        self._slack_token = Variable.get('slack_bot_token')
+        try:
+            self._slack_token = Variable.get('slack_bot_token')
+        except KeyError:
+            _logger.error("Couldn't get slack_bot_token from variables")
+            self._slack_token = None
+        except:
+            _logger.error("Unexpected error")
+            self._slack_token = None
 
     def execute(self, dag, task, execution_date, run_time, url):
         client = slack.WebClient(token=self._slack_token)
