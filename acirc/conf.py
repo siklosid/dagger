@@ -10,12 +10,14 @@ AIRFLOW_HOME = os.environ.get('AIRFLOW_HOME', '/usr/local/airflow/')
 DAGS_DIR = os.path.join(AIRFLOW_HOME, 'dags')
 ENV = os.environ.get('ENV', 'local')
 ENV_SUFFIX = "dev" if ENV == "local" else ""
-WITH_DATA_NODES = True
 DEFAULT_ALERT = {
     'type': 'slack',
     'channel': '#airflow-jobs',
     'mentions': None
 }
+
+# Airflow parameters
+WITH_DATA_NODES = True
 
 
 ## Logging config

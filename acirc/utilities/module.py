@@ -29,7 +29,7 @@ class Module:
 
     def read_task_config(self, task):
         try:
-            task_file = path.join(self._directory, task)  + ".yaml"
+            task_file = path.join(self._directory, task) + ".yaml"
             with open(task_file, "r") as myfile:
                 content = myfile.read()
         except:
@@ -42,7 +42,11 @@ class Module:
         for _key, _value in _template_parameters.items():
             locals()[_key] = _value
 
-        return _task_str.format(**locals()).replace("{", "{{").replace("}", "}}")
+        return _task_str.format(**locals())\
+            .replace("{", "{{")\
+            .replace("}", "}}")\
+            .replace("__CBS__", "{")\
+            .replace("__CBE__", "}")
 
     @staticmethod
     def dump_yaml(yaml_str, yaml_path):
@@ -58,7 +62,7 @@ class Module:
             template_parameters.update(attrs)
 
             for task, task_yaml in self._tasks.items():
-                task_name = f"{task}_{branch_name}"
+                task_name = f"{branch_name}_{task}"
                 _logger.info(f"Generating task {task_name}")
                 task_str = self.replace_template_parameters(task_yaml, template_parameters)
                 task_dict = yaml.safe_load(task_str)

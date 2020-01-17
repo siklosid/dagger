@@ -3,6 +3,7 @@ from acirc.pipeline.pipeline import Pipeline
 from acirc import conf
 from acirc.dag_creator.airflow.operator_factory import OperatorFactory
 from acirc.alerts.alert import airflow_task_fail_alerts
+from circ.utils.macros import user_defined_macros
 from airflow import DAG
 
 from datetime import timedelta
@@ -42,6 +43,7 @@ class DagCreator:
             catchup=False,
             start_date=pipeline.start_date,
             schedule_interval=pipeline.schedule,
+            user_defined_macros=user_defined_macros,
             **pipeline.parameters,
         )
 
