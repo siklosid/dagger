@@ -20,6 +20,8 @@ class SparkTask(Task):
             Attribute(attribute_name='s3_files_bucket', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='extra_py_files', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='emr_master', parent_fields=['task_parameters'], required=False),
+            Attribute(attribute_name='overrides', parent_fields=['task_parameters'], required=False,
+                      validator=dict, comment="Batch overrides dictionary: https://docs.aws.amazon.com/sdkforruby/api/Aws/Batch/Types/ContainerOverrides.html"),
             Attribute(attribute_name='aws_conn_id', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='region_name', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='job_queue', parent_fields=['task_parameters'], required=False),
@@ -37,6 +39,7 @@ class SparkTask(Task):
         self._s3_files_bucket = self.parse_attribute('s3_files_bucket') or conf.SPARK_S3_FILES_BUCKET
         self._extra_py_files = self.parse_attribute('extra_py_files') or []
         self._emr_master = self.parse_attribute('emr_master') or conf.SPARK_EMR_MASTER
+        self._overrides = self.parse_attribute('overrides') or {}
         self._aws_conn_id = self.parse_attribute('aws_conn_id')
         self._region_name = self.parse_attribute('region_name') or 'eu-central-1'
         self._job_queue = self.parse_attribute('job_queue') or 'airflow-prio1'
@@ -67,6 +70,10 @@ class SparkTask(Task):
         return self._emr_master
 
     @property
+    def overrides(self):
+        return self._overrides
+
+    @property
     def aws_conn_id(self):
         return self._aws_conn_id
 
@@ -88,6 +95,5 @@ class SparkTask(Task):
         return {
             'conf spark.driver.memory': '512m',
             'conf spark.executor.memory': '512m',
-            'conf spark.cores.max': '1',
             'conf spark.scheduler.pool': '{}'.format(conf.ENV),
         }

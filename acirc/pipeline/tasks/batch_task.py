@@ -12,6 +12,8 @@ class BatchTask(Task):
             Attribute(attribute_name='executable_prefix', nullable=True, parent_fields=['task_parameters'],
                       comment="E.g.: python"),
             Attribute(attribute_name='job_name', parent_fields=['task_parameters']),
+            Attribute(attribute_name='overrides', parent_fields=['task_parameters'], required=False,
+                      validator=dict, comment="Batch overrides dictionary: https://docs.aws.amazon.com/sdkforruby/api/Aws/Batch/Types/ContainerOverrides.html"),
             Attribute(attribute_name='aws_conn_id', parent_fields=['task_parameters'], required=False),
             Attribute(attribute_name='region_name', parent_fields=['task_parameters'],
                       required=False),
@@ -28,6 +30,7 @@ class BatchTask(Task):
         self._executable_prefix = self.parse_attribute('executable_prefix') or ""
         job_name = "{}-{}".format(pipeline.name, self.parse_attribute('job_name'))
         self._job_name = job_name
+        self._overrides = self.parse_attribute('overrides') or {}
         self._aws_conn_id = self.parse_attribute('aws_conn_id')
         self._region_name = self.parse_attribute('region_name') or 'eu-central-1'
         self._job_queue = self.parse_attribute('job_queue') or 'airflow-prio1'
@@ -44,6 +47,10 @@ class BatchTask(Task):
     @property
     def job_name(self):
         return self._job_name
+
+    @property
+    def overrides(self):
+        return self._overrides
 
     @property
     def aws_conn_id(self):

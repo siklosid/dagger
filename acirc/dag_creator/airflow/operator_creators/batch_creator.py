@@ -17,9 +17,10 @@ class BatchCreator(OperatorCreator):
         return command
 
     def _create_operator(self, **kwargs):
-        overrides = {
+        overrides = self._task.overrides
+        overrides.update({
             "command": self._generate_command()
-        }
+        })
 
         batch_op = AWSBatchOperator(
             dag=self._dag,
