@@ -1,4 +1,5 @@
 from acirc.dag_creator.airflow.operator_creator import OperatorCreator
+from acirc import conf
 from circ.operators.spark_submit_operator import SparkSubmitOperator
 from circ.operators.awsbatch_operator import AWSBatchOperator
 
@@ -26,6 +27,27 @@ class SparkCreator(OperatorCreator):
 
         return shlex.split(" ".join(args))
 
+    @staticmethod
+    def _convert_size_text_to_megabytes(size):
+        multipliers = {
+            'm': 1,
+            'g': 1024,
+        }
+
+        for suffix in multipliers:
+            if size.lower().endswith(suffix):
+                return int(size[0:-len(suffix)]) * multipliers[suffix]
+
+        return None
+
+    def _calculate_memory_from_spark_args(self):
+        spark_args = self._task.spark_args
+        driver_memory = spark_args['conf spark.driver.memory']
+        executor_memory = spark_args['conf spark.executor.memory']
+
+        return int(conf.SPARK_OVERHEAD_MULTIPLIER * max(self._convert_size_text_to_megabytes(driver_memory),
+                                                        self._convert_size_text_to_megabytes(executor_memory)))
+
     def _create_operator(self, **kwargs):
         if self._task.spark_engine == 'emr':
             spark_op = SparkSubmitOperator(
@@ -40,6 +62,11 @@ class SparkCreator(OperatorCreator):
                 **kwargs,
             )
         elif self._task.spark_engine == 'batch':
+            overrides = {
+                'memory': self._calculate_memory_from_spark_args()
+            }
+            overrides.update(self._task.overrides)
+
             job_name = "{}".format(dirname(self._task.job_file).replace('/', '-'))
             executable = basename(self._task.job_file)
 
@@ -47,9 +74,9 @@ class SparkCreator(OperatorCreator):
             command += ["spark-submit"] + self._generate_spark_args()
             command += [executable] + self._generate_command()
 
-            overrides = {
-                'command': command
-            }
+            overrides.update({
+                "command": command
+            })
 
             spark_op = AWSBatchOperator(
                 dag=self._dag,
