@@ -23,7 +23,7 @@ class GDriveIO(IO):
 
     @property
     def rendered_name(self):
-        return self.alias()
+        return f"{self._folder}/{self._file_name}"
 
     @property
     def airflow_name(self):
