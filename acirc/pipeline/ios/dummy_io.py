@@ -24,4 +24,4 @@ class DummyIO(IO):
 
     @property
     def airflow_name(self):
-        return "{}".format(self._name)
+        return "dummy-{}".format(self._name)
