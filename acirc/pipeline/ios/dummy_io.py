@@ -13,8 +13,10 @@ class DummyIO(IO):
     def __init__(self, io_config, task):
         super().__init__(io_config, task)
 
+        self._pipeline_name = task.pipeline_name
+
     def alias(self):
-        return "dummy://{}".format(self._name)
+        return "dummy://{}/{}".format(self._pipeline_name, self._name)
 
     @property
     def rendered_name(self):
