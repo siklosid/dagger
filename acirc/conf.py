@@ -25,23 +25,23 @@ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(messag
 
 # ConfigFinder
 _logger = logging.getLogger('configFinder')
-_logger.setLevel(logging.INFO)
+_logger.setLevel(logging.ERROR)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.ERROR)
 ch.setFormatter(formatter)
 _logger.addHandler(ch)
 
 _logger = logging.getLogger('graph')
-_logger.setLevel(logging.INFO)
+_logger.setLevel(logging.ERROR)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.ERROR)
 ch.setFormatter(formatter)
 _logger.addHandler(ch)
 
 _logger = logging.getLogger('alerts')
-_logger.setLevel(logging.INFO)
+_logger.setLevel(logging.ERROR)
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.ERROR)
 ch.setFormatter(formatter)
 _logger.addHandler(ch)
 
@@ -55,3 +55,6 @@ SPARK_DEFAULT_ENGINE = "emr"
 SPARK_OVERHEAD_MULTIPLIER = 1.5
 
 SQOOP_DEFAULT_FORMAT = "avro"
+SQOOP_DEFAULT_PROPERTIES = {
+    'mapreduce.job.user.classpath.first': 'true',
+}
