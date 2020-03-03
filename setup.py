@@ -51,19 +51,19 @@ setup(
     description="Config Driven ETL",
     entry_points={
         'console_scripts': [
-            'acirc=acirc.main:cli',
+            'dagger=dagger.main:cli',
         ],
     },
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    keywords='acirc',
-    name='acirc',
+    keywords='dagger',
+    name='dagger',
     setup_requires=install_requires,
     install_requires=install_requires,
     test_suite='tests',
     packages=find_packages(),
     tests_require=test_requires,
-    url='https://gitlab.com/goflash1/data/acirc',
+    url='https://gitlab.com/goflash1/data/dagger',
     version='0.9.0',
     zip_safe=False,
 )

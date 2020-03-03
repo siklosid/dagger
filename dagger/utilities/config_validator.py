@@ -1,7 +1,7 @@
 import logging
 from dagger.utilities.exceptions import (
-    AcircMissingFieldException,
-    AcircFieldFormatException,
+    DaggerMissingFieldException,
+    DaggerFieldFormatException,
 )
 
 _logger = logging.getLogger('configFinder')
@@ -121,14 +121,14 @@ class ConfigValidator:
             if attr.required:
                 msg = "Required field: {} is missing in {}".format(attribute_name, self._location)
                 _logger.error(msg)
-                raise AcircMissingFieldException(msg)
+                raise DaggerMissingFieldException(msg)
             else:
                 return None
 
         if parsed_value is None and not attr.nullable:
             msg = "Field {} cannot be empty in {}".format(attribute_name, self._location)
             _logger.error(msg)
-            raise AcircFieldFormatException(msg)
+            raise DaggerFieldFormatException(msg)
 
         try:
             if attr.validator and parsed_value:
@@ -136,7 +136,7 @@ class ConfigValidator:
         except Exception as e:
             msg = "Wrong format for field: {} in {} with error: {}".format(attribute_name, self._location, str(e))
             _logger.error(msg)
-            raise AcircFieldFormatException(msg)
+            raise DaggerFieldFormatException(msg)
 
         return parsed_value
 

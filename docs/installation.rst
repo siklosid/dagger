@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install acirc, run this command in your terminal:
+To install dagger, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install acirc
+    $ pip install dagger
 
-This is the preferred method to install acirc, as it will always install the most recent stable release.
+This is the preferred method to install dagger, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for acirc can be downloaded from the `Github repo`_.
+The sources for dagger can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://gitlab.com/goflash1/data/acirc
+    $ git clone git://gitlab.com/goflash1/data/dagger
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://gitlab.com/goflash1/data/acirc/tarball/master
+    $ curl  -OL https://gitlab.com/goflash1/data/dagger/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://gitlab.com/goflash1/data/acirc
-.. _tarball: https://gitlab.com/goflash1/data/acirc/tarball/master
+.. _Github repo: https://gitlab.com/goflash1/data/dagger
+.. _tarball: https://gitlab.com/goflash1/data/dagger/tarball/master
