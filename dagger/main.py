@@ -3,17 +3,18 @@
 """Console script for dao."""
 
 import click
-
+from dagger.cli.init_alert import init_alert, list_alerts
+from dagger.cli.init_io import init_io, list_ios
 from dagger.cli.init_pipeline import init_pipeline
 from dagger.cli.init_task import init_task, list_tasks
-from dagger.cli.init_io import init_io, list_ios
-from dagger.cli.init_alert import init_alert, list_alerts
 from dagger.cli.module import generate_tasks, module_config
 from dagger.utils import setup_logging
 
 
 @click.group()
-@click.option('-v', '--verbose', is_flag=True, default=False, help='Turn on debug logging')
+@click.option(
+    "-v", "--verbose", is_flag=True, default=False, help="Turn on debug logging"
+)
 @click.pass_context
 def cli(context, verbose):
     """dagger's CLI. With it, you can perform pretty much all operations you desire

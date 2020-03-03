@@ -1,15 +1,15 @@
+import sys
+
+import click
 from dagger.pipeline.io_factory import IOFactory
 from dagger.utils import Printer
-
-import sys
-import click
 
 io_factory = IOFactory()
 valid_tasks = io_factory.factory.keys()
 
 
 @click.command()
-@click.option('--type', '-t', help='Type of task')
+@click.option("--type", "-t", help="Type of task")
 def init_io(type: str) -> None:
     """
     Printing io template config
@@ -28,6 +28,4 @@ def list_ios() -> None:
 
 
 if __name__ == "__main__":
-    print(io_factory.factory['redshift'].sample())
-
-
+    print(io_factory.factory["redshift"].sample())

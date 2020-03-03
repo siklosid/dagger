@@ -1,11 +1,11 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from circ.operators.sqoop_operator import SqoopOperator
-
 from os.path import join
+
+from circ.operators.sqoop_operator import SqoopOperator
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
 
 class SqoopCreator(OperatorCreator):
-    ref_name = 'sqoop'
+    ref_name = "sqoop"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
@@ -21,9 +21,7 @@ class SqoopCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
 
-        properties = {
-            'mapreduce.job.user.classpath.first': 'true',
-        }
+        properties = {"mapreduce.job.user.classpath.first": "true"}
 
         sql_string = None
         if self._task.sql:

@@ -1,13 +1,13 @@
-from airflow.models import Variable
-from dagger.utilities.config_validator import ConfigValidator, Attribute
-from dagger import conf
+import logging
 from abc import ABC, abstractmethod
 from typing import List
 
 import slack
+from airflow.models import Variable
+from dagger import conf
+from dagger.utilities.config_validator import Attribute, ConfigValidator
 
-import logging
-_logger = logging.getLogger('alerts')
+_logger = logging.getLogger("alerts")
 
 
 class AlertBase(ConfigValidator, ABC):
@@ -15,9 +15,9 @@ class AlertBase(ConfigValidator, ABC):
 
     @classmethod
     def init_attributes(cls, orig_cls):
-        cls.add_config_attributes([
-            Attribute(attribute_name='type', auto_value=orig_cls.ref_name),
-        ])
+        cls.add_config_attributes(
+            [Attribute(attribute_name="type", auto_value=orig_cls.ref_name)]
+        )
 
     def __init__(self, location, alert_config):
         super().__init__(location=location, config=alert_config)
@@ -28,23 +28,33 @@ class AlertBase(ConfigValidator, ABC):
 
 
 class SlackAlert(AlertBase):
-    ref_name = 'slack'
+    ref_name = "slack"
 
     @classmethod
     def init_attributes(cls, orig_cls):
-        cls.add_config_attributes([
-            Attribute(attribute_name='channel', validator=str, comment="Name of slack channel or slack id of user E.g.: #airflow-jobs or UN01EL1RU"),
-            Attribute(attribute_name='mentions', validator=list, nullable=True,
-                      comment="List of slack user ids or slack groups. E.g.: <@UN01EL1RU> for user, @data-eng for slack group"),
-        ])
+        cls.add_config_attributes(
+            [
+                Attribute(
+                    attribute_name="channel",
+                    validator=str,
+                    comment="Name of slack channel or slack id of user E.g.: #airflow-jobs or UN01EL1RU",
+                ),
+                Attribute(
+                    attribute_name="mentions",
+                    validator=list,
+                    nullable=True,
+                    comment="List of slack user ids or slack groups. E.g.: <@UN01EL1RU> for user, @data-eng for slack group",
+                ),
+            ]
+        )
 
     def __init__(self, location, alert_config):
         super().__init__(location, alert_config)
-        self._channel = self.parse_attribute('channel')
-        self._mentions = self.parse_attribute('mentions') or []
+        self._channel = self.parse_attribute("channel")
+        self._mentions = self.parse_attribute("mentions") or []
 
         try:
-            self._slack_token = Variable.get('slack_bot_token')
+            self._slack_token = Variable.get("slack_bot_token")
         except KeyError:
             _logger.error("Couldn't get slack_bot_token from variables")
             self._slack_token = None
@@ -65,9 +75,8 @@ class SlackAlert(AlertBase):
                 """
 
         response = client.chat_postMessage(
-            link_names=1,
-            channel=self._channel,
-            text=slack_msg)
+            link_names=1, channel=self._channel, text=slack_msg
+        )
 
         print(response)
 
@@ -104,5 +113,5 @@ def airflow_task_fail_alerts(alerts: List[AlertBase], context):
             task_instance.task_id,
             context["execution_date"],
             run_time,
-            task_instance.log_url
+            task_instance.log_url,
         )

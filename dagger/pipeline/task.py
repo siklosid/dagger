@@ -1,11 +1,11 @@
-from dagger.utilities.config_validator import ConfigValidator, Attribute
-from dagger.pipeline.io import IO
-from dagger.pipeline.io_factory import IOFactory
 import logging
-
 from os.path import join
 
-_logger = logging.getLogger('configFinder')
+from dagger.pipeline.io import IO
+from dagger.pipeline.io_factory import IOFactory
+from dagger.utilities.config_validator import Attribute, ConfigValidator
+
+_logger = logging.getLogger("configFinder")
 
 
 class Task(ConfigValidator):
@@ -14,37 +14,53 @@ class Task(ConfigValidator):
 
     @classmethod
     def init_attributes(cls, orig_cls):
-        cls.add_config_attributes([
-            Attribute(attribute_name='type', auto_value=orig_cls.ref_name),
-            Attribute(attribute_name='description'),
-            Attribute(attribute_name='inputs', format_help='list',
-                      comment='Use dagger init-io cli'),
-            Attribute(attribute_name='outputs', format_help='list',
-                      comment='Use dagger init-io cli'),
-            Attribute(attribute_name='pool', required=False),
-            Attribute(attribute_name='airflow_task_parameters', nullable=True, format_help="dictionary"),
-            Attribute(attribute_name='template_parameters', nullable=True, format_help="dictionary"),
-            Attribute(attribute_name='task_parameters', nullable=True),
-        ])
+        cls.add_config_attributes(
+            [
+                Attribute(attribute_name="type", auto_value=orig_cls.ref_name),
+                Attribute(attribute_name="description"),
+                Attribute(
+                    attribute_name="inputs",
+                    format_help="list",
+                    comment="Use dagger init-io cli",
+                ),
+                Attribute(
+                    attribute_name="outputs",
+                    format_help="list",
+                    comment="Use dagger init-io cli",
+                ),
+                Attribute(attribute_name="pool", required=False),
+                Attribute(
+                    attribute_name="airflow_task_parameters",
+                    nullable=True,
+                    format_help="dictionary",
+                ),
+                Attribute(
+                    attribute_name="template_parameters",
+                    nullable=True,
+                    format_help="dictionary",
+                ),
+                Attribute(attribute_name="task_parameters", nullable=True),
+            ]
+        )
 
     def __init__(self, name: str, pipeline_name, pipeline, config: dict):
-        super().__init__(join(pipeline.directory, name + '.yaml'), config)
+        super().__init__(join(pipeline.directory, name + ".yaml"), config)
 
         self._io_factory = IOFactory()
 
         self._name = name
         self._pipeline_name = pipeline_name
         self._pipeline = pipeline
-        self._description = self.parse_attribute('description')
-        self._parameters = self.parse_attribute('task_parameters')
-        self._airflow_parameters = self.parse_attribute('airflow_task_parameters') or {}
-        self._template_parameters = self.parse_attribute('template_parameters') or {}
+        self._description = self.parse_attribute("description")
+        self._parameters = self.parse_attribute("task_parameters")
+        self._airflow_parameters = self.parse_attribute("airflow_task_parameters") or {}
+        self._template_parameters = self.parse_attribute("template_parameters") or {}
 
         self._inputs = []
         self._outputs = []
-        self._pool = self.parse_attribute('pool') or self.default_pool
-        self.process_inputs(config['inputs'])
-        self.process_outputs(config['outputs'])
+        self._pool = self.parse_attribute("pool") or self.default_pool
+        self.process_inputs(config["inputs"])
+        self.process_outputs(config["outputs"])
 
     @property
     def name(self):
@@ -97,11 +113,11 @@ class Task(ConfigValidator):
     def process_inputs(self, inputs):
         if inputs:
             for io_config in inputs:
-                io_type = io_config['type']
+                io_type = io_config["type"]
                 self.add_input(self._io_factory.create_io(io_type, io_config, self))
 
     def process_outputs(self, outputs):
         if outputs:
             for io_config in outputs:
-                io_type = io_config['type']
+                io_type = io_config["type"]
                 self.add_output(self._io_factory.create_io(io_type, io_config, self))

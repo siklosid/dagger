@@ -20,12 +20,10 @@ class OperatorCreator(ABC):
     def _update_airflow_parameters(self):
         self._airflow_parameters.update(self._task.airflow_parameters)
 
-        self._airflow_parameters.update({
-            'description': self._task.description,
-        })
+        self._airflow_parameters.update({"description": self._task.description})
 
         if self._task.pool:
-            self._airflow_parameters['pool'] = self._task.pool
+            self._airflow_parameters["pool"] = self._task.pool
 
     def create_operator(self):
         self._template_parameters.update(self._task.template_parameters)

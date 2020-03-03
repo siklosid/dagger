@@ -1,3 +1,5 @@
+from airflow.operators.dummy_operator import DummyOperator
+from circ.utils.operator_factories import make_control_flow
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from dagger.dag_creator.airflow.operator_creators import (
     airflow_op_creator,
@@ -11,13 +13,9 @@ from dagger.dag_creator.airflow.operator_creators import (
     sqoop_creator,
 )
 
-from airflow.operators.dummy_operator import DummyOperator
-
-from circ.utils.operator_factories import make_control_flow
-
 
 class DataOperator(DummyOperator):
-    ui_color = '#e8f7e4'
+    ui_color = "#e8f7e4"
 
     def __init__(self, *args, **kwargs):
         super(DataOperator, self).__init__(*args, **kwargs)
@@ -42,4 +40,3 @@ class OperatorFactory:
     @staticmethod
     def create_dataset_operator(data_id, dag):
         return DataOperator(dag=dag, task_id=data_id)
-

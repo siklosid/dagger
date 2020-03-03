@@ -1,9 +1,9 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from circ.operators.awsbatch_operator import AWSBatchOperator
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
 
 class BatchCreator(OperatorCreator):
-    ref_name = 'batch'
+    ref_name = "batch"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
@@ -12,15 +12,15 @@ class BatchCreator(OperatorCreator):
         command = []
         command += [self._task.executable_prefix, self._task.executable]
         for param_name, param_value in self._template_parameters.items():
-            command.append("--{name}={value}".format(name=param_name, value=param_value))
+            command.append(
+                "--{name}={value}".format(name=param_name, value=param_value)
+            )
 
         return command
 
     def _create_operator(self, **kwargs):
         overrides = self._task.overrides
-        overrides.update({
-            "command": self._generate_command()
-        })
+        overrides.update({"command": self._generate_command()})
 
         batch_op = AWSBatchOperator(
             dag=self._dag,

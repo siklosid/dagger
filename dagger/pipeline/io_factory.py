@@ -1,11 +1,5 @@
 from dagger.pipeline.io import IO
-from dagger.pipeline.ios import (
-    db_io,
-    dummy_io,
-    s3_io,
-    redshift_io,
-    gdrive_io
-)
+from dagger.pipeline.ios import db_io, dummy_io, gdrive_io, redshift_io, s3_io
 
 
 class IOFactory:
