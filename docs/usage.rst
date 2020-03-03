@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use acirc in a project::
+To use dagger in a project::
 
-    import acirc
+    import dagger

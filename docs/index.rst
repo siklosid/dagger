@@ -1,4 +1,4 @@
-Welcome to acirc's documentation!
+Welcome to dagger's documentation!
 ======================================
 
 .. toctree::

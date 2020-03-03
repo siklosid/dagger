@@ -1,11 +1,11 @@
 
 
-class AcircMissingFieldException(Exception):
+class DaggerMissingFieldException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
 
-class AcircFieldFormatException(Exception):
+class DaggerFieldFormatException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
