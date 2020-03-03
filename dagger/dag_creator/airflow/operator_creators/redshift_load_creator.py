@@ -1,21 +1,19 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from circ.operators.postgres_operator import PostgresOperator
-
 from os.path import join
 
+from circ.operators.postgres_operator import PostgresOperator
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
-REDSHIFT_LOAD_CMD = \
-"""
+REDSHIFT_LOAD_CMD = """
 {delete_cmd};
-copy {table_name}{columns}  
-from '{input_path}' 
+copy {table_name}{columns}
+from '{input_path}'
 iam_role '{iam_role}'
 {extra_parameters}
 """
 
 
 class RedshiftLoadCreator(OperatorCreator):
-    ref_name = 'redshift_load'
+    ref_name = "redshift_load"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
@@ -25,15 +23,20 @@ class RedshiftLoadCreator(OperatorCreator):
 
     def _get_delete_cmd(self):
         if self._task.incremental:
-            return "DELETE FROM {table} WHERE {condition}"\
-                .format(table=self._table_to, condition=self._task.delete_condition)
+            return "DELETE FROM {table} WHERE {condition}".format(
+                table=self._table_to, condition=self._task.delete_condition
+            )
         else:
             return "TRUNCATE TABLE {table}".format(table=self._table_to)
 
     def _get_load_command(self):
 
-        extra_parameters =\
-            "\n".join(["{} {}".format(key, value) for key, value in self._task.extra_parameters.items()])
+        extra_parameters = "\n".join(
+            [
+                "{} {}".format(key, value)
+                for key, value in self._task.extra_parameters.items()
+            ]
+        )
 
         unload_cmd = REDSHIFT_LOAD_CMD.format(
             delete_cmd=self._get_delete_cmd(),

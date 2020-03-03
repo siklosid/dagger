@@ -1,24 +1,29 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from dagger import conf
-from airflow.operators.python_operator import PythonOperator
 import importlib
-
 from os import path
+
+from airflow.operators.python_operator import PythonOperator
+from dagger import conf
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
 
 class PythonCreator(OperatorCreator):
-    ref_name = 'python'
+    ref_name = "python"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
     def _create_operator(self, **kwargs):
         params = {**kwargs}
-        del params['description']
+        del params["description"]
 
-        python_file = path.relpath(path.join(self._task.pipeline.directory, self._task.python), conf.AIRFLOW_HOME)
-        python_module = path.splitext(python_file)[0].replace('/', '.')
-        python_function = getattr(importlib.import_module(python_module), self._task.function)
+        python_file = path.relpath(
+            path.join(self._task.pipeline.directory, self._task.python),
+            conf.AIRFLOW_HOME,
+        )
+        python_module = path.splitext(python_file)[0].replace("/", ".")
+        python_function = getattr(
+            importlib.import_module(python_module), self._task.function
+        )
 
         batch_op = PythonOperator(
             dag=self._dag,

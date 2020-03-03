@@ -1,15 +1,15 @@
+import sys
+
+import click
 from dagger.pipeline.task_factory import TaskFactory
 from dagger.utils import Printer
-
-import sys
-import click
 
 task_factory = TaskFactory()
 valid_tasks = task_factory.factory.keys()
 
 
 @click.command()
-@click.option('--type', '-t', help='Type of task')
+@click.option("--type", "-t", help="Type of task")
 def init_task(type: str) -> None:
     """
     Printing task template config
@@ -28,6 +28,4 @@ def list_tasks() -> None:
 
 
 if __name__ == "__main__":
-    task_factory.factory['batch'].sample()
-
-
+    task_factory.factory["batch"].sample()

@@ -1,5 +1,5 @@
-from dagger.utilities.config_validator import Attribute
 from dagger.pipeline.io import IO
+from dagger.utilities.config_validator import Attribute
 
 
 class DummyIO(IO):
@@ -7,8 +7,7 @@ class DummyIO(IO):
 
     @classmethod
     def init_attributes(cls, orig_cls):
-        cls.add_config_attributes([
-        ])
+        cls.add_config_attributes([])
 
     def __init__(self, io_config, task):
         super().__init__(io_config, task)

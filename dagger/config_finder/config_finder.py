@@ -1,12 +1,10 @@
-import os
 import fnmatch
+import logging
+import os
 from typing import List
 
-import logging
-
-
 PIPELINE_CONFIG_FILENAME = "pipeline.yaml"
-_logger = logging.getLogger('configFinder')
+_logger = logging.getLogger("configFinder")
 
 
 class TaskConfig:
@@ -55,7 +53,7 @@ class ConfigFinder:
         pipeline_configs = []
 
         for root, _, files in os.walk(self._root):
-            confs = fnmatch.filter(files, '*.yaml')
+            confs = fnmatch.filter(files, "*.yaml")
             if len(confs) <= 1:
                 continue
 
@@ -74,6 +72,8 @@ class ConfigFinder:
                 _logger.info("Didn't find config in directory: %s", root)
                 continue
 
-            pipeline_configs.append(PipelineConfig(root, pipeline_config_file, job_configs))
+            pipeline_configs.append(
+                PipelineConfig(root, pipeline_config_file, job_configs)
+            )
 
         return pipeline_configs

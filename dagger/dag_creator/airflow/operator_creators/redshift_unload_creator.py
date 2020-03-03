@@ -1,20 +1,18 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from circ.operators.postgres_operator import PostgresOperator
-
 from os.path import join
 
+from circ.operators.postgres_operator import PostgresOperator
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
-REDSHIFT_UNLOAD_CMD = \
-"""
-unload ('{sql_string}')   
-to '{output_path}' 
+REDSHIFT_UNLOAD_CMD = """
+unload ('{sql_string}')
+to '{output_path}'
 iam_role '{iam_role}'
 {extra_parameters}
 """
 
 
 class RedshiftUnloadCreator(OperatorCreator):
-    ref_name = 'redshift_unload'
+    ref_name = "redshift_unload"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
@@ -34,8 +32,12 @@ class RedshiftUnloadCreator(OperatorCreator):
 
     def _get_unload_command(self, sql_string):
         output_path = self._task.outputs[0].rendered_name
-        extra_parameters =\
-            "\n".join(["{} {}".format(key, value) for key, value in self._task.extra_parameters.items()])
+        extra_parameters = "\n".join(
+            [
+                "{} {}".format(key, value)
+                for key, value in self._task.extra_parameters.items()
+            ]
+        )
 
         unload_cmd = REDSHIFT_UNLOAD_CMD.format(
             sql_string=sql_string,
@@ -48,7 +50,9 @@ class RedshiftUnloadCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
         if self._task.sql_file:
-            sql_string = self._read_sql(self._task.pipeline.directory, self._task.sql_file)
+            sql_string = self._read_sql(
+                self._task.pipeline.directory, self._task.sql_file
+            )
         else:
             sql_string = self._default_sql()
 

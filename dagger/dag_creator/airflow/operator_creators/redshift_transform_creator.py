@@ -1,11 +1,11 @@
-from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from circ.operators.postgres_operator import PostgresOperator
-
 from os.path import join
+
+from circ.operators.postgres_operator import PostgresOperator
+from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
 
 class RedshiftTransformCreator(OperatorCreator):
-    ref_name = 'redshift_transform'
+    ref_name = "redshift_transform"
 
     def __init__(self, task, dag):
         super().__init__(task, dag)
