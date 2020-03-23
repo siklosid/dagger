@@ -1,4 +1,4 @@
-owner: "david.siklosi@circ.com"
+owner: "user@domain.com"
 description: |
   Testing batch operator
 schedule: "0 3 * * *"
@@ -9,5 +9,3 @@ airflow_parameters:
   dag_parameters:
     default_view: "graph"
 alerts:
-  - slack: "#data-alerts"
-  - email: ["marketing@circ.com", "david.siklosi@email.com"]

@@ -3,10 +3,10 @@ from datetime import timedelta
 from functools import partial
 
 from airflow import DAG
-from circ.utils.macros import user_defined_macros
 from dagger import conf
 from dagger.alerts.alert import airflow_task_fail_alerts
 from dagger.dag_creator.airflow.operator_factory import OperatorFactory
+from dagger.dag_creator.airflow.utils.macros import user_defined_macros
 from dagger.graph.task_graph import Graph, TaskGraph
 from dagger.pipeline.pipeline import Pipeline
 

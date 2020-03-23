@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* David Siklosi <david.siklosi@circ.com>
+* David Siklosi <siklosi.david@gmail.com>
 
 Contributors
 ------------

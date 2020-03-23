@@ -1,10 +1,12 @@
 import shlex
 from os.path import basename, dirname
 
-from circ.operators.awsbatch_operator import AWSBatchOperator
-from circ.operators.spark_submit_operator import SparkSubmitOperator
 from dagger import conf
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
+from dagger.dag_creator.airflow.operators.awsbatch_operator import AWSBatchOperator
+from dagger.dag_creator.airflow.operators.spark_submit_operator import (
+    SparkSubmitOperator,
+)
 
 
 class SparkCreator(OperatorCreator):

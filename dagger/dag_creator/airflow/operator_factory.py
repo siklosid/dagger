@@ -1,5 +1,4 @@
 from airflow.operators.dummy_operator import DummyOperator
-from circ.utils.operator_factories import make_control_flow
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from dagger.dag_creator.airflow.operator_creators import (
     airflow_op_creator,
@@ -12,6 +11,7 @@ from dagger.dag_creator.airflow.operator_creators import (
     spark_creator,
     sqoop_creator,
 )
+from dagger.dag_creator.airflow.utils.operator_factories import make_control_flow
 
 
 class DataOperator(DummyOperator):

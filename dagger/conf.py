@@ -44,8 +44,9 @@ _logger.addHandler(ch)
 REDSHIFT_CONN_ID = "redshift_default"
 REDSHIFT_IAM_ROLE = "arn:aws:iam::120444018371:role/redshift"
 
-SPARK_S3_FILES_BUCKET = "circdata-files"
-SPARK_EMR_MASTER = "spark-jobs.data.circ"
+SPARK_S3_FILES_BUCKET = "spark_s3_bucket"
+SPARK_S3_LIBS_SUFFIX = "pyspark_extra_libs/libs-bundle.zip"
+SPARK_EMR_MASTER = "spark-jobs.emr.master"
 SPARK_DEFAULT_ENGINE = "emr"
 SPARK_OVERHEAD_MULTIPLIER = 1.5
 

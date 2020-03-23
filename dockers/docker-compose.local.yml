@@ -1,0 +1,67 @@
+version: '3'
+
+services:
+
+  postgres:
+    image: postgres:10
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: airflow
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+    ports:
+      - 5432:5432
+
+  webserver:
+    hostname: webserver
+    image: dagger/airflow:${AIRFLOW_VERSION}
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW_HOME=${AIRFLOW_HOME}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__FERNET_KEY=zdkf0niohVjv_9RcdBOj3MpRz6gYr1T_2okkA8KRk-w=
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - PYTHONPATH=${AIRFLOW_HOME}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=airflow
+      - POSTGRES_DB=airflow
+      - POSTGRES_PORT=5432
+      - POSTGRES_PASSWORD=airflow
+      - NAVBAR_COLOR=currentColor
+      - REMOTE_LOGGING=False
+      - ENV=local
+    volumes:
+      - ${AIRFLOW_DAGS_DIR}:${AIRFLOW_HOME}/dags
+      - ${DAGGER_DIR}:${AIRFLOW_HOME}/dagger
+      - /tmp/airflow_logs-webserver:${AIRFLOW_HOME}/logs
+    ports:
+        - 8080:8080
+    command: webserver
+
+  scheduler:
+    hostname: scheduler
+    image: dagger/airflow:${AIRFLOW_VERSION}
+    depends_on:
+      - postgres
+    environment:
+      - AIRFLOW_HOME=${AIRFLOW_HOME}
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__FERNET_KEY=zdkf0niohVjv_9RcdBOj3MpRz6gYr1T_2okkA8KRk-w=
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - PYTHONPATH=${AIRFLOW_HOME}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=airflow
+      - POSTGRES_DB=airflow
+      - POSTGRES_PORT=5432
+      - POSTGRES_PASSWORD=airflow
+      - REMOTE_LOGGING=False
+      - AIRFLOW__CORE__COLORED_CONSOLE_LOG=False
+      - ENV=local
+    volumes:
+      - ${AIRFLOW_DAGS_DIR}:${AIRFLOW_HOME}/dags
+      - ${DAGGER_DIR}:${AIRFLOW_HOME}/dagger
+      - /tmp/airflow_logs-scheduler:${AIRFLOW_HOME}/logs
+    command: scheduler
