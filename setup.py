@@ -41,7 +41,7 @@ test_requires = reqs("test.txt") + install_requires
 
 setup(
     author="David Siklosi",
-    author_email="david.siklosi@circ.com",
+    author_email="siklosi.david@gmail.com",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",

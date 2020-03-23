@@ -26,6 +26,9 @@ export PRINT_HELP_PYSCRIPT
 
 BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
+include .common.env
+export
+
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
@@ -89,3 +92,23 @@ install-dev: clean ## install the package to the active Python's site-packages
 	python setup.py install
 	pip install -e .
 	pip install -r reqs/dev.txt
+
+build-airflow:  ## Build airflow image
+build-airflow: PROJ_NAME="airflow"
+build-airflow:
+	docker build --build-arg AIRFLOW_VERSION=${AIRFLOW_VERSION} -t ${DOCKER_REGISTRY}/${PROJ_NAME}:${AIRFLOW_VERSION} ./dockers/airflow
+
+test-airflow: ## Run airflow image locally
+test-airflow: export ARGS=$(shell if [ "${logs}" != "true" ]; then echo "-d"; fi)
+test-airflow: build-airflow
+	AIRFLOW_DAGS_DIR=$(shell pwd)/tests/fixtures/config_finder/root/dags \
+	DAGGER_DIR=$(shell pwd)/dagger \
+	docker-compose -f dockers/docker-compose.local.yml up ${ARGS}
+
+stop-airflow: ## Stopping airflow
+stop-airflow:
+	docker-compose -f dockers/docker-compose.local.yml down
+
+airflow-scheduler: ## Log in to scheduler
+airflow-scheduler:
+	docker exec -it dockers_scheduler_1 sh -c 'cd ~/dags && bash'

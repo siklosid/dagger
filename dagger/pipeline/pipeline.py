@@ -15,7 +15,7 @@ class Pipeline(ConfigValidator):
                 Attribute(
                     attribute_name="owner",
                     validator=str,
-                    format_help="<team|person>@circ.com",
+                    format_help="<team|person>@domain.com",
                 ),
                 Attribute(attribute_name="description", validator=str),
                 Attribute(

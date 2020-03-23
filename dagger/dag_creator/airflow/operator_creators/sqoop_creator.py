@@ -1,7 +1,7 @@
 from os.path import join
 
-from circ.operators.sqoop_operator import SqoopOperator
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
+from dagger.dag_creator.airflow.operators.sqoop_operator import SqoopOperator
 
 
 class SqoopCreator(OperatorCreator):

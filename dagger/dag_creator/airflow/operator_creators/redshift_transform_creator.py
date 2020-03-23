@@ -1,7 +1,7 @@
 from os.path import join
 
-from circ.operators.postgres_operator import PostgresOperator
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
+from dagger.dag_creator.airflow.operators.postgres_operator import PostgresOperator
 
 
 class RedshiftTransformCreator(OperatorCreator):

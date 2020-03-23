@@ -1,5 +1,5 @@
-from circ.operators.awsbatch_operator import AWSBatchOperator
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
+from dagger.dag_creator.airflow.operators.awsbatch_operator import AWSBatchOperator
 
 
 class BatchCreator(OperatorCreator):
