@@ -32,7 +32,11 @@ export
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+clean: clean-venv clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+
+clean-venv: ## remove virtualenv
+	$(shell if command -v deactivate ; then deactivate ; fi)
+	rm -fr venv
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -89,8 +93,10 @@ install: clean ## install the package to the active Python's site-packages
 
 
 install-dev: clean ## install the package to the active Python's site-packages
-	python setup.py install
-	pip install -e .
+	virtualenv -p python3 venv; \
+	source venv/bin/activate; \
+	python setup.py install; \
+	pip install -e . ; \
 	pip install -r reqs/dev.txt
 
 build-airflow:  ## Build airflow image
