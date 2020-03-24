@@ -1,15 +1,27 @@
 =====
-dagger
+Dagger
 =====
-
 
 How to install
 --------
-
 * `virtualenv -p python3 venv`
 * `. venv/bin/activate`
 * `make install`
 * `dagger --help`
+
+How to install for development
+--------
+* `make install-dev`
+* `. venv/bin/activate`
+
+How to test locally
+--------
+* Build and start airflow in docker: `make test-airflow`
+* Go to `localhost:8080` in your browser to see airflow UI.
+    * User: dev_user
+    * Password: dev_user
+* Example Dagger dags are defined at tests/fixtures/config_finder/root/dags/ and mounted as the dags directory in the container
+
 
 How to use it
 --------
