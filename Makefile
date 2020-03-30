@@ -109,6 +109,7 @@ test-airflow: export ARGS=$(shell if [ "${logs}" != "true" ]; then echo "-d"; fi
 test-airflow: build-airflow
 	AIRFLOW_DAGS_DIR=$(shell pwd)/tests/fixtures/config_finder/root/dags \
 	DAGGER_DIR=$(shell pwd)/dagger \
+	DOCKERS_DIR=$(shell pwd)/dockers \
 	docker-compose -f dockers/docker-compose.local.yml up ${ARGS}
 
 stop-airflow: ## Stopping airflow

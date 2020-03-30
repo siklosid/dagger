@@ -14,6 +14,10 @@ DEFAULT_ALERT = {"type": "slack", "channel": "#airflow-jobs", "mentions": None}
 # Airflow parameters
 WITH_DATA_NODES = True
 
+# Neo4j parameters
+NE4J_HOST = "localhost"
+NE4J_PORT = 7687
+
 
 ## Logging config
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
