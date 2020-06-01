@@ -65,18 +65,37 @@ services:
       - ${DAGGER_DIR}:${AIRFLOW_HOME}/dagger
       - /tmp/airflow_logs-scheduler:${AIRFLOW_HOME}/logs
     command: scheduler
+
   neo4j:
-      image: neo4j:3.3.0
-      container_name: neo4j_dagger
-      environment:
-        - NEO4J_AUTH=neo4j/test
-      ulimits:
-        nofile:
-          soft: 40000
-          hard: 40000
-      ports:
-          - 7474:7474
-          - 7687:7687
-      volumes:
-          - ${DOCKERS_DIR}/neo4j/conf:/conf
-          - /tmp/neo4j/data:/neo4j/data
+    image: neo4j:3.5.0
+    container_name: neo4j_dagger
+    depends_on:
+      - elasticsearch
+    environment:
+      - NEO4J_AUTH=neo4j/test
+    ulimits:
+      nofile:
+        soft: 40000
+        hard: 40000
+    ports:
+        - 7474:7474
+        - 7687:7687
+    volumes:
+        - ${DOCKERS_DIR}/neo4j/conf:/conf
+        - ${DOCKERS_DIR}/neo4j/plugins:/plugins
+        - /tmp/neo4j/data:/neo4j/data
+        - /tmp/neo4j/log:/var/log/neo4j
+
+  elasticsearch:
+    image: elasticsearch:6.7.0
+    container_name: es
+    ports:
+      - 9201:9200
+    expose:
+      - 9200
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+#      volumes:
+#        - ./.local/elasticsearch/data:/usr/share/elasticsearch/data

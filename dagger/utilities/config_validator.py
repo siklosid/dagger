@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 from dagger.utilities.exceptions import (
     DaggerFieldFormatException,
@@ -9,10 +10,14 @@ _logger = logging.getLogger("configFinder")
 
 
 class Attribute:
+    """
+
+    """
+
     def __init__(
         self,
         attribute_name: str,
-        parent_fields: list = None,
+        parent_fields: List = None,
         required: bool = True,
         nullable: bool = False,
         validator=None,
@@ -83,7 +88,7 @@ class ConfigValidator:
     config_attributes = {}
 
     @classmethod
-    def init_attributes_once(cls, orig_cls):
+    def init_attributes_once(cls, orig_cls: str) -> None:
         if cls.config_attributes.get(cls.__name__, None):
             return
 

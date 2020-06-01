@@ -78,11 +78,15 @@ class GraphTraverserBase(ABC):
             else:
                 self._create_edge_without_data(parent_task_id, children_ids)
 
+    def _finish_dag_creation(self):
+        pass
+
     def traverse_graph(self):
         self._create_dags()
         self._create_job_tasks()
         if self._with_data_nodes:
             self._create_data_tasks()
         self._create_edges()
+        self._finish_dag_creation()
 
         return self._dags
