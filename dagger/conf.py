@@ -18,6 +18,11 @@ WITH_DATA_NODES = True
 NE4J_HOST = "localhost"
 NE4J_PORT = 7687
 
+# Elastic Search Parameters
+ES_HOST = "localhost"
+ES_PORT = 9201
+ES_INDEX = "data_graph"
+
 
 ## Logging config
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
