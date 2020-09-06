@@ -5,6 +5,7 @@ from abc import ABC
 import dagger.pipeline.pipeline
 from dagger.pipeline.io import IO
 from dagger.pipeline.task import Task
+from dagger.utilities.exceptions import IdAlreadyExistsException
 
 _logger = logging.getLogger("graph")
 
@@ -81,14 +82,12 @@ class Graph(object):
         if self._nodes.get(node_type, None) is None:
             self._nodes[node_type] = {}
 
-        if self._nodes[node_type].get(node_id, None) is None and self._node2type.get(
-            node_id, None
-        ):
+        if self._nodes[node_type].get(node_id, None) is None and self._node2type.get(node_id, None):
             _logger.exception(
-                "A different type of node with the same name: %s already exists",
+                "A different type of node with the same id: %s already exists",
                 node_id,
             )
-            exit(1)
+            raise IdAlreadyExistsException(f"A different type of node with the same id: {node_id} already exists")
 
         if self._nodes[node_type].get(node_id) and not overwrite:
             _logger.debug("Node with name: %s already exists", node_id)

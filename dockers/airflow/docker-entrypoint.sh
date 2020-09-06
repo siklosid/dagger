@@ -23,6 +23,9 @@ configure_airflow() {
 
 }
 
+id
+ls -lh ${AIRFLOW_HOME}/dags/
+
 if [ "$AIRFLOW__CORE__EXECUTOR" != "SequentialExecutor" ]; then
   wait_for_port "Postgres" "$POSTGRES_HOST" "$POSTGRES_PORT"
 fi

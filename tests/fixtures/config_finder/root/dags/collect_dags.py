@@ -8,7 +8,6 @@ cf = ConfigFinder(conf.DAGS_DIR)
 cp = ConfigProcessor(cf)
 
 pipelines = cp.process_pipeline_configs()
-print("XXX", pipelines)
 
 g = TaskGraph()
 for pipeline in pipelines:

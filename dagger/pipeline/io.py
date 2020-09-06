@@ -19,12 +19,11 @@ class IO(ConfigValidator, ABC):
             ]
         )
 
-    def __init__(self, io_config, task):
+    def __init__(self, io_config, config_location):
         super().__init__(
             config=io_config,
-            location=join(task.pipeline.directory, task.name + ".yaml"),
+            location=config_location
         )
-        self._task = task
         self._name = self.parse_attribute("name")
         self._has_dependency = self.parse_attribute("has_dependency")
         if self._has_dependency is None:
