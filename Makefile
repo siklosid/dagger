@@ -96,9 +96,17 @@ install: clean ## install the package to the active Python's site-packages
 install-dev: clean ## install the package to the active Python's site-packages
 	virtualenv -p python3 venv; \
 	source venv/bin/activate; \
+	python -m pip install --upgrade pip; \
 	python setup.py install; \
 	pip install -e . ; \
-	pip install -r reqs/dev.txt -r reqs/test.txt
+	pip install -r reqs/dev.txt -r reqs/test.txt --use-feature=2020-resolver
+
+install-test: clean ## install the package to the active Python's site-packages
+	virtualenv -p python3 venv; \
+	source venv/bin/activate; \
+	python -m pip install --upgrade pip; \
+	pip install -r reqs/test.txt
+
 
 build-airflow:  ## Build airflow image
 build-airflow: PROJ_NAME="airflow"
