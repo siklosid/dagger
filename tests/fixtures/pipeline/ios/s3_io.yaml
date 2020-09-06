@@ -1,0 +1,4 @@
+type: s3
+name: test_s3
+bucket: test_bucket
+path: test_path

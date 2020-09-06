@@ -1,0 +1,4 @@
+type: redshift
+name: test_redshift
+schema: test_schema                        # Leave it empty for system tables
+table: test_table

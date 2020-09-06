@@ -1,0 +1,5 @@
+type: database
+name: name
+database_type: mysql                 # mysql, postgresql, etc
+conn_id: host:port
+table: test_table

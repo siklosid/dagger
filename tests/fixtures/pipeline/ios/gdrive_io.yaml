@@ -1,0 +1,4 @@
+type: gdrive
+name: test_gdrive
+folder: test_folder                       # format: ID shown at the URL address of the Google Drive folder
+file_name: test_file_name
