@@ -17,14 +17,14 @@ class GDriveIO(IO):
             ]
         )
 
-    def __init__(self, io_config, task):
-        super().__init__(io_config, task)
+    def __init__(self, io_config, config_location):
+        super().__init__(io_config, config_location)
 
         self._folder = self.parse_attribute("folder")
         self._file_name = self.parse_attribute("file_name")
 
     def alias(self):
-        return "gdrive-{}-{}".format(self._folder, self._file_name)
+        return "gdrive://{}/{}".format(self._folder, self._file_name)
 
     @property
     def rendered_name(self):

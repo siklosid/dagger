@@ -19,8 +19,8 @@ class DbIO(IO):
             ]
         )
 
-    def __init__(self, io_config, task):
-        super().__init__(io_config, task)
+    def __init__(self, io_config, config_location):
+        super().__init__(io_config, config_location)
 
         self._database_type = self.parse_attribute("database_type")
         self._conn_id = self.parse_attribute("conn_id")

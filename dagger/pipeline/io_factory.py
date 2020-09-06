@@ -1,4 +1,5 @@
 from dagger.pipeline.io import IO
+from os import path
 from dagger.pipeline.ios import db_io, dummy_io, gdrive_io, redshift_io, s3_io
 
 
@@ -10,4 +11,5 @@ class IOFactory:
             self.factory[cls.ref_name] = cls
 
     def create_io(self, ref_name, io_config, task):
-        return self.factory[ref_name](io_config=io_config, task=task)
+        config_location = path.join(task.pipeline.directory, task.name + ".yaml")
+        return self.factory[ref_name](io_config=io_config, config_location=config_location)

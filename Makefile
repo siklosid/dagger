@@ -61,6 +61,7 @@ lint: ## check style with flake8
 	flake8 dagger tests
 
 test: ## run tests quickly with the default Python
+	AIRFLOW_HOME=$(shell pwd)/tests/fixtures/config_finder/root/ \
 	python setup.py test
 
 coverage: ## check code coverage quickly with the default Python
@@ -97,20 +98,20 @@ install-dev: clean ## install the package to the active Python's site-packages
 	source venv/bin/activate; \
 	python setup.py install; \
 	pip install -e . ; \
-	pip install -r reqs/dev.txt
+	pip install -r reqs/dev.txt -r reqs/test.txt
 
 build-airflow:  ## Build airflow image
 build-airflow: PROJ_NAME="airflow"
 build-airflow:
 	docker build --build-arg AIRFLOW_VERSION=${AIRFLOW_VERSION} -t ${DOCKER_REGISTRY}/${PROJ_NAME}:${AIRFLOW_VERSION} ./dockers/airflow
 
-test-airflow: ## Run airflow image locally
+test-airflow: ## Run airflow image locally | args: services
 test-airflow: export ARGS=$(shell if [ "${logs}" != "true" ]; then echo "-d"; fi)
 test-airflow: build-airflow
 	AIRFLOW_DAGS_DIR=$(shell pwd)/tests/fixtures/config_finder/root/dags \
 	DAGGER_DIR=$(shell pwd)/dagger \
 	DOCKERS_DIR=$(shell pwd)/dockers \
-	docker-compose -f dockers/docker-compose.local.yml up ${ARGS}
+	docker-compose -f dockers/docker-compose.local.yml up ${ARGS} ${services}
 
 stop-airflow: ## Stopping airflow
 stop-airflow:

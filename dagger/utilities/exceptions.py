@@ -11,3 +11,8 @@ class DaggerFieldFormatException(Exception):
 class InvalidConfigException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+
+class IdAlreadyExistsException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
