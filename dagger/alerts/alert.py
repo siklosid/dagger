@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 from typing import List
 
 import slack
-from airflow.models import Variable
 from dagger import conf
 from dagger.utilities.config_validator import Attribute, ConfigValidator
 
@@ -54,7 +53,7 @@ class SlackAlert(AlertBase):
         self._mentions = self.parse_attribute("mentions") or []
 
         try:
-            self._slack_token = Variable.get("slack_bot_token")
+            self._slack_token = conf.SLACK_TOKEN
         except KeyError:
             _logger.error("Couldn't get slack_bot_token from variables")
             self._slack_token = None

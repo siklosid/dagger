@@ -1,0 +1,40 @@
+airflow:
+  with_data_node: false
+
+
+neo4j:
+#  host:
+#  port:
+
+
+elastic_search:
+#  host:
+#  port:
+#  index:
+
+
+redshift:
+#  conn_id:
+#  iam_role:
+
+
+spark:
+#  files_s3_bucket:
+#  libs_s3_path:
+#  emr_master:
+#  default_engine:
+#  overhead_multiplier:
+
+
+sqoop:
+#  default_files_format: avro
+#  default_properties:
+#    mapreduce.job.user.classpath.first: "true"
+
+
+alert:
+#  slack_token:
+#  default_alert:
+#    type: slack
+#    channel: "#airflow-jobs"
+#    mentions:
