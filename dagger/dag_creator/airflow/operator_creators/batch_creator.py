@@ -27,6 +27,7 @@ class BatchCreator(OperatorCreator):
             task_id=self._task.name,
             job_name=self._task.job_name,
             region_name=self._task.region_name,
+            cluster_name=self._task.cluster_name,
             job_queue=self._task.job_queue,
             overrides=overrides,
             **kwargs,
