@@ -7,8 +7,6 @@ from airflow.utils import apply_defaults
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from dagger.dag_creator.airflow.utils.decorators import lazy_property
 
-COMPUTE_ENVIRONMENT = "arn:aws:ecs:eu-central-1:120444018371:cluster/ComputeEnvironment-ee5154b789b7b48_Batch_7ec746ca-30f3-3b21-b012-50261658a823"
-
 
 class AWSBatchOperator(DaggerBaseOperator):
     """
@@ -37,6 +35,9 @@ class AWSBatchOperator(DaggerBaseOperator):
     :param region_name: region name to use in AWS Hook.
         Override the region_name in connection (if provided)
     :type region_name: str
+    :param cluster_name: Batch cluster short name or arn
+    :type region_name: str
+
     """
 
     ui_color = "#c3dae0"
@@ -52,7 +53,8 @@ class AWSBatchOperator(DaggerBaseOperator):
         overrides={},
         job_definition=None,
         aws_conn_id=None,
-        region_name="eu-central-1",
+        region_name=None,
+        cluster_name=None,
         *args,
         **kwargs,
     ):
@@ -60,6 +62,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         self.job_name = self._validate_job_name(job_name)
         self.aws_conn_id = aws_conn_id
         self.region_name = region_name
+        self.cluster_name = cluster_name
         self.job_definition = job_definition or job_name
         self.job_queue = job_queue
         self.overrides = overrides
@@ -102,7 +105,6 @@ class AWSBatchOperator(DaggerBaseOperator):
         self.job_id = res["jobId"]
         self.log.info(
             "\n"
-            f"\n\tCode at: https://gitlab.com/goflash1/data/etl-jobs/airflow-dags/tree/master/dags/{job_path}"
             f"\n\tJob name: {self.job_name}"
             f"\n\tJob definition: {self.job_definition}"
             f"\n\tJob id: {self.job_id}"
@@ -129,8 +131,8 @@ class AWSBatchOperator(DaggerBaseOperator):
                 print_logs_url = False
                 self.log.info(
                     "\n"
-                    "\n\tLogs at: https://eu-central-1.console.aws.amazon.com/cloudwatch/home?"
-                    f"region=eu-central-1#logEventViewer:group=/aws/batch/job;stream={log_stream_name}"
+                    f"\n\tLogs at: https://{self.region_name}.console.aws.amazon.com/cloudwatch/home?"
+                    f"region={self.region_name}#logEventViewer:group=/aws/batch/job;stream={log_stream_name}"
                     "\n"
                 )
 
@@ -159,7 +161,7 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     def retry_check(self, container_instance_arn):
         res = self.ecs_client.describe_container_instances(
-            cluster=COMPUTE_ENVIRONMENT, containerInstances=[container_instance_arn]
+            cluster=self.cluster_name, containerInstances=[container_instance_arn]
         )
         instance_status = res["containerInstances"][0]["status"]
         if instance_status != "ACTIVE":

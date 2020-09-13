@@ -1,5 +1,6 @@
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
+from dagger import conf
 
 
 class BatchTask(Task):
@@ -39,6 +40,11 @@ class BatchTask(Task):
                     required=False,
                 ),
                 Attribute(
+                    attribute_name="cluster_name",
+                    parent_fields=["task_parameters"],
+                    required=False,
+                ),
+                Attribute(
                     attribute_name="job_queue",
                     parent_fields=["task_parameters"],
                     required=False,
@@ -59,9 +65,10 @@ class BatchTask(Task):
         job_name = "{}-{}".format(pipeline.name, self.parse_attribute("job_name"))
         self._job_name = job_name
         self._overrides = self.parse_attribute("overrides") or {}
-        self._aws_conn_id = self.parse_attribute("aws_conn_id")
-        self._region_name = self.parse_attribute("region_name") or "eu-central-1"
-        self._job_queue = self.parse_attribute("job_queue") or "airflow-prio1"
+        self._aws_conn_id = self.parse_attribute("aws_conn_id") or conf.BATCH_AWS_CONN_ID
+        self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION
+        self._cluster_name = self.parse_attribute("cluster_name") or conf.BATCH_CLUSTER_NAME
+        self._job_queue = self.parse_attribute("job_queue") or conf.BATCH_DEFAULT_QUEUE
         self._max_retries = self.parse_attribute("max_retries") or 4200
 
     @property
@@ -87,6 +94,10 @@ class BatchTask(Task):
     @property
     def region_name(self):
         return self._region_name
+
+    @property
+    def cluster_name(self):
+        return self._cluster_name
 
     @property
     def job_queue(self):

@@ -26,6 +26,13 @@ spark:
 #  overhead_multiplier:
 
 
+batch:
+#  aws_region:
+#  aws_conn_id:
+#  default_queue:
+#  cluster_name:
+
+
 sqoop:
 #  default_files_format: avro
 #  default_properties:
