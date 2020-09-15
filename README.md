@@ -1,5 +1,5 @@
 # Dagger
-Convert yaml files into airflow dags.
+Dagger is a light framework that can convert simple yaml files into complex Airflow dags. It makes your pipelines more re-usable and more structured. Based on matching the inputs and outputs of your etl jobs it can visualise the full dependency graph of your workflows including your datasets as well.
 
 
 How to install
