@@ -1,6 +1,6 @@
-=====
-Dagger
-=====
+# Dagger
+Convert yaml files into airflow dags.
+
 
 How to install
 --------
