@@ -50,6 +50,13 @@ class AthenaTransformTask(Task):
                     comment="The list of fields to partition by. These fields should come last in the select statement",
                     parent_fields=["task_parameters"],
                 ),
+                Attribute(
+                    attribute_name="output_format",
+                    required=False,
+                    validator=str,
+                    comment="Output file format. One of PARQUET/ORC/JSON/CSV",
+                    parent_fields=["task_parameters"],
+                )
             ]
         )
 
@@ -65,6 +72,7 @@ class AthenaTransformTask(Task):
         self._workgroup = self.parse_attribute("workgroup") or conf.ATHENA_DEFAULT_WORKGROUP
         self._is_incremental = self.parse_attribute("is_incremental")
         self._partitioned_by = self.parse_attribute("partitioned_by")
+        self._output_format = self.parse_attribute("output_format")
 
     @property
     def sql_file(self):
@@ -93,3 +101,7 @@ class AthenaTransformTask(Task):
     @property
     def partitioned_by(self):
         return self._partitioned_by
+
+    @property
+    def output_format(self):
+        return self._output_format

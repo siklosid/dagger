@@ -37,6 +37,7 @@ class AthenaTransformCreator(OperatorCreator):
             output_table=self._output_table,
             is_incremental=self._task.is_incremental,
             partitioned_by=self._task.partitioned_by,
+            output_format=self._task.output_format,
             workgroup=self._task.workgroup,
             params=self._template_parameters,
             **kwargs,

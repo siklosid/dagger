@@ -37,6 +37,7 @@ athena:
 #  default_s3_output_location:
 #  s3_tmp_results_location:
 #  default_workgroup:
+#  default_output_format:
 
 
 sqoop:

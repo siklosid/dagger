@@ -52,7 +52,8 @@ class AWSAthenaOperator(BaseOperator):
     template_ext = ('.sql', )
 
     @apply_defaults
-    def __init__(self, query, database, s3_tmp_results_location, s3_output_location, output_table, is_incremental, partitioned_by, aws_conn_id='aws_default', client_request_token=None,
+    def __init__(self, query, database, s3_tmp_results_location, s3_output_location, output_table, is_incremental,
+                 partitioned_by=None, output_format=None, aws_conn_id='aws_default', client_request_token=None,
                  query_execution_context=None, result_configuration=None, sleep_time=30, max_tries=None,
                  workgroup='primary',
                  *args, **kwargs):
@@ -64,8 +65,10 @@ class AWSAthenaOperator(BaseOperator):
         self.s3_output_bucket = s3_output_location.split('/')[2]
         self.s3_output_path = '/'.join(s3_output_location.split('/')[3:])
         self.output_table = output_table
+
         self.is_incremental = is_incremental
         self.partitioned_by = partitioned_by
+        self.output_format = output_format
         self.aws_conn_id = aws_conn_id
         self.client_request_token = client_request_token or str(uuid4())
         self.workgroup = workgroup
@@ -89,12 +92,14 @@ INSERT INTO {self.database}.{self.output_table}
         s3_table_location = path.join(self.s3_output_location, self.database, self.output_table)
         with_parameters_dict = {
             "external_location": f"'{s3_table_location}/'",
-            "format": "'PARQUET'"
         }
 
         partitioned_by_str = ','.join([f"'{column}'" for column in self.partitioned_by])
         if self.partitioned_by:
             with_parameters_dict['partitioned_by'] = f"ARRAY[{partitioned_by_str}]"
+
+        if self.output_format:
+            with_parameters_dict['format'] = f"'{self.output_format}'"
 
         with_parameters_expression =\
             ",\n    ".join([f"{parameter} = {value}" for parameter, value in with_parameters_dict.items()])

@@ -86,6 +86,7 @@ ATHENA_AWS_CONN_ID = athena_config.get('aws_conn_id', None)
 ATHENA_DEFAULT_S3_OUTPUT_LOCATION = athena_config.get('default_s3_output_location', None)
 ATHENA_S3_TMP_RESULTS_LOCATION = athena_config.get('s3_tmp_results_location', None)
 ATHENA_DEFAULT_WORKGROUP = athena_config.get('workgroup', None)
+ATHENA_DEFAULT_OUTPUT_FORMAT = athena_config.get('default_output_format', None)
 
 # Sqoop
 sqoop_config = config.get('sqoop', None) or {}
