@@ -1,6 +1,7 @@
 from dagger.pipeline.task import Task
 from dagger.pipeline.tasks import (
     airflow_op_task,
+    athena_transform_task,
     batch_task,
     python_task,
     redshift_load_task,

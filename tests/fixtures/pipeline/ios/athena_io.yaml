@@ -1,0 +1,10 @@
+type: athena
+name: test
+schema: test_schema                       # Leave it empty for system tables
+table: test_table
+
+
+
+# Other attributes:
+
+# has_dependency:                # Weather this i/o should be added to the dependency graph or not. Default is True

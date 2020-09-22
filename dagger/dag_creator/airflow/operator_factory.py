@@ -2,6 +2,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from dagger.dag_creator.airflow.operator_creators import (
     airflow_op_creator,
+    athena_transform_creator,
     batch_creator,
     dummy_creator,
     python_creator,
