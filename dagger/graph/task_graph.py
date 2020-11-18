@@ -178,9 +178,23 @@ class TaskGraph:
     def print_graph(self, out_file=None):
         fs = open(out_file, "w") if out_file else sys.stdout
         for pipe_id, node in self._graph.get_nodes(self.NODE_TYPE_PIPELINE).items():
-            fs.write("Pipeline: {}\n".format(pipe_id))
-            fs.write("Tasks:")
+            fs.write(f"Pipeline: {pipe_id}\n")
             for node_id in list(node.children):
                 child_node = self._graph.get_node(node_id)
-                fs.write("\t" + str(child_node))
+                fs.write(f"\t task: {child_node.name}\n")
+                fs.write(f"\t inputs:\n")
+                for parent_id in list(child_node.parents):
+                    if self._graph.get_type(parent_id) == self.NODE_TYPE_DATASET:
+                        parent_node = self._graph.get_node(parent_id)
+                        fs.write(f"\t\t {parent_node.name}\n")
+                fs.write(f"\t outputs:\n")
+                for output_id in list(child_node.children):
+                    output_node = self._graph.get_node(output_id)
+                    fs.write(f"\t\t {output_node.name}\n")
+                    for output_task_id in list(output_node.children):
+                        task_node = self._graph.get_node(output_task_id)
+                        fs.write(f"\t\t\t dependency: {task_node.name}\n")
+
+                fs.write("\n")
+
             fs.write("\n")

@@ -34,7 +34,8 @@ batch:
 
 athena:
 #  aws_conn_id:
-#  default_s3_output_location:
+#  default_s3_output_bucket:
+#  default_s3_output_path:
 #  s3_tmp_results_location:
 #  default_workgroup:
 #  default_output_format:
