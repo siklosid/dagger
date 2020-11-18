@@ -94,8 +94,8 @@ INSERT INTO {self.database}.{self.output_table}
             "external_location": f"'{s3_table_location}/'",
         }
 
-        partitioned_by_str = ','.join([f"'{column}'" for column in self.partitioned_by])
         if self.partitioned_by:
+            partitioned_by_str = ','.join([f"'{column}'" for column in self.partitioned_by])
             with_parameters_dict['partitioned_by'] = f"ARRAY[{partitioned_by_str}]"
 
         if self.output_format:

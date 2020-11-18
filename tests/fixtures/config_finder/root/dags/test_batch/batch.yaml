@@ -4,7 +4,7 @@ inputs:
   - type: s3
     name: data1
     bucket: datalake
-    path: path/{{ds}}/data1.parquet
+    path: path/{{ds}}/
 outputs:
   - type: redshift
     name: batch_table

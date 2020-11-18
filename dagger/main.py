@@ -8,6 +8,7 @@ from dagger.cli.init_io import init_io, list_ios
 from dagger.cli.init_pipeline import init_pipeline
 from dagger.cli.init_task import init_task, list_tasks
 from dagger.cli.module import generate_tasks, module_config
+from dagger.cli.print_graph import print_graph
 from dagger.utils import setup_logging
 
 
@@ -39,3 +40,4 @@ cli.add_command(generate_tasks)
 cli.add_command(module_config)
 cli.add_command(init_alert)
 cli.add_command(list_alerts)
+cli.add_command(print_graph)
