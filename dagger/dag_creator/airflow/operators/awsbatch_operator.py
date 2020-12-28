@@ -1,9 +1,9 @@
 from pathlib import Path
 from time import sleep
 
+from airflow.utils.decorators import apply_defaults
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.exceptions import AirflowException
-from airflow.utils import apply_defaults
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from dagger.dag_creator.airflow.utils.decorators import lazy_property
 
@@ -50,7 +50,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         self,
         job_name,
         job_queue,
-        overrides={},
+        overrides=None,
         job_definition=None,
         aws_conn_id=None,
         region_name=None,
@@ -65,7 +65,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         self.cluster_name = cluster_name
         self.job_definition = job_definition or job_name
         self.job_queue = job_queue
-        self.overrides = overrides
+        self.overrides = overrides or {}
         self.job_id = None
 
     @lazy_property
