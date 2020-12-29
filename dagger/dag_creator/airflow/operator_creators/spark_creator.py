@@ -7,7 +7,7 @@ from dagger.dag_creator.airflow.operators.awsbatch_operator import AWSBatchOpera
 from dagger.dag_creator.airflow.operators.spark_submit_operator import (
     SparkSubmitOperator,
 )
-from airflow.providers.amazon.aws.operators.glue import AwsGlueJobOperator
+from dagger.dag_creator.airflow.operators.aws_glue_job_operator import AwsGlueJobOperator
 
 
 class SparkCreator(OperatorCreator):
