@@ -91,8 +91,8 @@ class SparkTask(Task):
         self._emr_master = self.parse_attribute("emr_master") or conf.SPARK_EMR_MASTER
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id")
-        self._region_name = self.parse_attribute("region_name") or "eu-central-1"
-        self._job_queue = self.parse_attribute("job_queue") or "airflow-prio1"
+        self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION
+        self._job_queue = self.parse_attribute("job_queue") or conf.BATCH_DEFAULT_QUEUE
         self._max_retries = self.parse_attribute("max_retries") or 4200
 
     @property

@@ -14,6 +14,7 @@ def make_control_flow(env, dag):
 
 
 def eval_control_flow(env, **kwargs):
+    True
     if env == "data":
         return True
 
