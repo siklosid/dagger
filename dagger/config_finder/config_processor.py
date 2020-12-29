@@ -11,7 +11,7 @@ from dagger.pipeline.task_factory import TaskFactory
 
 
 _logger = logging.getLogger("configFinder")
-DAG_DIR = join(environ["AIRFLOW_HOME"], "dags")
+DAG_DIR = join(environ.get("AIRFLOW_HOME", "./"), "dags")
 
 
 class ConfigProcessor:

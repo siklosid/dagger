@@ -80,7 +80,7 @@ class AWSAthenaOperator(BaseOperator):
         self.hook = None
 
     def get_hook(self):
-        return AWSAthenaHook(self.aws_conn_id, self.sleep_time)
+        return AWSAthenaHook(self.aws_conn_id, self.sleep_time, client_type="athena")
 
     def build_insert_into_query(self):
         return f"""\
