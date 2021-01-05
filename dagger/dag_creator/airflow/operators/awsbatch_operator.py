@@ -76,13 +76,13 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     @lazy_property
     def logs_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="batch").get_client_type(
+        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="logs").get_client_type(
             "logs", region_name=self.region_name
         )
 
     @lazy_property
     def ecs_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="batch").get_client_type(
+        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="ecs").get_client_type(
             "ecs", region_name=self.region_name
         )
 

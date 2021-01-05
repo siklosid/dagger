@@ -7,6 +7,7 @@ from dagger.dag_creator.airflow.operators.awsbatch_operator import AWSBatchOpera
 from dagger.dag_creator.airflow.operators.spark_submit_operator import (
     SparkSubmitOperator,
 )
+from dagger.dag_creator.airflow.operators.aws_glue_job_operator import AwsGlueJobOperator
 
 
 class SparkCreator(OperatorCreator):
@@ -88,6 +89,17 @@ class SparkCreator(OperatorCreator):
                 job_queue=self._task.job_queue,
                 overrides=overrides,
                 **kwargs,
+            )
+        elif self._task.spark_engine == "glue":
+            parameters = self._template_parameters
+            parameters.update(self._task.spark_args)
+
+            spark_op = AwsGlueJobOperator(
+                dag=self._dag,
+                task_id=self._task.name,
+                job_name=self._task.name,
+                script_args=parameters,
+                region_name=self._task.region_name,
             )
 
         return spark_op
