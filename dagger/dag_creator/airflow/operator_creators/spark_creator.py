@@ -98,14 +98,8 @@ class SparkCreator(OperatorCreator):
                 dag=self._dag,
                 task_id=self._task.name,
                 job_name=self._task.name,
-                script_location="s3://chotst-data-artifacts/jobs/spark/dimension_updater/dimension_updater.py",  # TODO
-                concurrent_run_limit=1,
                 script_args=parameters,
-                retry_limit=3,  # TODO
-                num_of_dpus=2,  # TODO
                 region_name=self._task.region_name,
-                s3_bucket="s3://chotst-spark-log-events",  # TODO
-                iam_role_name="AWSGlueServiceRole-spark-job",  # TODO
             )
 
         return spark_op
