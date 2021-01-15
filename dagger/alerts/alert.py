@@ -2,7 +2,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List
 
-import slack
+from slack.web.client import WebClient
 from dagger import conf
 from dagger.utilities.config_validator import Attribute, ConfigValidator
 
@@ -62,7 +62,7 @@ class SlackAlert(AlertBase):
             self._slack_token = None
 
     def execute(self, dag, task, execution_date, run_time, url):
-        client = slack.WebClient(token=self._slack_token)
+        client = WebClient(token=self._slack_token)
 
         slack_msg = f"""
                 :red_circle: {' '.join(self._mentions)} Task Failed.

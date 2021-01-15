@@ -14,4 +14,4 @@ sphinx-rtd-theme==0.4.3
 numpydoc==0.9.1
 neo4j==1.7.6
 elasticsearch==7.7.1
-Werkzeug==0.16.0
+Werkzeug==1.0.1
