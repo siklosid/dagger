@@ -91,8 +91,9 @@ class SparkCreator(OperatorCreator):
                 **kwargs,
             )
         elif self._task.spark_engine == "glue":
-            parameters = self._template_parameters
-            parameters.update(self._task.spark_args)
+            parameters = {
+                f"--{parameter}": value for parameter, value in self._template_parameters.items()
+            }
 
             spark_op = AwsGlueJobOperator(
                 dag=self._dag,

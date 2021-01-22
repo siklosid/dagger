@@ -46,7 +46,7 @@ class AwsGlueJobOperator(BaseOperator):
     :type region_name: str
     """
 
-    template_fields = ()
+    template_fields = ("script_args",)
     template_ext = ()
     ui_color = '#ededed'
 
