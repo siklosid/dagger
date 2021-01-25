@@ -16,11 +16,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import os.path
 from typing import Optional
 
-from airflow.models import BaseOperator
-from airflow.providers.amazon.aws.hooks.s3 import S3Hook
+from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from airflow.utils.decorators import apply_defaults
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.exceptions import AirflowException
@@ -32,7 +30,7 @@ OUTPUT_LOG_GROUP = "/aws-glue/jobs/output"
 ERROR_LOG_GROUP = "/aws-glue/jobs/error"
 
 
-class AwsGlueJobOperator(BaseOperator):
+class AwsGlueJobOperator(DaggerBaseOperator):
     """
     Creates an AWS Glue Job. AWS Glue is a serverless Spark
     ETL service for running Spark Jobs on the AWS cloud.

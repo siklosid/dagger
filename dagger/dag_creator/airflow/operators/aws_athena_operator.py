@@ -20,13 +20,13 @@
 
 from uuid import uuid4
 
-from airflow.models import BaseOperator
+from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.hooks.aws_athena_hook import AWSAthenaHook
 from os import path
 
 
-class AWSAthenaOperator(BaseOperator):
+class AWSAthenaOperator(DaggerBaseOperator):
     """
     An operator that submit presto query to athena.
 
