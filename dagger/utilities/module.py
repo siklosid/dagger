@@ -41,6 +41,8 @@ class Module:
     @staticmethod
     def replace_template_parameters(_task_str, _template_parameters):
         for _key, _value in _template_parameters.items():
+            if type(_value) == str:
+                _value = f"\"{_value}\""
             locals()[_key] = _value
 
         return (
