@@ -76,6 +76,13 @@ class RedshiftLoadTask(Task):
                     format_help="string",
                     comment="Path to the file which contains the create table ddl",
                 ),
+                Attribute(
+                    attribute_name="copy_ddl_from",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    format_help="string {schema}.{table}",
+                    comment="If you have the schema of the table e.g.: in spectrum you can copy the ddl from there",
+                ),
             ]
         )
 
@@ -92,6 +99,7 @@ class RedshiftLoadTask(Task):
         )
         self._tmp_table_prefix = self.parse_attribute("tmp_table_prefix")
         self._create_table_ddl = self.parse_attribute("create_table_ddl")
+        self._copy_ddl_from = self.parse_attribute("copy_ddl_from")
         load_parameters = self._get_default_load_params()
         if self._max_errors:
             load_parameters["maxerrors"] = self._max_errors
@@ -133,3 +141,7 @@ class RedshiftLoadTask(Task):
     @property
     def create_table_ddl(self):
         return self._create_table_ddl
+
+    @property
+    def copy_ddl_from(self):
+        return self._copy_ddl_from
