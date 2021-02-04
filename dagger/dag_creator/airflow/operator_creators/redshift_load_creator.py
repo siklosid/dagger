@@ -22,6 +22,8 @@ class RedshiftLoadCreator(OperatorCreator):
         self._tmp_table = f"{self._task.tmp_table_prefix}_{self._output_table}" if self._task.tmp_table_prefix else None
         self._tmp_table_quoted = f"\"{self._tmp_table}\"" if self._tmp_table else None
 
+        self._copy_ddl_from = self._task.copy_ddl_from
+
     @staticmethod
     def _read_sql(directory, file_path):
         full_path = join(directory, file_path)
@@ -35,12 +37,18 @@ class RedshiftLoadCreator(OperatorCreator):
         if self._tmp_table and self._task.create_table_ddl:
             ddl = self._read_sql(self._task.pipeline.directory, self._task.create_table_ddl)
             return ddl.format(schema_name=self._output_schema_quoted, table_name=self._tmp_table_quoted)
+        if self._tmp_table and self._copy_ddl_from:
+            return f"CREATE TABLE {self._output_schema_quoted}.{self._tmp_table_quoted}" \
+                   f"(LIKE {self._copy_ddl_from})"
         elif self._tmp_table:
             return f"CREATE TABLE {self._output_schema_quoted}.{self._tmp_table_quoted}" \
                    f"(LIKE {self._output_schema_quoted}.{self._output_table_quoted})"
         elif self._task.create_table_ddl:
             ddl = self._read_sql(self._task.pipeline.directory, self._task.create_table_ddl)
             return ddl.format(schema_name=self._output_schema_quoted, table_name=self._output_table_quoted)
+        elif self._copy_ddl_from:
+            return f"CREATE TABLE IF NOT EXISTS {self._output_schema_quoted}.{self._output_table}" \
+                   f"(LIKE {self._copy_ddl_from})"
 
         return None
 
