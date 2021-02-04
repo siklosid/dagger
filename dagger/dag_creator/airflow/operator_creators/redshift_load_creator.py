@@ -83,7 +83,7 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return \
             f"BEGIN TRANSACTION;\n" \
-            f"DROP TABLE {self._output_schema_quoted}.{self._output_table_quoted};\n" \
+            f"DROP TABLE IF EXISTS {self._output_schema_quoted}.{self._output_table_quoted};\n" \
             f"ALTER TABLE {self._output_schema_quoted}.{self._tmp_table_quoted} " \
             f"RENAME TO {self._output_table_quoted};\n" \
             f"END"
