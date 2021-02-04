@@ -61,6 +61,21 @@ class RedshiftLoadTask(Task):
                     comment="Any additional parameter will be added like <key value> \
                       Check https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html",
                 ),
+                Attribute(
+                    attribute_name="tmp_table_prefix",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    format_help="string",
+                    comment="Only valid if job is truncated. If set table will be loaded into a tmp table prefixed "
+                            "<tmp_table_prefix> and than it will be moved to it's final destination",
+                ),
+                Attribute(
+                    attribute_name="create_table_ddl",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    format_help="string",
+                    comment="Path to the file which contains the create table ddl",
+                ),
             ]
         )
 
@@ -75,6 +90,8 @@ class RedshiftLoadTask(Task):
         self._postgres_conn_id = (
             self.parse_attribute("postgres_conn_id") or conf.REDSHIFT_CONN_ID
         )
+        self._tmp_table_prefix = self.parse_attribute("tmp_table_prefix")
+        self._create_table_ddl = self.parse_attribute("create_table_ddl")
         load_parameters = self._get_default_load_params()
         if self._max_errors:
             load_parameters["maxerrors"] = self._max_errors
@@ -108,3 +125,11 @@ class RedshiftLoadTask(Task):
     @property
     def extra_parameters(self):
         return self._extra_parameters
+
+    @property
+    def tmp_table_prefix(self):
+        return self._tmp_table_prefix
+
+    @property
+    def create_table_ddl(self):
+        return self._create_table_ddl
