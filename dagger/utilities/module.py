@@ -1,5 +1,6 @@
 import logging
 from os import path
+from mergedeep import merge
 
 import yaml
 
@@ -41,6 +42,12 @@ class Module:
     @staticmethod
     def replace_template_parameters(_task_str, _template_parameters):
         for _key, _value in _template_parameters.items():
+            if type(_value) == str:
+                try:
+                    int_value = int(_value)
+                    _value = f"\"{_value}\""
+                except:
+                    pass
             locals()[_key] = _value
 
         return (
@@ -74,11 +81,7 @@ class Module:
                 )
                 task_dict = yaml.safe_load(task_str)
 
-                for override_parameter in self._override_parameters.get(
-                    branch_name, {}
-                ).get(task, []):
-                    to_exec = "task_dict" + override_parameter
-                    exec(to_exec)
+                merge(task_dict, self._override_parameters.get(branch_name, {}).get(task, {}))
 
                 self.dump_yaml(task_dict, f"{task_name}.yaml")
 
