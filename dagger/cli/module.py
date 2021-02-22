@@ -4,14 +4,14 @@ from dagger.utils import Printer
 
 
 @click.command()
-@click.option("--module", "-m", help="Path to module directory")
-@click.option("--module_config", "-c", help="Path to module_config_file")
-def generate_tasks(module: str, module_config: str) -> None:
+@click.option("--config_file", "-c", help="Path to module config file")
+@click.option("--target_dir", "-t", help="Path to directory to generate the task configs to")
+def generate_tasks(config_file: str, target_dir: str) -> None:
     """
     Generating tasks for a module based on config
     """
 
-    module = Module(module, module_config)
+    module = Module(config_file, target_dir)
     module.generate_task_configs()
 
     Printer.print_success("Tasks are successfully generated")

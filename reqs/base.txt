@@ -2,3 +2,4 @@ Click==7.1.2
 slack==0.0.2
 slackclient==2.5.0
 envyaml==0.2060
+mergedeep==1.3.1
