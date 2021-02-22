@@ -24,7 +24,7 @@ class PostgresOperator(DaggerBaseOperator):
     :type database: str
     """
 
-    template_fields = ("sql",)
+    template_fields = ("sql", "params")
     template_ext = (".sql",)
     ui_color = "#ededed"
 
