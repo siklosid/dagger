@@ -29,7 +29,7 @@ class Attribute:
         self._name = attribute_name
         self._parent_fields = parent_fields or []
         self._required = required
-        self._nullable = nullable
+        self._nullable = nullable or not required
         self._validator = validator
         self._auto_value = auto_value
         self._format = format_help
