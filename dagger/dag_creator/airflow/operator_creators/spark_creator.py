@@ -101,6 +101,7 @@ class SparkCreator(OperatorCreator):
                 job_name=self._task.name,
                 script_args=parameters,
                 region_name=self._task.region_name,
+                **kwargs
             )
 
         return spark_op
