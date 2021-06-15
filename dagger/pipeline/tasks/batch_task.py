@@ -22,6 +22,7 @@ class BatchTask(Task):
                     comment="E.g.: python",
                 ),
                 Attribute(attribute_name="job_name", parent_fields=["task_parameters"]),
+                Attribute(attribute_name="absolute_job_name", parent_fields=["task_parameters"]),
                 Attribute(
                     attribute_name="overrides",
                     parent_fields=["task_parameters"],
