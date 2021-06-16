@@ -78,8 +78,8 @@ class BatchTask(Task):
         return self._executable
 
     @property
-    def executable(self):
-        return self._executable
+    def executable_prefix(self):
+        return self._executable_prefix
 
     @property
     def absolute_job_name(self):
