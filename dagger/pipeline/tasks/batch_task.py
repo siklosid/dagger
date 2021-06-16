@@ -1,6 +1,6 @@
+from dagger import conf
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
-from dagger import conf
 
 
 class BatchTask(Task):
@@ -21,8 +21,8 @@ class BatchTask(Task):
                     parent_fields=["task_parameters"],
                     comment="E.g.: python",
                 ),
-                Attribute(attribute_name="job_name", parent_fields=["task_parameters"]),
-                Attribute(attribute_name="absolute_job_name", parent_fields=["task_parameters"]),
+                Attribute(attribute_name="job_name", parent_fields=["task_parameters"], required=False),
+                Attribute(attribute_name="absolute_job_name", parent_fields=["task_parameters"], required=False),
                 Attribute(
                     attribute_name="overrides",
                     parent_fields=["task_parameters"],
