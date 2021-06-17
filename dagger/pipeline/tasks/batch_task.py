@@ -1,6 +1,6 @@
+from dagger import conf
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
-from dagger import conf
 
 
 class BatchTask(Task):
@@ -21,7 +21,8 @@ class BatchTask(Task):
                     parent_fields=["task_parameters"],
                     comment="E.g.: python",
                 ),
-                Attribute(attribute_name="job_name", parent_fields=["task_parameters"]),
+                Attribute(attribute_name="job_name", parent_fields=["task_parameters"], required=False),
+                Attribute(attribute_name="absolute_job_name", parent_fields=["task_parameters"], required=False),
                 Attribute(
                     attribute_name="overrides",
                     parent_fields=["task_parameters"],
@@ -64,6 +65,7 @@ class BatchTask(Task):
         self._executable_prefix = self.parse_attribute("executable_prefix") or ""
         job_name = "{}-{}".format(pipeline.name, self.parse_attribute("job_name"))
         self._job_name = job_name
+        self._absolute_job_name = self.parse_attribute("absolute_job_name")
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id") or conf.BATCH_AWS_CONN_ID
         self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION
@@ -78,6 +80,10 @@ class BatchTask(Task):
     @property
     def executable_prefix(self):
         return self._executable_prefix
+
+    @property
+    def absolute_job_name(self):
+        return self._absolute_job_name
 
     @property
     def job_name(self):

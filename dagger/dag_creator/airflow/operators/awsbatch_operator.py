@@ -1,9 +1,10 @@
 from pathlib import Path
 from time import sleep
 
-from airflow.utils.decorators import apply_defaults
 from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.exceptions import AirflowException
+from airflow.utils.decorators import apply_defaults
+
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from dagger.dag_creator.airflow.utils.decorators import lazy_property
 
@@ -47,19 +48,20 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     @apply_defaults
     def __init__(
-        self,
-        job_name,
-        job_queue,
-        overrides=None,
-        job_definition=None,
-        aws_conn_id=None,
-        region_name=None,
-        cluster_name=None,
-        *args,
-        **kwargs,
+            self,
+            job_queue,
+            job_name=None,
+            absolute_job_name=None,
+            overrides=None,
+            job_definition=None,
+            aws_conn_id=None,
+            region_name=None,
+            cluster_name=None,
+            *args,
+            **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.job_name = self._validate_job_name(job_name)
+        self.job_name = self._validate_job_name(job_name, absolute_job_name)
         self.aws_conn_id = aws_conn_id
         self.region_name = region_name
         self.cluster_name = cluster_name
@@ -86,7 +88,13 @@ class AWSBatchOperator(DaggerBaseOperator):
             "ecs", region_name=self.region_name
         )
 
-    def _validate_job_name(self, job_name):
+    def _validate_job_name(self, job_name, absolute_job_name):
+        if absolute_job_name is None and job_name is None:
+            raise Exception("Both job_name and absolute_job_name cannot be null")
+
+        if absolute_job_name is not None:
+            return absolute_job_name
+
         job_path = Path().home() / "dags" / job_name.replace("-", "/")
         assert (
             job_path.is_dir()
