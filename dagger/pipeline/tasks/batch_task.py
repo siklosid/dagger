@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from dagger import conf
@@ -65,10 +66,8 @@ class BatchTask(Task):
 
         self._executable = self.parse_attribute("executable")
         self._executable_prefix = self.parse_attribute("executable_prefix") or ""
-        job_name_raw = f"""{pipeline.name.replace("-", "/")}/{self.parse_attribute("job_name")}"""
-        final_path = str(Path(job_name_raw).resolve())
-        final_path = final_path.replace(str(Path.cwd()) + '/', '')
-        job_name = final_path.replace("/", "-")
+        job_path = f"""{pipeline.directory}/{self.parse_attribute("job_name")}"""
+        job_name = str(os.path.relpath(job_path, conf.DAGS_DIR)).replace("/", "-")
         self._job_name = job_name
         self._absolute_job_name = self.parse_attribute("absolute_job_name")
         self._overrides = self.parse_attribute("overrides") or {}
