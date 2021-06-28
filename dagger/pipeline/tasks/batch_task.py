@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from dagger import conf
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
@@ -63,7 +66,8 @@ class BatchTask(Task):
 
         self._executable = self.parse_attribute("executable")
         self._executable_prefix = self.parse_attribute("executable_prefix") or ""
-        job_name = "{}-{}".format(pipeline.name, self.parse_attribute("job_name"))
+        job_path = f"""{pipeline.directory}/{self.parse_attribute("job_name")}"""
+        job_name = str(os.path.relpath(job_path, conf.DAGS_DIR)).replace("/", "-")
         self._job_name = job_name
         self._absolute_job_name = self.parse_attribute("absolute_job_name")
         self._overrides = self.parse_attribute("overrides") or {}
