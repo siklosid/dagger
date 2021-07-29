@@ -64,8 +64,7 @@ class SparkCreator(OperatorCreator):
                 job_args=self._generate_command(),
                 spark_args=self._generate_spark_args(),
                 s3_files_bucket=self._task.s3_files_bucket,
-                extra_py_files=self._task.extra_py_files,
-                emr_master=self._task.emr_master,
+                extra_py_files=self._task.extra_py_files
                 **kwargs,
             )
         elif self._task.spark_engine == "batch":

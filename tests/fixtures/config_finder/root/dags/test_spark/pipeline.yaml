@@ -1,0 +1,11 @@
+owner: "user@domain.com"
+description: |
+  Testing batch operator
+schedule: "0 3 * * *"
+start_date: "2019-11-12T02:00"
+slack_alert: on
+airflow_parameters:
+  default_args:
+  dag_parameters:
+    default_view: "graph"
+alerts:
