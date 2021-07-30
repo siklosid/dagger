@@ -1,7 +1,10 @@
-import logging
 import os
 import signal
+import time
+
 import boto3
+from airflow.contrib.hooks.emr_hook import EmrHook
+from airflow.exceptions import AirflowException
 from airflow.utils.decorators import apply_defaults
 
 from dagger import conf
@@ -17,14 +20,17 @@ class SparkSubmitOperator(DaggerBaseOperator):
 
     @apply_defaults
     def __init__(
-        self,
-        job_file,
-        job_args=None,
-        spark_args=None,
-        s3_files_bucket=conf.SPARK_S3_FILES_BUCKET,
-        extra_py_files=None,
-        *args,
-        **kwargs,
+            self,
+            job_file,
+            cluster_name,
+            aws_conn_id='aws_default',
+            emr_conn_id='emr_default',
+            job_args=None,
+            spark_args=None,
+            s3_files_bucket=conf.SPARK_S3_FILES_BUCKET,
+            extra_py_files=None,
+            *args,
+            **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.job_file = job_file
@@ -38,12 +44,15 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.s3_files_bucket = s3_files_bucket
         self.extra_py_files = extra_py_files or []
         self.application_id = None
-        self.ssm_client = boto3.client("ssm")
-        self.emr_client = boto3.client("emr")
-        self.cluster_id = self.emr_client.list_clusters(ClusterStates=["WAITING", "RUNNING"])["Clusters"][0]["Id"]
+        self.cluster_id = self.emr_hook.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
+        self.emr_hook = EmrHook(aws_conn_id=aws_conn_id, emr_conn_id=emr_conn_id)
         self.emr_master_instance_id = \
             self.emr_client.list_instances(ClusterId=self.cluster_id, InstanceGroupTypes=["MASTER"],
                                            InstanceStates=["RUNNING"])["Instances"][0]["Ec2InstanceId"]
+
+    @property
+    def ssm_client(self):
+        return boto3.client("ssm")
 
     @property
     def s3_file_path(self):
@@ -78,7 +87,19 @@ class SparkSubmitOperator(DaggerBaseOperator):
             DocumentName="AWS-RunShellScript",
             Parameters={"commands": [self.spark_submit_cmd]},
         )
-        logging.INFO(response)
+        command_id = response['Command']['CommandId']
+        status = 'InProgress'
+        while status == 'InProgress':
+            time.sleep(30)
+            status = \
+                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+                    'StatusDetails']
+        self.log.info(
+            self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+                'StandardErrorContent'])
+
+        if status != 'Success':
+            raise AirflowException("Spark command failed")
 
     def on_kill(self):
         self.log.info("Sending SIGTERM signal to bash process group")
