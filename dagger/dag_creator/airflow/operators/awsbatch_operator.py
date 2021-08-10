@@ -65,7 +65,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         self.aws_conn_id = aws_conn_id
         self.region_name = region_name
         self.cluster_name = cluster_name
-        self.job_definition = job_definition or job_name
+        self.job_definition = job_definition or self.job_name
         self.job_queue = job_queue
         self.overrides = overrides or {}
         self.job_id = None
