@@ -73,7 +73,7 @@ class SparkCreator(OperatorCreator):
                 job_file=self._task.job_file,
                 job_args=_parse_args(self._template_parameters),
                 spark_args=_parse_args(self._task.spark_args),
-                extra_py_files=self._task.extra_py_files
+                extra_py_files=self._task.extra_py_files,
                                ** kwargs,
             )
         elif self._task.spark_engine == "batch":
