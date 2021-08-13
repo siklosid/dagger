@@ -27,6 +27,11 @@ class SparkTask(Task):
                     format_help="Dictionary",
                 ),
                 Attribute(
+                    attribute_name="cluster_name",
+                    parent_fields=["task_parameters"],
+                    required=True,
+                ),
+                Attribute(
                     attribute_name="job_args",
                     parent_fields=["task_parameters"],
                     required=False,

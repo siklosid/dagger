@@ -71,10 +71,11 @@ class SparkCreator(OperatorCreator):
                 dag=self._dag,
                 task_id=self._task.name,
                 job_file=self._task.job_file,
+                cluster_name=self._task.cluster_name,
                 job_args=_parse_args(self._template_parameters),
                 spark_args=_parse_args(self._task.spark_args),
                 extra_py_files=self._task.extra_py_files,
-                               ** kwargs,
+                **kwargs,
             )
         elif self._task.spark_engine == "batch":
             overrides = {"memory": self._calculate_memory_from_spark_args()}
