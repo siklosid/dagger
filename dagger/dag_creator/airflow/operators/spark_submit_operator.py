@@ -36,8 +36,8 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.job_args = job_args
         self.spark_args = spark_args
         self.extra_py_files = extra_py_files
-        self.cluster_id = self.emr_hook.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
         self.emr_hook = EmrHook(aws_conn_id=aws_conn_id, emr_conn_id=emr_conn_id)
+        self.cluster_id = self.emr_hook.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
         self.emr_master_instance_id = \
             self.emr_client.list_instances(ClusterId=self.cluster_id, InstanceGroupTypes=["MASTER"],
                                            InstanceStates=["RUNNING"])["Instances"][0]["Ec2InstanceId"]
