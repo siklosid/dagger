@@ -1,5 +1,3 @@
-from os.path import join, relpath
-
 from dagger import conf
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
@@ -19,17 +17,13 @@ class SparkTask(Task):
                     required=True,
                     comment="Where to run spark job. Accepted values: emr, batch, glue",
                 ),
-                Attribute(attribute_name="job_file", parent_fields=["task_parameters"]),
+                Attribute(attribute_name="job_file", parent_fields=["task_parameters"],  required=True),
+                Attribute(attribute_name="cluster_name", parent_fields=["task_parameters"],  required=True),
                 Attribute(
                     attribute_name="spark_args",
                     parent_fields=["task_parameters"],
                     required=False,
                     format_help="Dictionary",
-                ),
-                Attribute(
-                    attribute_name="cluster_name",
-                    parent_fields=["task_parameters"],
-                    required=True,
                 ),
                 Attribute(
                     attribute_name="job_args",
@@ -86,6 +80,7 @@ class SparkTask(Task):
         super().__init__(name, pipeline_name, pipeline, job_config)
         self._spark_engine = self.parse_attribute("spark_engine")
         self._job_file = self.parse_attribute("job_file")
+        self._cluster_name = self.parse_attribute("cluster_name")
         spark_args = self.parse_attribute("spark_args")
         self._spark_args = self._get_default_spark_args()
         if spark_args is not None:
@@ -110,16 +105,12 @@ class SparkTask(Task):
         return self._spark_args
 
     @property
-    def s3_files_bucket(self):
-        return self._s3_files_bucket
-
-    @property
     def extra_py_files(self):
         return self._extra_py_files
 
     @property
-    def emr_master(self):
-        return self._emr_master
+    def cluster_name(self):
+        return self._cluster_name
 
     @property
     def overrides(self):
