@@ -1,4 +1,5 @@
 from os.path import basename, dirname
+from shlex import shlex
 
 from dagger import conf
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
@@ -39,7 +40,7 @@ class SparkCreator(OperatorCreator):
         for key, value in self._task.spark_args.items():
             args.append(f"--{key}={value}")
 
-        return " ".join(args)
+        return shlex.split(" ".join(args))
 
     @staticmethod
     def _convert_size_text_to_megabytes(size):
