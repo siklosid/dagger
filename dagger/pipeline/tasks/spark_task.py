@@ -16,8 +16,8 @@ class SparkTask(Task):
                 Attribute(
                     attribute_name="spark_engine",
                     parent_fields=["task_parameters"],
-                    required=False,
-                    comment="Where to run spark job. Accepted values: emr/batch",
+                    required=True,
+                    comment="Where to run spark job. Accepted values: emr, batch, glue",
                 ),
                 Attribute(attribute_name="job_file", parent_fields=["task_parameters"]),
                 Attribute(
@@ -27,7 +27,13 @@ class SparkTask(Task):
                     format_help="Dictionary",
                 ),
                 Attribute(
-                    attribute_name="s3_files_bucket",
+                    attribute_name="job_args",
+                    parent_fields=["task_parameters"],
+                    required=False,
+                    format_help="Dictionary",
+                ),
+                Attribute(
+                    attribute_name="job_file",
                     parent_fields=["task_parameters"],
                     required=False,
                 ),
@@ -37,7 +43,7 @@ class SparkTask(Task):
                     required=False,
                 ),
                 Attribute(
-                    attribute_name="emr_master",
+                    attribute_name="emr_conn_id",
                     parent_fields=["task_parameters"],
                     required=False,
                 ),
@@ -73,22 +79,13 @@ class SparkTask(Task):
 
     def __init__(self, name, pipeline_name, pipeline, job_config):
         super().__init__(name, pipeline_name, pipeline, job_config)
-
-        self._spark_engine = (
-            self.parse_attribute("spark_engine") or conf.SPARK_DEFAULT_ENGINE
-        )
-        self._job_file = relpath(
-            join(self.pipeline.directory, self.parse_attribute("job_file")),
-            conf.DAGS_DIR,
-        )
-        spark_args = self.parse_attribute("spark_args") or {}
+        self._spark_engine = self.parse_attribute("spark_engine")
+        self._job_file = self.parse_attribute("job_file")
+        spark_args = self.parse_attribute("spark_args")
         self._spark_args = self._get_default_spark_args()
-        self._spark_args.update(spark_args)
-        self._s3_files_bucket = (
-            self.parse_attribute("s3_files_bucket") or conf.SPARK_S3_FILES_BUCKET
-        )
-        self._extra_py_files = self.parse_attribute("extra_py_files") or []
-        self._emr_master = self.parse_attribute("emr_master") or conf.SPARK_EMR_MASTER
+        if spark_args is not None:
+            self._spark_args.update(spark_args)
+        self._extra_py_files = self.parse_attribute("extra_py_files") or None
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id")
         self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION

@@ -27,23 +27,15 @@ class SparkSubmitOperator(DaggerBaseOperator):
             emr_conn_id='emr_default',
             job_args=None,
             spark_args=None,
-            s3_files_bucket=conf.SPARK_S3_FILES_BUCKET,
             extra_py_files=None,
             *args,
             **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.job_file = job_file
-        self.job_args = job_args or []
-        self.spark_args = spark_args or [
-            "--conf spark.driver.memory=512m",
-            "--conf spark.executor.memory=512m",
-            "--conf spark.cores.max=1",
-            f"--conf spark.scheduler.pool={ENV}",
-        ]
-        self.s3_files_bucket = s3_files_bucket
-        self.extra_py_files = extra_py_files or []
-        self.application_id = None
+        self.job_args = job_args
+        self.spark_args = spark_args
+        self.extra_py_files = extra_py_files
         self.cluster_id = self.emr_hook.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
         self.emr_hook = EmrHook(aws_conn_id=aws_conn_id, emr_conn_id=emr_conn_id)
         self.emr_master_instance_id = \
@@ -55,28 +47,18 @@ class SparkSubmitOperator(DaggerBaseOperator):
         return boto3.client("ssm")
 
     @property
-    def s3_file_path(self):
-        return os.path.join(
-            "s3://", self.s3_files_bucket, f"{ENV_SUFFIX}airflow/dags/{self.job_file}"
-        )
-
-    @property
-    def s3_bundle_path(self):
-        return os.path.join(
-            "s3://", self.s3_files_bucket, f"{ENV_SUFFIX}", conf.SPARK_S3_LIBS_SUFFIX
-        )
-
-    @property
     def spark_submit_cmd(self):
-        spark_submit_cmd = [
-            "spark-submit --master yarn --deploy-mode cluster",
-            " ".join(self.spark_args),
-            f"--py-files {self.s3_bundle_path},",
-            ",".join(self.extra_py_files),
-            self.s3_file_path,
-            " ".join(self.job_args),
-        ]
-        return " ".join(spark_submit_cmd)
+        spark_submit_cmd = "spark-submit --master yarn --deploy-mode cluster"
+        if self.spark_args is not None:
+            spark_submit_cmd += " " + self.spark_args
+        if self.extra_py_files is not None:
+            spark_submit_cmd += " " + f"--py-files {self.extra_py_files}"
+
+        spark_submit_cmd += " " + self.job_file
+
+        if self.job_args is not None:
+            spark_submit_cmd += " " + self.job_args
+        return spark_submit_cmd
 
     def execute(self, context):
         """
