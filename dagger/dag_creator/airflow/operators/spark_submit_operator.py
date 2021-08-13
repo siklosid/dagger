@@ -3,13 +3,11 @@ import signal
 import time
 
 import boto3
-from airflow.contrib.hooks.emr_hook import EmrHook
 from airflow.exceptions import AirflowException
 from airflow.utils.decorators import apply_defaults
 
-from dagger import conf
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
-
+import logging
 ENV = os.environ["ENV"].lower()
 ENV_SUFFIX = "dev/" if ENV == "local" else ""
 
@@ -36,11 +34,14 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.job_args = job_args
         self.spark_args = spark_args
         self.extra_py_files = extra_py_files
-        self.emr_hook = EmrHook(aws_conn_id=aws_conn_id, emr_conn_id=emr_conn_id)
-        self.cluster_id = self.emr_hook.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
+        self.cluster_id = self.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
         self.emr_master_instance_id = \
             self.emr_client.list_instances(ClusterId=self.cluster_id, InstanceGroupTypes=["MASTER"],
                                            InstanceStates=["RUNNING"])["Instances"][0]["Ec2InstanceId"]
+
+    @property
+    def emr_client(self):
+        return boto3.client("emr")
 
     @property
     def ssm_client(self):
@@ -59,6 +60,21 @@ class SparkSubmitOperator(DaggerBaseOperator):
         if self.job_args is not None:
             spark_submit_cmd += " " + self.job_args
         return spark_submit_cmd
+
+    def get_cluster_id_by_name(self, emr_cluster_name, cluster_states):
+
+        response = self.emr_client.list_clusters(ClusterStates=cluster_states)
+        matching_clusters = list(
+            filter(lambda cluster: cluster['Name'] == emr_cluster_name, response['Clusters']))
+
+        if len(matching_clusters) == 1:
+            cluster_id = matching_clusters[0]['Id']
+            logging.info('Found cluster name = %s id = %s' % (emr_cluster_name, cluster_id))
+            return cluster_id
+        elif len(matching_clusters) > 1:
+            raise AirflowException('More than one cluster found for name = %s' % emr_cluster_name)
+        else:
+            return None
 
     def execute(self, context):
         """
