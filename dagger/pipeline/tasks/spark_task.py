@@ -1,3 +1,5 @@
+from dagger.utilities.exceptions import DaggerMissingFieldException
+
 from dagger import conf
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute
@@ -17,9 +19,9 @@ class SparkTask(Task):
                     required=True,
                     comment="Where to run spark job. Accepted values: emr, batch, glue",
                 ),
-                Attribute(attribute_name="job_file", parent_fields=["task_parameters"],  required=True),
-                Attribute(attribute_name="cluster_name", parent_fields=["task_parameters"],  required=False),
-                Attribute(attribute_name="job_bucket", parent_fields=["task_parameters"],  required=False),
+                Attribute(attribute_name="job_file", parent_fields=["task_parameters"], required=True),
+                Attribute(attribute_name="cluster_name", parent_fields=["task_parameters"], required=False),
+                Attribute(attribute_name="job_bucket", parent_fields=["task_parameters"], required=False),
                 Attribute(
                     attribute_name="spark_args",
                     parent_fields=["task_parameters"],
@@ -80,11 +82,16 @@ class SparkTask(Task):
     def __init__(self, name, pipeline_name, pipeline, job_config):
         super().__init__(name, pipeline_name, pipeline, job_config)
         self._spark_engine = self.parse_attribute("spark_engine")
-        job_file_path = self.parse_attribute("job_file")
+        job_file_path = self.parse_attribute("job_file") or ''
         job_bucket = self.parse_attribute("job_bucket") or conf.SPARK_JOB_BUCKET
         self._cluster_name = self.parse_attribute("cluster_name") or conf.SPARK_CLUSTER_NAME
         self._extra_py_files = self.parse_attribute("extra_py_files")
-        self._job_file = f"s3://{job_bucket}/{job_file_path}"
+        if job_file_path == '' and self._spark_engine == 'emr':
+            raise DaggerMissingFieldException("Job file is mandatory for emr")
+        elif job_file_path == '':
+            self._job_file = job_file_path
+        else:
+            self._job_file = f"s3://{job_bucket}/{job_file_path}"
         self._spark_args = self.parse_attribute("spark_args")
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id")
@@ -131,4 +138,3 @@ class SparkTask(Task):
     @property
     def max_retries(self):
         return self._max_retries
-
