@@ -1,0 +1,30 @@
+type: spark
+description: Reading broadcast dynamo changelogs and creating broadcast_edited fact
+  table from it
+inputs:
+  - type: athena
+    name: test
+    schema: test
+    table: test
+outputs:
+  - type: s3
+    name: test
+    bucket: test_bucket
+    path: test/path
+airflow_task_parameters: null
+template_parameters:
+  schedule_time: '{{ macros.datetime.strftime(next_execution_date, ''%Y-%m-%dT%H'')
+    }}'
+  frequency: '1'
+  changelog_type: test_type
+  source_table: test_source
+  target_database: test_db
+  target_table: test_table
+  unique_keys: testss
+  columns_to_drop: test
+task_parameters:
+  job_file: 'abc/test.py'
+  spark_engine: emr
+  job_args:
+      param1: test
+pool: emr

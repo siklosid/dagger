@@ -67,10 +67,9 @@ REDSHIFT_IAM_ROLE = redshift_config.get('iam_role', None)
 
 # Spark
 spark_config = config.get('spark', None) or {}
-SPARK_S3_FILES_BUCKET = spark_config.get('files_s3_bucket', None)
-SPARK_S3_LIBS_SUFFIX = spark_config.get('libs_s3_path', None)
-SPARK_EMR_MASTER = spark_config.get('emr_master', None)
-SPARK_DEFAULT_ENGINE = spark_config.get('default_engine', 'emr')
+SPARK_JOB_BUCKET = spark_config.get('job_bucket', None)
+SPARK_CLUSTER_NAME = spark_config.get('cluster_name', None)
+SPARK_DEFAULT_QUEUE = spark_config.get('default_queue', None)
 SPARK_OVERHEAD_MULTIPLIER = spark_config.get('overhead_multiplier', 1.5)
 
 # Batch

@@ -1,13 +1,36 @@
-import shlex
 from os.path import basename, dirname
+from shlex import shlex
 
 from dagger import conf
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
+from dagger.dag_creator.airflow.operators.aws_glue_job_operator import AwsGlueJobOperator
 from dagger.dag_creator.airflow.operators.awsbatch_operator import AWSBatchOperator
 from dagger.dag_creator.airflow.operators.spark_submit_operator import (
     SparkSubmitOperator,
 )
-from dagger.dag_creator.airflow.operators.aws_glue_job_operator import AwsGlueJobOperator
+
+
+def _parse_args(job_args):
+    if job_args is None:
+        return None
+    command = []
+    for param_name, param_value in job_args.items():
+        command.append(
+            "--{name}={value}".format(name=param_name, value=param_value)
+        )
+
+    return "".join(command)
+
+def _parse_spark_args(job_args):
+    if job_args is None:
+        return None
+    command = []
+    for param_name, param_value in job_args.items():
+        command.append(
+            "--{name} {value}".format(name=param_name, value=param_value)
+        )
+
+    return "".join(command)
 
 
 class SparkCreator(OperatorCreator):
@@ -38,7 +61,7 @@ class SparkCreator(OperatorCreator):
 
         for suffix in multipliers:
             if size.lower().endswith(suffix):
-                return int(size[0 : -len(suffix)]) * multipliers[suffix]
+                return int(size[0: -len(suffix)]) * multipliers[suffix]
 
         return None
 
@@ -61,11 +84,10 @@ class SparkCreator(OperatorCreator):
                 dag=self._dag,
                 task_id=self._task.name,
                 job_file=self._task.job_file,
-                job_args=self._generate_command(),
-                spark_args=self._generate_spark_args(),
-                s3_files_bucket=self._task.s3_files_bucket,
+                cluster_name=self._task.cluster_name,
+                job_args=_parse_args(self._template_parameters),
+                spark_args=_parse_spark_args(self._task.spark_args),
                 extra_py_files=self._task.extra_py_files,
-                emr_master=self._task.emr_master,
                 **kwargs,
             )
         elif self._task.spark_engine == "batch":

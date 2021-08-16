@@ -15,6 +15,7 @@ outputs:
     folder: "1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL"
     file_name: report.csv
 task_parameters:
+    absolute_job_name: tst
     executable: batch.py
     executable_prefix: python
     job_name: batch_job
