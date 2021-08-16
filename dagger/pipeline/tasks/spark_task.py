@@ -18,7 +18,8 @@ class SparkTask(Task):
                     comment="Where to run spark job. Accepted values: emr, batch, glue",
                 ),
                 Attribute(attribute_name="job_file", parent_fields=["task_parameters"],  required=True),
-                Attribute(attribute_name="cluster_name", parent_fields=["task_parameters"],  required=True),
+                Attribute(attribute_name="cluster_name", parent_fields=["task_parameters"],  required=False),
+                Attribute(attribute_name="job_bucket", parent_fields=["task_parameters"],  required=False),
                 Attribute(
                     attribute_name="spark_args",
                     parent_fields=["task_parameters"],
@@ -79,13 +80,12 @@ class SparkTask(Task):
     def __init__(self, name, pipeline_name, pipeline, job_config):
         super().__init__(name, pipeline_name, pipeline, job_config)
         self._spark_engine = self.parse_attribute("spark_engine")
-        self._job_file = self.parse_attribute("job_file")
-        self._cluster_name = self.parse_attribute("cluster_name")
-        spark_args = self.parse_attribute("spark_args")
-        self._spark_args = self._get_default_spark_args()
-        if spark_args is not None:
-            self._spark_args.update(spark_args)
-        self._extra_py_files = self.parse_attribute("extra_py_files") or None
+        job_file_path = self.parse_attribute("job_file")
+        job_bucket = self.parse_attribute("job_bucket") or conf.SPARK_JOB_BUCKET
+        self._cluster_name = self.parse_attribute("cluster_name") or conf.SPARK_CLUSTER_NAME
+        self._extra_py_files = self.parse_attribute("extra_py_files")
+        self._job_file = f"s3://{job_bucket}/{job_file_path}"
+        self._spark_args = self.parse_attribute("spark_args")
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id")
         self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION
@@ -132,10 +132,3 @@ class SparkTask(Task):
     def max_retries(self):
         return self._max_retries
 
-    @staticmethod
-    def _get_default_spark_args():
-        return {
-            "conf spark.driver.memory": "512m",
-            "conf spark.executor.memory": "512m",
-            "conf spark.scheduler.pool": "{}".format(conf.ENV),
-        }

@@ -11,10 +11,23 @@ from dagger.dag_creator.airflow.operators.spark_submit_operator import (
 
 
 def _parse_args(job_args):
+    if job_args is None:
+        return None
     command = []
     for param_name, param_value in job_args.items():
         command.append(
             "--{name}={value}".format(name=param_name, value=param_value)
+        )
+
+    return "".join(command)
+
+def _parse_spark_args(job_args):
+    if job_args is None:
+        return None
+    command = []
+    for param_name, param_value in job_args.items():
+        command.append(
+            "--{name} {value}".format(name=param_name, value=param_value)
         )
 
     return "".join(command)
@@ -73,7 +86,7 @@ class SparkCreator(OperatorCreator):
                 job_file=self._task.job_file,
                 cluster_name=self._task.cluster_name,
                 job_args=_parse_args(self._template_parameters),
-                spark_args=_parse_args(self._task.spark_args),
+                spark_args=_parse_spark_args(self._task.spark_args),
                 extra_py_files=self._task.extra_py_files,
                 **kwargs,
             )

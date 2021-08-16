@@ -21,8 +21,6 @@ class SparkSubmitOperator(DaggerBaseOperator):
             self,
             job_file,
             cluster_name,
-            aws_conn_id='aws_default',
-            emr_conn_id='emr_default',
             job_args=None,
             spark_args=None,
             extra_py_files=None,
@@ -50,8 +48,8 @@ class SparkSubmitOperator(DaggerBaseOperator):
     @property
     def spark_submit_cmd(self):
         spark_submit_cmd = "spark-submit --master yarn --deploy-mode cluster"
-        # if self.spark_args is not None:
-        #     spark_submit_cmd += " " + self.spark_args
+        if self.spark_args is not None:
+            spark_submit_cmd += " " + self.spark_args
         if self.extra_py_files is not None:
             spark_submit_cmd += " " + f"--py-files {self.extra_py_files}"
 

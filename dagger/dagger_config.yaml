@@ -19,10 +19,9 @@ redshift:
 
 
 spark:
-#  files_s3_bucket:
-#  libs_s3_path:
-#  emr_master:
-#  default_engine:
+#  job_bucket:
+#  default_queue:
+#  cluster_name:
 #  overhead_multiplier:
 
 
