@@ -7,7 +7,6 @@ from dagger.utilities.config_validator import Attribute
 
 class SparkTask(Task):
     ref_name = "spark"
-    default_pool = "spark"
 
     @classmethod
     def init_attributes(cls, orig_cls):
