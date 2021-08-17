@@ -44,10 +44,6 @@ class SparkSubmitOperator(DaggerBaseOperator):
         return boto3.client("ssm")
 
     @property
-    def emr_master_instance_id(self):
-        return
-
-    @property
     def spark_submit_cmd(self):
         spark_submit_cmd = "spark-submit --master yarn --deploy-mode cluster"
         if self.spark_args is not None:
@@ -94,10 +90,10 @@ class SparkSubmitOperator(DaggerBaseOperator):
         while status == 'InProgress':
             time.sleep(30)
             status = \
-                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                     'StatusDetails']
         self.log.info(
-            self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+            self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                 'StandardErrorContent'])
 
         if status != 'Success':
