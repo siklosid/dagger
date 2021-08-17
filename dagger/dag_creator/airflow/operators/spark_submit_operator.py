@@ -8,6 +8,7 @@ from airflow.utils.decorators import apply_defaults
 
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 import logging
+
 ENV = os.environ["ENV"].lower()
 ENV_SUFFIX = "dev/" if ENV == "local" else ""
 
@@ -32,10 +33,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.job_args = job_args
         self.spark_args = spark_args
         self.extra_py_files = extra_py_files
-        self.cluster_id = self.get_cluster_id_by_name(cluster_name, ["WAITING", "RUNNING"])
-        self.emr_master_instance_id = \
-            self.emr_client.list_instances(ClusterId=self.cluster_id, InstanceGroupTypes=["MASTER"],
-                                           InstanceStates=["RUNNING"])["Instances"][0]["Ec2InstanceId"]
+        self.cluster_name = cluster_name
 
     @property
     def emr_client(self):
@@ -78,8 +76,12 @@ class SparkSubmitOperator(DaggerBaseOperator):
         """
         See `execute` method from airflow.operators.bash_operator
         """
+        cluster_id = self.get_cluster_id_by_name(self.cluster_name, ["WAITING", "RUNNING"])
+        emr_master_instance_id = self.emr_client.list_instances(ClusterId=cluster_id, InstanceGroupTypes=["MASTER"],
+                                                                InstanceStates=["RUNNING"])["Instances"][0][
+            "Ec2InstanceId"]
         response = self.ssm_client.send_command(
-            InstanceIds=[self.emr_master_instance_id],
+            InstanceIds=[emr_master_instance_id],
             DocumentName="AWS-RunShellScript",
             Parameters={"commands": [self.spark_submit_cmd]},
         )
@@ -88,10 +90,10 @@ class SparkSubmitOperator(DaggerBaseOperator):
         while status == 'InProgress':
             time.sleep(30)
             status = \
-                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                     'StatusDetails']
         self.log.info(
-            self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=self.emr_master_instance_id)[
+            self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                 'StandardErrorContent'])
 
         if status != 'Success':
