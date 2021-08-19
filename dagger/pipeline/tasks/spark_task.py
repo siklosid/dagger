@@ -28,12 +28,6 @@ class SparkTask(Task):
                     format_help="Dictionary",
                 ),
                 Attribute(
-                    attribute_name="job_args",
-                    parent_fields=["task_parameters"],
-                    required=False,
-                    format_help="Dictionary",
-                ),
-                Attribute(
                     attribute_name="job_file",
                     parent_fields=["task_parameters"],
                     required=False,
