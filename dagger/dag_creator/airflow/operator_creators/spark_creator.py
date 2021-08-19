@@ -19,7 +19,7 @@ def _parse_args(job_args):
             "--{name}={value}".format(name=param_name, value=param_value)
         )
 
-    return "".join(command)
+    return " ".join(command)
 
 def _parse_spark_args(job_args):
     if job_args is None:
