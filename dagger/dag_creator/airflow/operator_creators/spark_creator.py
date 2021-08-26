@@ -16,10 +16,10 @@ def _parse_args(job_args):
     command = []
     for param_name, param_value in job_args.items():
         command.append(
-            "--{name}={value}".format(name=param_name, value=param_value)
+            "--{name}=\"{value}\"".format(name=param_name, value=param_value)
         )
 
-    return "".join(command)
+    return " ".join(command)
 
 def _parse_spark_args(job_args):
     if job_args is None:

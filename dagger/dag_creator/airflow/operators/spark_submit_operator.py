@@ -1,3 +1,4 @@
+import logging
 import os
 import signal
 import time
@@ -7,7 +8,6 @@ from airflow.exceptions import AirflowException
 from airflow.utils.decorators import apply_defaults
 
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
-import logging
 
 ENV = os.environ["ENV"].lower()
 ENV_SUFFIX = "dev/" if ENV == "local" else ""
