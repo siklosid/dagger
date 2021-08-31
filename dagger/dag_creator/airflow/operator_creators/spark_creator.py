@@ -15,9 +15,11 @@ def _parse_args(job_args):
         return None
     command = []
     for param_name, param_value in job_args.items():
-        command.append(
-            "--{name}=\"{value}\"".format(name=param_name, value=param_value)
-        )
+        if type(param_value) == bool:
+            value = "{value}".format(value=param_value)
+        else:
+            value = "\"{value}\"".format(value=param_value)
+        command.append("--{name}={value}".format(name=param_name, value=value))
 
     return " ".join(command)
 
