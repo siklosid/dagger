@@ -28,6 +28,12 @@ class SparkTask(Task):
                     format_help="Dictionary",
                 ),
                 Attribute(
+                    attribute_name="spark_conf_args",
+                    parent_fields=["task_parameters"],
+                    required=False,
+                    format_help="Dictionary",
+                ),
+                Attribute(
                     attribute_name="job_file",
                     parent_fields=["task_parameters"],
                     required=False,
@@ -86,6 +92,7 @@ class SparkTask(Task):
         else:
             self._job_file = f"s3://{job_bucket}/{job_file_path}"
         self._spark_args = self.parse_attribute("spark_args")
+        self._spark_conf_args = self.parse_attribute("spark_conf_args")
         self._overrides = self.parse_attribute("overrides") or {}
         self._aws_conn_id = self.parse_attribute("aws_conn_id")
         self._region_name = self.parse_attribute("region_name") or conf.BATCH_AWS_REGION
@@ -103,6 +110,10 @@ class SparkTask(Task):
     @property
     def spark_args(self):
         return self._spark_args
+
+    @property
+    def spark_conf_args(self):
+        return self._spark_conf_args
 
     @property
     def extra_py_files(self):
