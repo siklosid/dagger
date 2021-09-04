@@ -23,16 +23,17 @@ def _parse_args(job_args):
 
     return " ".join(command)
 
-def _parse_spark_args(job_args):
+
+def _parse_spark_args(job_args, delimiter=' ', prefix=''):
     if job_args is None:
         return None
     command = []
     for param_name, param_value in job_args.items():
         command.append(
-            "--{name} {value}".format(name=param_name, value=param_value)
+            f"--{prefix}{param_name}{delimiter}{param_value}"
         )
 
-    return "".join(command)
+    return " ".join(command)
 
 
 class SparkCreator(OperatorCreator):
@@ -89,6 +90,7 @@ class SparkCreator(OperatorCreator):
                 cluster_name=self._task.cluster_name,
                 job_args=_parse_args(self._template_parameters),
                 spark_args=_parse_spark_args(self._task.spark_args),
+                spark_conf_args=_parse_spark_args(self._task.spark_conf_args, '=', 'conf '),
                 extra_py_files=self._task.extra_py_files,
                 **kwargs,
             )

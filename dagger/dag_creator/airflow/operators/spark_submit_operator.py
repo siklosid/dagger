@@ -15,7 +15,7 @@ ENV_SUFFIX = "dev/" if ENV == "local" else ""
 
 class SparkSubmitOperator(DaggerBaseOperator):
     ui_color = "bisque"
-    template_fields = ("job_args",)
+    template_fields = ("job_args", "spark_args", "spark_conf_args")
 
     @apply_defaults
     def __init__(
@@ -24,6 +24,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
             cluster_name,
             job_args=None,
             spark_args=None,
+            spark_conf_args=None,
             extra_py_files=None,
             *args,
             **kwargs,
@@ -32,6 +33,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.job_file = job_file
         self.job_args = job_args
         self.spark_args = spark_args
+        self.spark_conf_args = spark_conf_args
         self.extra_py_files = extra_py_files
         self.cluster_name = cluster_name
 
@@ -48,10 +50,14 @@ class SparkSubmitOperator(DaggerBaseOperator):
         spark_submit_cmd = "spark-submit --master yarn --deploy-mode cluster"
         if self.spark_args is not None:
             spark_submit_cmd += " " + self.spark_args
+        if self.spark_conf_args is not None:
+            spark_submit_cmd += " " + self.spark_conf_args
         if self.extra_py_files is not None:
             spark_submit_cmd += " " + f"--py-files {self.extra_py_files}"
 
         spark_submit_cmd += " " + self.job_file
+
+        logging.info(f"Running spark command: {spark_submit_cmd}")
 
         if self.job_args is not None:
             spark_submit_cmd += " " + self.job_args
