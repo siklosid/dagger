@@ -104,7 +104,11 @@ def airflow_task_fail_alerts(alerts: List[AlertBase], context):
         return
 
     task_instance = context["task_instance"]
-    run_time = (task_instance.end_date - task_instance.start_date).total_seconds()
+    try:
+        run_time = (task_instance.end_date - task_instance.start_date).total_seconds()
+    except TypeError as e:
+        logging
+        run_time = 0
 
     for alert in alerts:
         alert.execute(
