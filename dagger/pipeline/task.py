@@ -1,4 +1,7 @@
 import logging
+import re
+import datetime
+
 from os.path import join
 
 from dagger.pipeline.io import IO
@@ -7,6 +10,8 @@ from dagger.utilities.config_validator import Attribute, ConfigValidator
 
 _logger = logging.getLogger("configFinder")
 
+
+dagger_python_re = re.compile('^{{\sdagger.python\((.*)\)\s}}$')
 
 class Task(ConfigValidator):
     ref_name = None
@@ -54,6 +59,7 @@ class Task(ConfigValidator):
         self._description = self.parse_attribute("description")
         self._parameters = self.parse_attribute("task_parameters")
         self._airflow_parameters = self.parse_attribute("airflow_task_parameters") or {}
+        self._render_parameters(self._airflow_parameters)
         self._template_parameters = self.parse_attribute("template_parameters") or {}
 
         self._inputs = []
@@ -61,6 +67,23 @@ class Task(ConfigValidator):
         self._pool = self.parse_attribute("pool") or self.default_pool
         self.process_inputs(config["inputs"])
         self.process_outputs(config["outputs"])
+
+    @staticmethod
+    def _render_parameter(parameter):
+        if type(parameter) != str:
+            return parameter
+
+        matched = dagger_python_re.match(parameter)
+        if matched:
+            return eval(matched.group(1))
+        else:
+            return parameter
+        return parameter
+
+    @staticmethod
+    def _render_parameters(params: dict):
+        for key, value in params.items():
+            params[key] = Task._render_parameter(value)
 
     @property
     def name(self):

@@ -1,7 +1,6 @@
 import importlib
 from os import path
 
-from airflow.operators.python_operator import BranchPythonOperator
 from dagger import conf
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
