@@ -1,0 +1,9 @@
+owner: "user@domain.com"
+description: |
+  Testing graph
+schedule: "0 3 * * *"
+start_date: "2019-11-12T02:00"
+airflow_parameters:
+  default_args:
+  dag_parameters:
+alerts:

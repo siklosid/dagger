@@ -1,0 +1,8 @@
+Pipeline: ..-..-..-..
+	 task: dummy_task
+	 inputs:
+		 dummy://dummy_input
+	 outputs:
+		 dummy://dummy_output
+
+

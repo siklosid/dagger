@@ -3,6 +3,7 @@ from dagger.pipeline.tasks import (
     airflow_op_task,
     athena_transform_task,
     batch_task,
+    dummy_task,
     python_task,
     redshift_load_task,
     redshift_transform_task,
