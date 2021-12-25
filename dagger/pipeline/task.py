@@ -11,7 +11,7 @@ from dagger.utilities.config_validator import Attribute, ConfigValidator
 _logger = logging.getLogger("configFinder")
 
 
-dagger_python_re = re.compile('^{{\sdagger.python\((.*)\)\s}}$')
+dagger_python_re = re.compile('^{{[ \t]*dagger.python[(](.*)[)][ \t]*}}$')
 
 class Task(ConfigValidator):
     ref_name = None
