@@ -1,4 +1,4 @@
-Pipeline: ..-..-..-..
+Pipeline: test_pipeline
 	 task: dummy_task
 	 inputs:
 		 dummy://dummy_input

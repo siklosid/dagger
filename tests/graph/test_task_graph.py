@@ -9,6 +9,7 @@ from dagger.utilities.exceptions import IdAlreadyExistsException
 from dagger.pipeline.ios.dummy_io import DummyIO
 from dagger.pipeline.tasks.dummy_task import DummyTask
 from dagger.pipeline.pipeline import Pipeline
+from dagger import conf
 
 
 
@@ -63,17 +64,17 @@ class TestTaskGraph(unittest.TestCase):
         with open('tests/fixtures/graph/dummy_input.yaml', "r") as stream:
             config = yaml.safe_load(stream)
 
-        self.dummy_input = DummyIO(config, "/")
+        self.dummy_input = DummyIO(config, conf.DAGS_DIR)
 
         with open('tests/fixtures/graph/dummy_output.yaml', "r") as stream:
             config = yaml.safe_load(stream)
 
-        self.dummy_output = DummyIO(config, "/")
+        self.dummy_output = DummyIO(config, conf.DAGS_DIR)
 
         with open('tests/fixtures/graph/pipeline.yaml', "r") as stream:
             config = yaml.safe_load(stream)
 
-        self.pipeline = Pipeline("/", config)
+        self.pipeline = Pipeline(os.path.join(conf.DAGS_DIR, "test_pipeline"), config)
 
         with open('tests/fixtures/graph/dummy_task.yaml', "r") as stream:
             config = yaml.safe_load(stream)
@@ -84,13 +85,11 @@ class TestTaskGraph(unittest.TestCase):
         with open('tests/fixtures/graph/graph.txt', "r") as stream:
             self.graph_str = stream.read()
 
-
     def test_add_dataset(self):
         graph = task_graph.TaskGraph()
 
         graph.add_dataset(self.dummy_input)
         self.assertEqual(len(graph._graph._nodes), 1)
-        print(graph._graph._nodes)
         self.assertEqual(graph._graph.get_node("dummy://test_dummy_input")._node_id, "dummy://test_dummy_input")
         self.assertEqual(
             graph._graph.get_nodes(graph.NODE_TYPE_DATASET).get("dummy://test_dummy_input")._node_id,
@@ -101,7 +100,6 @@ class TestTaskGraph(unittest.TestCase):
         self.assertEqual(graph._graph.get_type("dummy://test_dummy_output"), None)
 
         graph.add_dataset(self.dummy_output)
-        print(graph._graph._nodes)
         self.assertEqual(len(graph._graph._nodes), 1)
         self.assertEqual(graph._graph.get_nodes(graph.NODE_TYPE_PIPELINE), None)
         self.assertEqual(graph._graph.get_nodes(graph.NODE_TYPE_TASK), None)
@@ -146,7 +144,7 @@ class TestTaskGraph(unittest.TestCase):
         self.assertEqual(len(graph._graph.get_nodes(graph.NODE_TYPE_PIPELINE)), 1)
         self.assertEqual(len(graph._graph.get_nodes(graph.NODE_TYPE_DATASET)), 2)
         self.assertEqual(len(graph._graph.get_nodes(graph.NODE_TYPE_TASK)), 1)
-        self.assertEqual(graph._graph.get_node("..-..-..-..")._node_id, "..-..-..-..")
+        self.assertEqual(graph._graph.get_node("test_pipeline")._node_id, "test_pipeline")
         self.assertEqual(graph._graph.get_node("dummy://dummy_input")._node_id, "dummy://dummy_input")
         self.assertEqual(graph._graph.get_node("dummy://dummy_output")._node_id, "dummy://dummy_output")
 
@@ -159,8 +157,8 @@ class TestTaskGraph(unittest.TestCase):
         self.assertNotIn("dummy://dummy_input", graph._graph.get_node("dummy_task:pipeline")._children)
         self.assertNotIn("dummy://dummy_output", graph._graph.get_node("dummy_task:pipeline")._parents)
 
-        self.assertIn("..-..-..-..", graph._graph.get_node("dummy_task:pipeline")._parents)
-        self.assertIn("dummy_task:pipeline", graph._graph.get_node("..-..-..-..")._children)
+        self.assertIn("test_pipeline", graph._graph.get_node("dummy_task:pipeline")._parents)
+        self.assertIn("dummy_task:pipeline", graph._graph.get_node("test_pipeline")._children)
 
     def test_print_graph(self):
         graph = task_graph.TaskGraph()
