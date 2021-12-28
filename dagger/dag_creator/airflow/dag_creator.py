@@ -13,8 +13,8 @@ from dagger.graph.task_graph import Graph
 
 # noinspection PyStatementEffect
 class DagCreator(GraphTraverserBase):
-    def __init__(self, task_graph: Graph):
-        super().__init__(task_graph)
+    def __init__(self, task_graph: Graph, with_data_nodes: bool = conf.WITH_DATA_NODES):
+        super().__init__(task_graph=task_graph, with_data_nodes=with_data_nodes)
         self._operator_factory = OperatorFactory()
 
     @staticmethod
@@ -72,7 +72,7 @@ class DagCreator(GraphTraverserBase):
             self._data_tasks[pipe_id][
                 dataset_id
             ] = self._operator_factory.create_dataset_operator(
-                re.sub("[^0-9a-zA-Z\-_]+", "_", dataset_id), self._dags[pipe_id]
+                re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
     def _create_edge_without_data(self, from_task_id, to_task_ids):
