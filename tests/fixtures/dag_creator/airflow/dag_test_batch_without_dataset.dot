@@ -1,0 +1,6 @@
+digraph test_batch {
+	graph [label=test_batch labelloc=t rankdir=LR]
+	batch [color="#000000" fillcolor="#c3dae0" label=batch shape=rectangle style="filled,rounded"]
+	"dummy-control-flow" [color="#000000" fillcolor="#ffefeb" label="dummy-control-flow" shape=rectangle style="filled,rounded"]
+	"dummy-control-flow" -> batch
+}

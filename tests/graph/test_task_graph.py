@@ -12,7 +12,6 @@ from dagger.pipeline.pipeline import Pipeline
 from dagger import conf
 
 
-
 class TestGraph(unittest.TestCase):
     def setUp(self):
         os.environ["AIRFLOW_HOME"] = '/Users/david/mygit/dagger/tests/fixtures/config_finder/root/'

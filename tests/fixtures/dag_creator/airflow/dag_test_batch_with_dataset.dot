@@ -1,0 +1,12 @@
+digraph test_batch {
+	graph [label=test_batch labelloc=t rankdir=LR]
+	batch [color="#000000" fillcolor="#c3dae0" label=batch shape=rectangle style="filled,rounded"]
+	"dummy-control-flow" [color="#000000" fillcolor="#ffefeb" label="dummy-control-flow" shape=rectangle style="filled,rounded"]
+	"gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv" [color="#000000" fillcolor="#e8f7e4" label="gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv" shape=rectangle style="filled,rounded"]
+	"redshift-dwh-batch_table" [color="#000000" fillcolor="#e8f7e4" label="redshift-dwh-batch_table" shape=rectangle style="filled,rounded"]
+	"s3-datalake-path-_ds_" [color="#000000" fillcolor="#e8f7e4" label="s3-datalake-path-_ds_" shape=rectangle style="filled,rounded"]
+	batch -> "gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv"
+	batch -> "redshift-dwh-batch_table"
+	"dummy-control-flow" -> "s3-datalake-path-_ds_"
+	"s3-datalake-path-_ds_" -> batch
+}
