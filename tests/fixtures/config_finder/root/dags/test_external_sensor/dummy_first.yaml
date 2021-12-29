@@ -1,0 +1,13 @@
+type: dummy
+description: First dummy task with having dependency on an test_batch
+inputs:                        # format: list | Use dagger init-io cli
+  - type: redshift
+    name: batch_table
+    schema: dwh
+    table: batch_table
+outputs:                       # format: list | Use dagger init-io cli
+  - type: dummy
+    name: first_dummy_output
+airflow_task_parameters:       # [Can be empty] | format: dictionary
+template_parameters:           # [Can be empty] | format: dictionary
+task_parameters:               # [Can be empty]
