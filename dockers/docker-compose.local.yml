@@ -89,12 +89,10 @@ services:
         - /tmp/neo4j/log:/var/log/neo4j
 
   elasticsearch:
-    image: elasticsearch:6.7.0
+    image: elasticsearch:7.16.2
     container_name: es
     ports:
       - 9201:9200
-    expose:
-      - 9200
     ulimits:
       nofile:
         soft: 65536

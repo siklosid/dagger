@@ -33,7 +33,7 @@ NE4J_PORT = neo4j_config.get('port', 7687)
 # Elastic Search Parameters
 es_config = config.get('elastic_search', None) or {}
 ES_HOST = es_config.get('host', "localhost")
-ES_PORT = es_config.get('port', 9201)
+ES_PORT = es_config.get('port', 9200)
 ES_INDEX = es_config.get('index', None)
 
 
