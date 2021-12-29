@@ -19,7 +19,7 @@ wait_for_port() {
 }
 
 configure_airflow() {
-  airflow create_user -r Admin -u dev_user -e dev@user.com -f Dev -l User -p dev_user
+  airflow users create -r Admin -u dev_user -e dev@user.com -f Dev -l User -p dev_user
 
 }
 
@@ -32,12 +32,13 @@ fi
 
 case "$1" in
   webserver)
-    airflow initdb
+    airflow db init
+    airflow db upgrade
     configure_airflow
     exec airflow webserver
     ;;
   scheduler)
-    sleep 10  # make sure airflow initdb & configure-airflow run first
+    airflow db check-migrations -t 600
     exec airflow "$@"
     ;;
   version)
