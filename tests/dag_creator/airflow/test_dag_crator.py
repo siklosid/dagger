@@ -30,6 +30,8 @@ class TestDagCreator(unittest.TestCase):
             return stream.read()
 
     def setUp(self) -> None:
+        self.maxDiff = None
+
         self.task_graph = self._fetch_task_graph()
 
         self.dot_test_batch_graph_without_dataset =\
@@ -56,8 +58,8 @@ class TestDagCreator(unittest.TestCase):
         dags = dag_creator.traverse_graph()
 
         self.assertEqual(len(dags), 3)
-        test_batch_dag = dags['test_batch']
 
+        test_batch_dag = dags['test_batch']
         dot = render_dag(test_batch_dag)
         self.assertEqual(dot.source, self.dot_test_batch_graph_with_dataset)
 

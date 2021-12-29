@@ -2,9 +2,10 @@ type: dummy
 description: First dummy task with having dependency on an test_batch
 inputs:                        # format: list | Use dagger init-io cli
   - type: redshift
-    name: batch_table
+    name: redshift_input
     schema: dwh
     table: batch_table
+    follow_external_dependency: True
 outputs:                       # format: list | Use dagger init-io cli
   - type: dummy
     name: first_dummy_output

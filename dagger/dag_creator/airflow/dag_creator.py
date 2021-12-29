@@ -110,7 +110,7 @@ class DagCreator(GraphTraverserBase):
                 re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
-    def _create_edge_without_data(self, from_task_id, to_task_ids):
+    def _create_edge_without_data(self, from_task_id, to_task_ids, node):
         from_pipe = (
             self._task_graph.get_node(from_task_id).obj.pipeline_name
             if from_task_id
@@ -120,7 +120,7 @@ class DagCreator(GraphTraverserBase):
             to_pipe = self._task_graph.get_node(to_task_id).obj.pipeline_name
             if from_pipe and from_pipe == to_pipe:
                 self._tasks[from_task_id] >> self._tasks[to_task_id]
-            elif from_pipe and from_pipe != to_pipe:
+            elif from_pipe and from_pipe != to_pipe and node.obj.follow_external_dependency:
                 external_task_sensor = self._get_external_task_sensor(from_task_id, to_task_id)
                 self._tasks[self._get_control_flow_task_id(to_pipe)] >> external_task_sensor >> self._tasks[to_task_id]
             else:
