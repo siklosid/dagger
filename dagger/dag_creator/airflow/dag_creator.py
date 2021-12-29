@@ -1,8 +1,11 @@
 import re
-from datetime import timedelta
+import croniter
+from datetime import timedelta, datetime
 from functools import partial
 
 from airflow import DAG
+from airflow.sensors.external_task import ExternalTaskSensor
+
 from dagger import conf
 from dagger.alerts.alert import airflow_task_fail_alerts
 from dagger.dag_creator.airflow.operator_factory import OperatorFactory
@@ -28,6 +31,38 @@ class DagCreator(GraphTraverserBase):
             "retries": 0,
             "retry_delay": timedelta(minutes=5),
         }
+
+    @staticmethod
+    def _get_execution_date_fn(from_dag_schedule: str, to_dag_schedule: str):
+        def execution_date_fn(execution_date, **kwargs):
+            to_dag_cron = croniter.croniter(to_dag_schedule, execution_date)
+            to_dag_next_schedule = to_dag_cron.get_next(datetime)
+
+            from_dag_cron = croniter.croniter(from_dag_schedule, to_dag_next_schedule)
+            from_dag_cron.get_next(datetime)
+            # skipping one schedule
+            from_dag_cron.get_prev(datetime)
+            from_dag_target_schedule = from_dag_cron.get_prev(datetime)
+
+            return from_dag_target_schedule
+
+        return execution_date_fn
+
+    def _get_external_task_sensor(self, from_task_id: str, to_task_id: str) -> ExternalTaskSensor:
+        from_pipeline_name = self._task_graph.get_node(from_task_id).obj.pipeline_name
+        from_task_name = self._task_graph.get_node(from_task_id).obj.name
+
+        from_pipeline_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
+        to_pipeline_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
+
+        return ExternalTaskSensor(
+            task_id=f"{from_pipeline_name}-{from_task_name}-sensor",
+            external_dag_id=from_pipeline_name,
+            external_task_id=from_task_name,
+            execution_delta=self._get_execution_date_fn(from_pipeline_schedule, to_pipeline_schedule),
+            poke_interval=conf.EXTERNAL_SENSOR_POKE_INTERVAL,
+            timeout=conf.EXTERNAL_SENSOR_TIMEOUT
+        )
 
     def _create_control_flow_task(self, pipe_id, dag):
         control_flow_task_id = self._get_control_flow_task_id(pipe_id)
@@ -75,7 +110,7 @@ class DagCreator(GraphTraverserBase):
                 re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
-    def _create_edge_without_data(self, from_task_id, to_task_ids):
+    def _create_edge_without_data(self, from_task_id, to_task_ids, node):
         from_pipe = (
             self._task_graph.get_node(from_task_id).obj.pipeline_name
             if from_task_id
@@ -83,12 +118,15 @@ class DagCreator(GraphTraverserBase):
         )
         for to_task_id in to_task_ids:
             to_pipe = self._task_graph.get_node(to_task_id).obj.pipeline_name
-            if not from_pipe or (from_pipe != to_pipe):
+            if from_pipe and from_pipe == to_pipe:
+                self._tasks[from_task_id] >> self._tasks[to_task_id]
+            elif from_pipe and from_pipe != to_pipe and node.obj.follow_external_dependency:
+                external_task_sensor = self._get_external_task_sensor(from_task_id, to_task_id)
+                self._tasks[self._get_control_flow_task_id(to_pipe)] >> external_task_sensor >> self._tasks[to_task_id]
+            else:
                 self._tasks[self._get_control_flow_task_id(to_pipe)] >> self._tasks[
                     to_task_id
                 ]
-            else:
-                self._tasks[from_task_id] >> self._tasks[to_task_id]
 
     def _create_edge_with_data(self, from_task_id, to_task_ids, node):
         from_pipe = (

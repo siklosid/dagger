@@ -83,8 +83,8 @@ class DagCreator(GraphTraverserBase):
                     description=node.obj.alias(),
                 )
 
-    def _create_edge_without_data(self, from_task_id, to_task_ids):
-        pass
+    def _create_edge_without_data(self, from_task_id, to_task_ids, node):
+        raise NotImplemented
 
     def _create_edge_with_data(self, from_task_id, to_task_ids, node):
         from_pipe = (

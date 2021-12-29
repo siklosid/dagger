@@ -77,7 +77,7 @@ class Graph(object):
         node_id: str,
         name_to_show: str = None,
         obj: object = None,
-        overwrite: bool = False,
+        update: bool = False,
     ):
         if self._nodes.get(node_type, None) is None:
             self._nodes[node_type] = {}
@@ -89,12 +89,14 @@ class Graph(object):
             )
             raise IdAlreadyExistsException(f"A different type of node with the same id: {node_id} already exists")
 
-        if self._nodes[node_type].get(node_id) and not overwrite:
+        if self._nodes[node_type].get(node_id) and not update:
             _logger.debug("Node with name: %s already exists", node_id)
             return
-
-        self._node2type[node_id] = node_type
-        self._nodes[node_type][node_id] = Node(node_id, name_to_show, obj)
+        elif self._nodes[node_type].get(node_id) and update:
+            self._nodes[node_type][node_id].obj.update(obj)
+        else:
+            self._node2type[node_id] = node_type
+            self._nodes[node_type][node_id] = Node(node_id, name_to_show, obj)
 
     def get_node(self, node_id: str):
         if not self._node_exists(node_id):
@@ -172,7 +174,7 @@ class TaskGraph:
 
     def add_dataset(self, io: IO):
         self._graph.add_node(
-            node_type=self.NODE_TYPE_DATASET, node_id=io.alias(), obj=io
+            node_type=self.NODE_TYPE_DATASET, node_id=io.alias(), obj=io, update=True
         )
 
     def print_graph(self, out_file=None):

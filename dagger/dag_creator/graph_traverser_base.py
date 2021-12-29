@@ -57,7 +57,7 @@ class GraphTraverserBase(ABC):
                 self._create_data_task(to_pipe, node)
 
     @abstractmethod
-    def _create_edge_without_data(self, from_task_id, to_task_ids):
+    def _create_edge_without_data(self, from_task_id, to_task_ids, node):
         raise NotImplementedError
 
     def _create_edge_with_data(self, from_task_id, to_task_ids, node):
@@ -76,7 +76,7 @@ class GraphTraverserBase(ABC):
             if self._with_data_nodes:
                 self._create_edge_with_data(parent_task_id, children_ids, node)
             else:
-                self._create_edge_without_data(parent_task_id, children_ids)
+                self._create_edge_without_data(parent_task_id, children_ids, node)
 
     def _finish_dag_creation(self):
         pass

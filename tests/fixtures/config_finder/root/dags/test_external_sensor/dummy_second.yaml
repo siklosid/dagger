@@ -1,0 +1,11 @@
+type: dummy
+description: Second dummy task depending on the first one
+inputs:                        # format: list | Use dagger init-io cli
+  - type: dummy
+    name: first_dummy_output
+outputs:                       # format: list | Use dagger init-io cli
+  - type: dummy
+    name: second_dummy_output
+airflow_task_parameters:       # [Can be empty] | format: dictionary
+template_parameters:           # [Can be empty] | format: dictionary
+task_parameters:               # [Can be empty]

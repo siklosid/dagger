@@ -1,0 +1,10 @@
+digraph test_external_sensor {
+	graph [label=test_external_sensor labelloc=t rankdir=LR]
+	"dummy-control-flow" [color="#000000" fillcolor="#ffefeb" label="dummy-control-flow" shape=rectangle style="filled,rounded"]
+	dummy_first [color="#000000" fillcolor="#e8f7e4" label=dummy_first shape=rectangle style="filled,rounded"]
+	dummy_second [color="#000000" fillcolor="#e8f7e4" label=dummy_second shape=rectangle style="filled,rounded"]
+	"test_batch-batch-sensor" [color="#000000" fillcolor="#19647e" label="test_batch-batch-sensor" shape=rectangle style="filled,rounded"]
+	"dummy-control-flow" -> "test_batch-batch-sensor"
+	dummy_first -> dummy_second
+	"test_batch-batch-sensor" -> dummy_first
+}
