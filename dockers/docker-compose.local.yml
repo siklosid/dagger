@@ -35,7 +35,7 @@ services:
     volumes:
       - ${AIRFLOW_DAGS_DIR}:${AIRFLOW_HOME}/dags
       - ${DAGGER_DIR}:${AIRFLOW_HOME}/dagger
-      - /tmp/airflow_logs-webserver:${AIRFLOW_HOME}/logs
+      - ${DAGGER_DIR}/logs:${AIRFLOW_HOME}/logs
     ports:
         - 8080:8080
     command: webserver
@@ -63,11 +63,11 @@ services:
     volumes:
       - ${AIRFLOW_DAGS_DIR}:${AIRFLOW_HOME}/dags
       - ${DAGGER_DIR}:${AIRFLOW_HOME}/dagger
-      - /tmp/airflow_logs-scheduler:${AIRFLOW_HOME}/logs
+      - ${DAGGER_DIR}/logs:${AIRFLOW_HOME}/logs
     command: scheduler
 
   neo4j:
-    image: neo4j:3.5.0
+    image: neo4j:4.1.4
     container_name: neo4j_dagger
     depends_on:
       - elasticsearch
@@ -78,8 +78,10 @@ services:
         soft: 40000
         hard: 40000
     ports:
-        - 7474:7474
-        - 7687:7687
+      - 7474:7474
+      - 7687:7687
+    expose:
+      - 7687
     volumes:
         - ${DOCKERS_DIR}/neo4j/conf:/conf
         - ${DOCKERS_DIR}/neo4j/plugins:/plugins
