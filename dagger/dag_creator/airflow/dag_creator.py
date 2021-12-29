@@ -59,7 +59,8 @@ class DagCreator(GraphTraverserBase):
             task_id=f"{from_pipeline_name}-{from_task_name}-sensor",
             external_dag_id=from_pipeline_name,
             external_task_id=from_task_name,
-            execution_delta=self._get_execution_date_fn(from_pipeline_schedule, to_pipeline_schedule),
+            execution_date_fn=self._get_execution_date_fn(from_pipeline_schedule, to_pipeline_schedule),
+            mode=conf.EXTERNAL_SENSOR_MODE,
             poke_interval=conf.EXTERNAL_SENSOR_POKE_INTERVAL,
             timeout=conf.EXTERNAL_SENSOR_TIMEOUT
         )
