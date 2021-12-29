@@ -10,7 +10,7 @@ class DagCreator(GraphTraverserBase):
         neo4j_uri = "bolt://{host}:{port}".format(
             host=conf.NE4J_HOST, port=conf.NE4J_PORT
         )
-        self._neo4j_driver = GraphDatabase.driver(neo4j_uri)
+        self._neo4j_driver = GraphDatabase.driver(neo4j_uri, auth=("neo4j", "test"))
 
         with self._neo4j_driver.session() as session:
             session.write_transaction(self._reset_graph)
@@ -26,7 +26,7 @@ class DagCreator(GraphTraverserBase):
         create_cmd = f"CREATE (node:{node_type} {{{node_args}}}) RETURN node"
         print(create_cmd)
         result = tx.run(create_cmd)
-        return list(result.records())[0]["node"].id
+        return result.single()['node'].id
 
     @staticmethod
     def _add_edge(tx, from_id: int, to_id: int, relationship_type: str, **kwargs):
@@ -70,17 +70,18 @@ class DagCreator(GraphTraverserBase):
         return node_id
 
     def _create_data_task(self, pipe_id, node):
-        if pipe_id not in self._data_tasks:
-            self._data_tasks[pipe_id] = {}
+        # if pipe_id not in self._data_tasks:
+        #     self._data_tasks[pipe_id] = {}
 
         dataset_id = node.obj.airflow_name
-        if dataset_id not in self._data_tasks[pipe_id]:
+        print('XXX dataset_id', dataset_id)
+        if dataset_id not in self._data_tasks:
             with self._neo4j_driver.session() as session:
-                self._data_tasks[pipe_id][dataset_id] = session.write_transaction(
+                self._data_tasks[dataset_id] = session.write_transaction(
                     self._add_node,
                     "Dataset",
-                    name=node.obj.name,
-                    description=node.obj.alias(),
+                    name=node.obj.alias(),
+                    description=node.obj.name,
                 )
 
     def _create_edge_without_data(self, from_task_id, to_task_ids, node):
@@ -98,7 +99,7 @@ class DagCreator(GraphTraverserBase):
                 session.write_transaction(
                     self._add_edge,
                     self._tasks[from_task_id],
-                    self._data_tasks[from_pipe][data_id],
+                    self._data_tasks[data_id],
                     "GENERATED_BY",
                 )
 
@@ -107,7 +108,7 @@ class DagCreator(GraphTraverserBase):
             with self._neo4j_driver.session() as session:
                 session.write_transaction(
                     self._add_edge,
-                    self._data_tasks[to_pipe][data_id],
+                    self._data_tasks[data_id],
                     self._tasks[to_task_id],
                     "DEPENDS_ON",
                 )

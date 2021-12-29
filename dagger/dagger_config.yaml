@@ -2,10 +2,11 @@ airflow:
   with_data_node: false
   external_sensor_poke_interval: 600
   external_sensor_timeout: 28800
+  external_sensor_mode: reschedule
 
 
 neo4j:
-#  host:
+  host: neo4j
 #  port:
 
 
