@@ -11,9 +11,9 @@ neo4j:
 
 
 elastic_search:
-#  host:
+  host: elasticsearch
 #  port:
-#  index:
+  index: index
 
 
 redshift:
