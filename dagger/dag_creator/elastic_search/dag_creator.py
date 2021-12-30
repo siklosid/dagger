@@ -10,7 +10,7 @@ ES_TYPE_DATASET = "dataset"
 
 class DagCreator(GraphTraverserBase):
     def __init__(self, task_graph: Graph):
-        super().__init__(task_graph, False)
+        super().__init__(task_graph, True)
 
         self.es = Elasticsearch(
             hosts=[f"{conf.ES_HOST}:{conf.ES_PORT}"]
@@ -23,40 +23,39 @@ class DagCreator(GraphTraverserBase):
         self.es.indices.create(
             index='index',
             body={
-                "settings":{
-                    "analysis":{
-                        "analyzer":{
-                            "my_analyzer":{
-                                "type":"custom",
-                                "tokenizer":"standard",
-                                "filter":[
-                                    "lowercase"
-                                ]
-                            },
-                            "my_stop_analyzer":{
-                                "type":"custom",
-                                "tokenizer":"standard",
-                                "filter":[
+                "settings": {
+                    "analysis": {
+                        "analyzer": {
+                            "my_analyzer": {
+                                "tokenizer": "standard",
+                                "filter": [
                                     "lowercase",
-                                    "english_stop"
+                                    "my_stemmer"
                                 ]
                             }
                         },
-                        "filter":{
-                            "english_stop":{
-                                "type":"stop",
-                                "stopwords":"_english_"
+                        "filter": {
+                            "my_stemmer": {
+                                "type": "stemmer",
+                                "language": "english"
                             }
                         }
                     }
                 },
                 "mappings": {
                     "properties": {
-                        "title": {
+                        "name": {
                             "type": "text",
                             "analyzer": "my_analyzer",
-                            "search_analyzer": "my_stop_analyzer",
-                            "search_quote_analyzer": "my_analyzer"
+                            "search_analyzer": "my_analyzer",
+                        },
+                        "description": {
+                            "type": "text",
+                            "analyzer": "my_analyzer",
+                            "search_analyzer": "my_analyzer",
+                        },
+                        "type": {
+                            "type": "text"
                         }
                     }
                 }
@@ -93,9 +92,8 @@ class DagCreator(GraphTraverserBase):
         result = self._index_doc(es_doc)
         return result['_id']
 
-
     def _create_edge_without_data(self, from_task_id, to_task_ids, node):
-        pass
+        raise NotImplemented
 
     def _create_edge_with_data(self, from_task_id, to_task_ids, node):
-        raise NotImplemented
+        pass
