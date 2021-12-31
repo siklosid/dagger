@@ -122,6 +122,12 @@ build-airflow: PROJ_NAME="airflow"
 build-airflow:
 	docker build --build-arg AIRFLOW_VERSION=${AIRFLOW_VERSION} -t ${DOCKER_REGISTRY}/${PROJ_NAME}:${AIRFLOW_VERSION} ./dockers/airflow
 
+build-dagger_ui:  ## Build dagger_ui image
+build-dagger_ui: PROJ_NAME="dagger_ui"
+build-dagger_ui:
+	docker build -t ${DOCKER_REGISTRY}/${PROJ_NAME}:"v0.1" ./dockers/dagger_ui
+
+
 test-airflow: ## Run airflow image locally | args: services
 test-airflow: export ARGS=$(shell if [ "${logs}" != "true" ]; then echo "-d"; fi)
 test-airflow: build-airflow

@@ -108,3 +108,14 @@ services:
       - IPC_LOCK
     volumes:
       - ${DOCKERS_DIR}/elasticsearch/data:/usr/share/elasticsearch/data
+
+  dagger_ui:
+    depends_on:
+      - elasticsearch
+      - neo4j
+    image: dagger/dagger_ui:v0.1
+    container_name: dagger_ui
+    ports:
+      - 5000:5000
+    volumes:
+      - ${DAGGER_DIR}/../dagger_ui/app:/usr/local/dagger/app

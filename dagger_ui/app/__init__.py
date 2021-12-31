@@ -11,4 +11,4 @@ es_client = Elasticsearch(f"{Config.ES_HOST}:{Config.ES_PORT}")
 
 from app import routes
 
-app.run(debug=True)
+app.run(debug=True, host="0.0.0.0")
