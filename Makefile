@@ -37,6 +37,7 @@ clean: clean-venv clean-build clean-pyc clean-test ## remove all build, test, co
 clean-venv: ## remove virtualenv
 	$(shell if command -v deactivate ; then deactivate ; fi)
 	rm -fr venv
+	rm -fr venv_ui
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -107,6 +108,13 @@ install-test: clean ## install the package to the active Python's site-packages
 	source venv/bin/activate; \
 	python -m pip install --upgrade pip; \
 	pip install -r reqs/test.txt
+
+install-ui: clean ## install the package to the active Python's site-packages
+	virtualenv -p python3 venv_ui; \
+	source venv_ui/bin/activate; \
+	python -m pip install --upgrade pip; \
+	python setup.py install; \
+	pip install -r reqs/ui.txt
 
 
 build-airflow:  ## Build airflow image
