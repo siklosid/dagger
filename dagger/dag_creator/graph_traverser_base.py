@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 
 from dagger import conf
 from dagger.graph.task_graph import Graph, TaskGraph
-from dagger.pipeline.pipeline import Pipeline
+
+import logging
+_logger = logging.getLogger("graph")
 
 
 class GraphTraverserBase(ABC):
@@ -82,11 +84,17 @@ class GraphTraverserBase(ABC):
         pass
 
     def traverse_graph(self):
+        _logger.info("Start traversing pipelines")
         self._create_dags()
+        _logger.info("Traversing jobs")
         self._create_job_tasks()
         if self._with_data_nodes:
+            _logger.info("Traversing datasets")
             self._create_data_tasks()
+        _logger.info("Creating edges")
         self._create_edges()
+        _logger.info("Finalising traverse")
         self._finish_dag_creation()
+        _logger.info("Finished traversing")
 
         return self._dags

@@ -37,6 +37,7 @@ clean: clean-venv clean-build clean-pyc clean-test ## remove all build, test, co
 clean-venv: ## remove virtualenv
 	$(shell if command -v deactivate ; then deactivate ; fi)
 	rm -fr venv
+	rm -fr venv_ui
 
 clean-build: ## remove build artifacts
 	rm -fr build/
@@ -108,11 +109,24 @@ install-test: clean ## install the package to the active Python's site-packages
 	python -m pip install --upgrade pip; \
 	pip install -r reqs/test.txt
 
+install-ui: clean ## install the package to the active Python's site-packages
+	virtualenv -p python3 venv_ui; \
+	source venv_ui/bin/activate; \
+	python -m pip install --upgrade pip; \
+	python setup.py install; \
+	pip install -r reqs/ui.txt
+
 
 build-airflow:  ## Build airflow image
 build-airflow: PROJ_NAME="airflow"
 build-airflow:
 	docker build --build-arg AIRFLOW_VERSION=${AIRFLOW_VERSION} -t ${DOCKER_REGISTRY}/${PROJ_NAME}:${AIRFLOW_VERSION} ./dockers/airflow
+
+build-dagger_ui:  ## Build dagger_ui image
+build-dagger_ui: PROJ_NAME="dagger_ui"
+build-dagger_ui:
+	docker build -t ${DOCKER_REGISTRY}/${PROJ_NAME}:"v0.1" ./dockers/dagger_ui
+
 
 test-airflow: ## Run airflow image locally | args: services
 test-airflow: export ARGS=$(shell if [ "${logs}" != "true" ]; then echo "-d"; fi)
