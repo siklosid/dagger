@@ -93,6 +93,7 @@ services:
     container_name: es
     ports:
       - 9200:9200
+      - 9300:9300
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node

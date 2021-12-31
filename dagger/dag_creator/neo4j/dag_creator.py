@@ -1,6 +1,7 @@
 from dagger import conf
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
 from dagger.graph.task_graph import Graph
+from dagger.utilities import uid
 from neo4j import GraphDatabase
 
 
@@ -24,7 +25,6 @@ class DagCreator(GraphTraverserBase):
     def _add_node(tx, node_type: str, **kwargs):
         node_args = ", ".join([f'{key}:"{value}"' for key, value in kwargs.items()])
         create_cmd = f"CREATE (node:{node_type} {{{node_args}}}) RETURN node"
-        print(create_cmd)
         result = tx.run(create_cmd)
         return result.single()['node'].id
 
@@ -38,7 +38,6 @@ class DagCreator(GraphTraverserBase):
             WHERE ID(from_node)={from_id} AND ID(to_node)={to_id}
             CREATE (from_node)-[:{relationship_type} {{{relationship_args}}}]->(to_node)
         """
-        print(create_cmd)
         tx.run(create_cmd)
 
     def _create_dag(self, pipe_id, node):
@@ -48,6 +47,7 @@ class DagCreator(GraphTraverserBase):
                 "Dag",
                 name=node.obj.name,
                 description=node.obj.description,
+                uid=uid.get_pipeline_uid(node.obj)
             )
         return node_id
 
@@ -58,10 +58,10 @@ class DagCreator(GraphTraverserBase):
                 "Job",
                 name=node.obj.name,
                 description=node.obj.description,
+                uid=uid.get_task_uid(node.obj)
             )
 
         pipe_id = node.obj.pipeline_name
-        print(pipe_id, self._dags)
         with self._neo4j_driver.session() as session:
             session.write_transaction(
                 self._add_edge, node_id, self._dags[pipe_id], "TASK_OF"
@@ -74,7 +74,6 @@ class DagCreator(GraphTraverserBase):
         #     self._data_tasks[pipe_id] = {}
 
         dataset_id = node.obj.airflow_name
-        print('XXX dataset_id', dataset_id)
         if dataset_id not in self._data_tasks:
             with self._neo4j_driver.session() as session:
                 self._data_tasks[dataset_id] = session.write_transaction(
@@ -82,6 +81,7 @@ class DagCreator(GraphTraverserBase):
                     "Dataset",
                     name=node.obj.alias(),
                     description=node.obj.name,
+                    uid=uid.get_dataset_uid(node.obj)
                 )
 
     def _create_edge_without_data(self, from_task_id, to_task_ids, node):

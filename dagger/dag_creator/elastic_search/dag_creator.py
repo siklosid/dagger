@@ -1,6 +1,7 @@
 from dagger import conf
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
 from dagger.graph.task_graph import Graph
+from dagger.utilities import uid
 from elasticsearch import Elasticsearch
 
 ES_TYPE_DAG = "dag"
@@ -56,40 +57,46 @@ class DagCreator(GraphTraverserBase):
                         },
                         "type": {
                             "type": "text"
-                        }
+                        },
                     }
                 }
             }
         )
 
-    def _index_doc(self, doc):
-        return self.es.index(index=conf.ES_INDEX, document=doc)
+    def _index_doc(self, doc, id):
+        return self.es.index(index=conf.ES_INDEX, document=doc, id=id)
 
     def _create_dag(self, pipe_id, node):
+        uuid = uid.get_pipeline_uid(node.obj)
         es_doc = {
             "name": node.obj.name,
             "description": node.obj.description,
             "type": ES_TYPE_DAG
         }
-        result = self._index_doc(es_doc)
+        result = self._index_doc(es_doc, uuid)
         return result['_id']
 
     def _create_job_task(self, node):
+        uuid = uid.get_task_uid(node.obj)
         es_doc = {
             "name": node.obj.name,
             "description": node.obj.description,
             "type": ES_TYPE_TASK
         }
-        result = self._index_doc(es_doc)
+        result = self._index_doc(es_doc, uuid)
         return result['_id']
 
     def _create_data_task(self, pipe_id, node):
+        uuid = uid.get_dataset_uid(node.obj)
+        if uuid in self._data_tasks:
+            return uuid
+
         es_doc = {
             "name": node.obj.alias(),
             "description": node.obj.name,
             "type": ES_TYPE_DATASET
         }
-        result = self._index_doc(es_doc)
+        result = self._index_doc(es_doc, uuid)
         return result['_id']
 
     def _create_edge_without_data(self, from_task_id, to_task_ids, node):
