@@ -122,8 +122,11 @@ class DagCreator(GraphTraverserBase):
             if from_pipe and from_pipe == to_pipe:
                 self._tasks[from_task_id] >> self._tasks[to_task_id]
             elif from_pipe and from_pipe != to_pipe and node.obj.follow_external_dependency:
-                external_task_sensor = self._get_external_task_sensor(from_task_id, to_task_id)
-                self._tasks[self._get_control_flow_task_id(to_pipe)] >> external_task_sensor >> self._tasks[to_task_id]
+                from_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
+                to_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
+                if not from_schedule.startswith('@') and not to_schedule.startswith('@'):
+                    external_task_sensor = self._get_external_task_sensor(from_task_id, to_task_id)
+                    self._tasks[self._get_control_flow_task_id(to_pipe)] >> external_task_sensor >> self._tasks[to_task_id]
             else:
                 self._tasks[self._get_control_flow_task_id(to_pipe)] >> self._tasks[
                     to_task_id
