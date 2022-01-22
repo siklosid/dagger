@@ -39,10 +39,6 @@ class IO(ConfigValidator, ABC):
     def __eq__(self, other):
         return self.alias() == other.alias()
 
-    def update(self, other_io):
-        self._has_dependency = self._has_dependency or other_io.has_dependency
-        self._follow_external_dependency = self._follow_external_dependency or other_io.follow_external_dependency
-
     @abstractmethod
     def alias(self):
         pass
