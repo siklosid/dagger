@@ -6,6 +6,7 @@ import dagger.pipeline.pipeline
 from dagger.pipeline.io import IO
 from dagger.pipeline.task import Task
 from dagger.utilities.exceptions import IdAlreadyExistsException
+from dagger.conf import config
 
 _logger = logging.getLogger("graph")
 
@@ -16,7 +17,6 @@ class Node(ABC):
         self._name = name_to_show if name_to_show else node_id
         self._parents = set()
         self._children = set()
-        self._attributes = {}
 
         self._obj = obj
 
@@ -44,15 +44,6 @@ class Node(ABC):
         return self._children
 
     @property
-    def attributes(self):
-        return self._attributes
-
-    @attributes.setter
-    def attributes(self, t_key_value):
-        key, value = t_key_value
-        self._attributes[key] = value
-
-    @property
     def obj(self):
         return self._obj
 
@@ -63,10 +54,21 @@ class Node(ABC):
         self._children.add(child_id)
 
 
+class Edge:
+    def __init__(self, follow_external_dependency=False):
+        print('XXX Creating edge with: ', follow_external_dependency)
+        self._follow_external_dependency = follow_external_dependency
+
+    @property
+    def follow_external_dependency(self):
+        return self._follow_external_dependency
+
+
 class Graph(object):
     def __init__(self):
         self._nodes = {}
         self._node2type = {}
+        self._edges = {}
 
     def _node_exists(self, node_id):
         return self._node2type.get(node_id, None) is not None
@@ -107,7 +109,8 @@ class Graph(object):
     def get_nodes(self, node_type):
         return self._nodes.get(node_type, None)
 
-    def add_edge(self, from_node_id, to_node_id):
+    def add_edge(self, from_node_id, to_node_id, **attributes):
+        print('XXX add edge', from_node_id, to_node_id, attributes)
         from_node = self.get_node(from_node_id)
         to_node = self.get_node(to_node_id)
 
@@ -129,12 +132,16 @@ class Graph(object):
 
         from_node.add_child(to_node_id)
         to_node.add_parent(from_node_id)
+        self._edges[(from_node_id, to_node_id)] = Edge(**attributes)
 
     def get_type(self, node_id):
         if not self._node_exists(node_id):
             return None
 
         return self._node2type[node_id]
+
+    def get_edge(self, from_node_id, to_node_id):
+        return self._edges.get((from_node_id, to_node_id))
 
 
 class TaskGraph:
@@ -165,7 +172,11 @@ class TaskGraph:
         for task_input in task.inputs:
             self.add_dataset(task_input)
             if task_input.has_dependency:
-                self._graph.add_edge(task_input.alias(), task.uniq_name)
+                self._graph.add_edge(
+                    task_input.alias(),
+                    task.uniq_name,
+                    follow_external_dependency=task_input.follow_external_dependency
+                )
 
         for task_output in task.outputs:
             self.add_dataset(task_output)

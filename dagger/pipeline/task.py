@@ -1,6 +1,7 @@
 import logging
 import re
 import datetime
+from typing import List
 
 from os.path import join
 
@@ -102,23 +103,23 @@ class Task(ConfigValidator):
         return self._pipeline
 
     @property
-    def uniq_name(self):
+    def uniq_name(self) -> str:
         return "{}:{}".format(self.name, self.pipeline_name)
 
     @property
-    def airflow_parameters(self):
+    def airflow_parameters(self) -> dict:
         return self._airflow_parameters
 
     @property
-    def template_parameters(self):
+    def template_parameters(self) -> dict:
         return self._template_parameters
 
     @property
-    def inputs(self):
+    def inputs(self) -> List[IO]:
         return self._inputs
 
     @property
-    def outputs(self):
+    def outputs(self) -> List[IO]:
         return self._outputs
 
     @property
