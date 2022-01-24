@@ -35,9 +35,7 @@ def search():
                         }
                     }
                 )
-                print('XXX Results', results)
                 documents = results['hits']
-                print('XXX Documents', documents)
 
             except ex_requests.ConnectionError:
                 # connection error

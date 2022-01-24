@@ -56,7 +56,6 @@ class Node(ABC):
 
 class Edge:
     def __init__(self, follow_external_dependency=False):
-        print('XXX Creating edge with: ', follow_external_dependency)
         self._follow_external_dependency = follow_external_dependency
 
     @property
@@ -107,7 +106,6 @@ class Graph(object):
         return self._nodes.get(node_type, None)
 
     def add_edge(self, from_node_id, to_node_id, **attributes):
-        print('XXX add edge', from_node_id, to_node_id, attributes)
         from_node = self.get_node(from_node_id)
         to_node = self.get_node(to_node_id)
 
