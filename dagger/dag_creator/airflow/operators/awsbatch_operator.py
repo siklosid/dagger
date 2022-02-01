@@ -96,7 +96,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         if absolute_job_name is not None:
             return absolute_job_name
 
-        job_path = conf.DAGS_DIR / job_name.replace("-", "/")
+        job_path = Path(conf.DAGS_DIR) / job_name.replace("-", "/")
         assert (
             job_path.is_dir()
         ), f"Job name `{job_name}`, points to a non-existing folder `{job_path}`"
