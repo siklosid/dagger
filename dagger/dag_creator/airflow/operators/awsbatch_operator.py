@@ -7,6 +7,7 @@ from airflow.utils.decorators import apply_defaults
 
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from dagger.dag_creator.airflow.utils.decorators import lazy_property
+from dagger import conf
 
 
 class AWSBatchOperator(DaggerBaseOperator):
@@ -95,7 +96,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         if absolute_job_name is not None:
             return absolute_job_name
 
-        job_path = Path().home() / "dags" / job_name.replace("-", "/")
+        job_path = conf.DAGS_DIR / job_name.replace("-", "/")
         assert (
             job_path.is_dir()
         ), f"Job name `{job_name}`, points to a non-existing folder `{job_path}`"
