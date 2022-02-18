@@ -6,6 +6,7 @@ from dagger.alerts.alert import AlertBase, AlertFactory
 from dagger.pipeline.task import Task
 from dagger.utilities.config_validator import Attribute, ConfigValidator
 
+ENV = conf.ENV
 
 class Pipeline(ConfigValidator):
     @classmethod
@@ -27,6 +28,10 @@ class Pipeline(ConfigValidator):
                     validator=lambda x: datetime.strptime(x, "%Y-%m-%dT%H:%M"),
                 ),
                 Attribute(attribute_name="airflow_parameters"),
+                Attribute(
+                    attribute_name="environments",
+                    required=False,
+                ),
                 Attribute(
                     attribute_name="default_args",
                     required=True,
@@ -59,12 +64,14 @@ class Pipeline(ConfigValidator):
         self._directory = directory
         self._name = relpath(directory, conf.DAGS_DIR).replace("/", "-")
 
-        self._owner = self.parse_attribute(attribute_name="owner")
-        self._description = self.parse_attribute(attribute_name="description")
-        self._default_args = self.parse_attribute(attribute_name="default_args") or {}
-        self._schedule = self.parse_attribute(attribute_name="schedule")
-        self._start_date = self.parse_attribute(attribute_name="start_date")
-        self._parameters = self.parse_attribute(attribute_name="dag_parameters") or {}
+        env_dependent_config = config.get("environments").get(ENV) if config.get("environments") else {}
+
+        self._owner = env_dependent_config.get("owner") or self.parse_attribute(attribute_name="owner")
+        self._description = env_dependent_config.get("description") or self.parse_attribute(attribute_name="description")
+        self._default_args = env_dependent_config.get("default_args") or self.parse_attribute(attribute_name="default_args") or {}
+        self._schedule = env_dependent_config.get("schedule") or self.parse_attribute(attribute_name="schedule")
+        self._start_date = env_dependent_config.get("start_date") or self.parse_attribute(attribute_name="start_date")
+        self._parameters = env_dependent_config.get("dag_parameters") or self.parse_attribute(attribute_name="dag_parameters") or {}
 
         self._tasks = []
 

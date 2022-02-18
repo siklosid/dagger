@@ -13,6 +13,7 @@ from dagger.dag_creator.airflow.utils.macros import user_defined_macros
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
 from dagger.graph.task_graph import Graph
 
+import logging
 
 # noinspection PyStatementEffect
 class DagCreator(GraphTraverserBase):
@@ -80,11 +81,14 @@ class DagCreator(GraphTraverserBase):
             default_args["on_failure_callback"] = partial(
                 airflow_task_fail_alerts, pipeline.alerts
             )
-
         dag = DAG(
             pipeline.name,
             description=pipeline.description,
             default_args=default_args,
+<<<<<<< Updated upstream
+=======
+            #catchup=False,
+>>>>>>> Stashed changes
             start_date=pipeline.start_date,
             schedule_interval=pipeline.schedule,
             user_defined_macros=user_defined_macros,

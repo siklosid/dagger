@@ -7,12 +7,13 @@ from dagger.config_finder.config_finder import ConfigFinder
 from dagger.pipeline.pipeline import Pipeline
 from dagger.pipeline.task_factory import TaskFactory
 
-# import dagger.conf as conf
+import dagger.conf as conf
 
 
 _logger = logging.getLogger("configFinder")
 DAG_DIR = join(environ.get("AIRFLOW_HOME", "./"), "dags")
 
+ENV = conf.ENV
 
 class ConfigProcessor:
     def __init__(self, config_finder: ConfigFinder):
@@ -49,11 +50,13 @@ class ConfigProcessor:
                 _logger.info("Processing task config: %s", task_config_path)
                 task_config = self._load_yaml(task_config_path)
                 task_type = task_config["type"]
-                pipeline.add_task(
-                    self._task_factory.create_task(
-                        task_type, task_name, pipeline_name, pipeline, task_config
+                env_dependent_config = task_config.get("environments").get(ENV) if task_config.get("environments") else {}
+                if not env_dependent_config.get("deactivate"):
+                    pipeline.add_task(
+                        self._task_factory.create_task(
+                            task_type, task_name, pipeline_name, pipeline, task_config
+                        )
                     )
-                )
 
             pipelines.append(pipeline)
 

@@ -48,10 +48,20 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 
 # Install python libraries & cleanup
 RUN pip install -U pip setuptools wheel pytest-runner
+<<<<<<< Updated upstream
 RUN pip install --use-deprecated legacy-resolver \
     authlib==0.15.4 \
     requests==2.25.1 \
     apache-airflow[slack,postgres,s3,statsd]==$AIRFLOW_VERSION --constraint $CONSTRAINTS \
+=======
+RUN pip install \
+    pytz \
+    pyOpenSSL \
+    ndg-httpsclient \
+    apache-airflow[crypto,slack,druid,postgres,s3,statsd]==$AIRFLOW_VERSION \
+    psycopg2-binary \
+    -U awscli>=1.16 \
+>>>>>>> Stashed changes
     && apt-get purge --auto-remove -yqq $BUILD_DEPS \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \

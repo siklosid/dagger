@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from dagger import conf
 
+ENV = conf.ENV
 
 class OperatorCreator(ABC):
     def __init__(self, task, dag):
@@ -7,6 +9,7 @@ class OperatorCreator(ABC):
         self._dag = dag
         self._template_parameters = {}
         self._airflow_parameters = {}
+        self._environments = {}
 
     @abstractmethod
     def _create_operator(self, kwargs):
@@ -20,6 +23,9 @@ class OperatorCreator(ABC):
         self._airflow_parameters.update(self._task.airflow_parameters)
 
         self._airflow_parameters.update({"description": self._task.description})
+
+        if self._environments.get(ENV):
+            self._airflow_parameters.update(self._environments.get(ENV).get("airflow_parameters"))
 
         if self._task.pool:
             self._airflow_parameters["pool"] = self._task.pool
