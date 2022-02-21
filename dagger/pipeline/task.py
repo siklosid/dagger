@@ -122,16 +122,11 @@ class Task(ConfigValidator):
         return self._template_parameters
 
     @property
-<<<<<<< Updated upstream
     def inputs(self) -> List[IO]:
-=======
+        return self._inputs
+
     def environments(self):
         return self._environments
-
-    @property
-    def inputs(self):
->>>>>>> Stashed changes
-        return self._inputs
 
     @property
     def outputs(self) -> List[IO]:

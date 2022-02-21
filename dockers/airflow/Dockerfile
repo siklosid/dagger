@@ -53,7 +53,6 @@ RUN pip install --use-deprecated legacy-resolver \
     authlib==0.15.4 \
     requests==2.25.1 \
     apache-airflow[slack,postgres,s3,statsd]==$AIRFLOW_VERSION --constraint $CONSTRAINTS \
-=======
 RUN pip install \
     pytz \
     pyOpenSSL \
@@ -61,7 +60,6 @@ RUN pip install \
     apache-airflow[crypto,slack,druid,postgres,s3,statsd]==$AIRFLOW_VERSION \
     psycopg2-binary \
     -U awscli>=1.16 \
->>>>>>> Stashed changes
     && apt-get purge --auto-remove -yqq $BUILD_DEPS \
     && apt-get autoremove -yqq --purge \
     && apt-get clean \
