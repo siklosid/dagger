@@ -107,7 +107,7 @@ install-test: clean ## install the package to the active Python's site-packages
 	virtualenv -p python3 venv; \
 	source venv/bin/activate; \
 	python -m pip install --upgrade pip; \
-	pip install -r reqs/test.txt
+	pip install -r reqs/test.txt -r reqs/base.txt
 
 install-ui: clean ## install the package to the active Python's site-packages
 	virtualenv -p python3 venv_ui; \
