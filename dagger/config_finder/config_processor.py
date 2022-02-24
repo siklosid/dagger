@@ -15,6 +15,7 @@ DAG_DIR = join(environ.get("AIRFLOW_HOME", "./"), "dags")
 
 ENV = conf.ENV
 
+
 class ConfigProcessor:
     def __init__(self, config_finder: ConfigFinder):
         self._config_finder = config_finder
@@ -29,6 +30,20 @@ class ConfigProcessor:
                 _logger.exception("Couldn't read config file {}", yaml_path, exc)
                 exit(1)
         return config
+
+    @staticmethod
+    def overwrite_params(config):
+        env_dependent_params = config.get("environments", {}).get(ENV, {})
+        try:
+            config["template_parameters"].update(env_dependent_params.get("template_parameters", {}))
+        except AttributeError:
+            config["template_parameters"] = env_dependent_params.get("template_parameters", {})
+        try:
+            config["airflow_task_parameters"].update(env_dependent_params.get("airflow_task_parameters", {}))
+        except AttributeError:
+            config["airflow_task_parameters"] = env_dependent_params.get("airflow_task_parameters", {})
+        deactivate = env_dependent_params.get("deactivate")
+        return config, deactivate
 
     def process_pipeline_configs(self):
         configs = self._config_finder.find_configs()
@@ -49,9 +64,9 @@ class ConfigProcessor:
 
                 _logger.info("Processing task config: %s", task_config_path)
                 task_config = self._load_yaml(task_config_path)
+                task_config, deactivate = self.overwrite_params(task_config)
                 task_type = task_config["type"]
-                env_dependent_config = task_config.get("environments").get(ENV) if task_config.get("environments") else {}
-                if not env_dependent_config.get("deactivate"):
+                if not deactivate:
                     pipeline.add_task(
                         self._task_factory.create_task(
                             task_type, task_name, pipeline_name, pipeline, task_config
