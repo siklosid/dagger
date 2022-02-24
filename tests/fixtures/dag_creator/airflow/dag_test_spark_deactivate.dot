@@ -1,0 +1,10 @@
+digraph test_spark {
+	graph [label=test_spark labelloc=t rankdir=LR]
+	"athena-test-test" [color="#000000" fillcolor="#e8f7e4" label="athena-test-test" shape=rectangle style="filled,rounded"]
+	"dummy-control-flow" [color="#000000" fillcolor="#ffefeb" label="dummy-control-flow" shape=rectangle style="filled,rounded"]
+	"s3-test_bucket-test-path" [color="#000000" fillcolor="#e8f7e4" label="s3-test_bucket-test-path" shape=rectangle style="filled,rounded"]
+	spark [color="#000000" fillcolor=bisque label=spark shape=rectangle style="filled,rounded"]
+	"athena-test-test" -> spark
+	"dummy-control-flow" -> "athena-test-test"
+	spark -> "s3-test_bucket-test-path"
+}
