@@ -8,6 +8,7 @@ from dagger.utilities.config_validator import Attribute, ConfigValidator
 
 ENV = conf.ENV
 
+
 class Pipeline(ConfigValidator):
     @classmethod
     def init_attributes(cls, orig_cls):

@@ -14,6 +14,7 @@ _logger = logging.getLogger("configFinder")
 
 dagger_python_re = re.compile('^{{[ \t]*dagger.python[(](.*)[)][ \t]*}}$')
 
+
 class Task(ConfigValidator):
     ref_name = None
     default_pool = None
@@ -125,7 +126,8 @@ class Task(ConfigValidator):
     def inputs(self) -> List[IO]:
         return self._inputs
 
-    def environments(self):
+    @property
+    def environments(self) -> dict:
         return self._environments
 
     @property
