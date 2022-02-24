@@ -13,7 +13,6 @@ from dagger.dag_creator.airflow.utils.macros import user_defined_macros
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
 from dagger.graph.task_graph import Graph
 
-import logging
 
 # noinspection PyStatementEffect
 class DagCreator(GraphTraverserBase):
