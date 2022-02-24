@@ -124,3 +124,9 @@ ENV/
 
 # Pytest
 .pytest_cache
+
+# Airflow
+*webserver_config.py
+
+# Logs
+*logs*
