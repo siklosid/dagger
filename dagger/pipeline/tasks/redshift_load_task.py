@@ -83,6 +83,13 @@ class RedshiftLoadTask(Task):
                     format_help="string {schema}.{table}",
                     comment="If you have the schema of the table e.g.: in spectrum you can copy the ddl from there",
                 ),
+                Attribute(
+                    attribute_name="sort_keys",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    format_help="Comma separated list of strings. {col1,col2}",
+                    comment="Redshift sort keys. If this is set, interleaved sort_keys must be null.",
+                ),
             ]
         )
 
@@ -105,6 +112,7 @@ class RedshiftLoadTask(Task):
             load_parameters["maxerrors"] = self._max_errors
         load_parameters.update(self.parse_attribute("extra_load_parameters") or {})
         self._extra_parameters = load_parameters
+        self._sort_keys = self.parse_attribute("sort_keys")
 
     @property
     def iam_role(self):
@@ -145,3 +153,7 @@ class RedshiftLoadTask(Task):
     @property
     def copy_ddl_from(self):
         return self._copy_ddl_from
+
+    @property
+    def sort_keys(self):
+        return self._sort_keys

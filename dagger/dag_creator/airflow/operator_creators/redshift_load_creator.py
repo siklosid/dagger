@@ -24,6 +24,8 @@ class RedshiftLoadCreator(OperatorCreator):
 
         self._copy_ddl_from = self._task.copy_ddl_from
 
+        self._sort_keys = self._task.sort_keys
+
     @staticmethod
     def _read_sql(directory, file_path):
         full_path = join(directory, file_path)
@@ -51,6 +53,14 @@ class RedshiftLoadCreator(OperatorCreator):
                    f"(LIKE {self._copy_ddl_from})"
 
         return None
+
+    def _get_sort_key_cmd(self):
+        sort_key_cmd = None
+        if self._sort_keys:
+            sort_key_cmd =\
+                f"ALTER TABLE {self._output_schema_quoted}.{self._tmp_table_quoted} " \
+                f"ALTER COMPOUND SORTKEY({self._sort_keys})"
+        return sort_key_cmd
 
     def _get_delete_cmd(self):
         if self._task.incremental:
@@ -91,6 +101,7 @@ class RedshiftLoadCreator(OperatorCreator):
     def _get_cmd(self):
         raw_load_cmd = [
             self._get_create_table_cmd(),
+            self._get_sort_key_cmd(),
             self._get_delete_cmd(),
             self._get_load_cmd(),
             self._get_replace_table_cmd()
