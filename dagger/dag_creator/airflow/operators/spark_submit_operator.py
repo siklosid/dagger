@@ -92,8 +92,8 @@ class SparkSubmitOperator(DaggerBaseOperator):
             Parameters={"commands": [self.spark_submit_cmd]},
         )
         command_id = response['Command']['CommandId']
-        status = 'InProgress'
-        while status == 'InProgress':
+        status = 'Pending'
+        while status in ['Pending', 'InProgress', 'Delayed']:
             time.sleep(30)
             status = \
                 self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
@@ -102,7 +102,9 @@ class SparkSubmitOperator(DaggerBaseOperator):
             self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                 'StandardErrorContent'])
 
-        if status != 'Success':
+        if status == 'Execution Timed Out':
+            raise AirflowException("Spark command execution timed out. Check Spark job status in YARN resource manager")
+        elif status != 'Success':
             raise AirflowException("Spark command failed")
 
     def on_kill(self):
