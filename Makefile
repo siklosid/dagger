@@ -64,7 +64,7 @@ lint: ## check style with flake8
 test: ## run tests quickly with the default Python
 	AIRFLOW_HOME=$(shell pwd)/tests/fixtures/config_finder/root/ \
 	ENV=local \
-	pytest
+	pytest -s
 
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source dagger setup.py test

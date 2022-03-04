@@ -4,6 +4,7 @@ from os.path import join, relpath, splitext
 from mergedeep import merge
 
 import yaml
+from envyaml import EnvYAML
 from dagger.config_finder.config_finder import ConfigFinder
 from dagger.pipeline.pipeline import Pipeline
 from dagger.pipeline.task_factory import TaskFactory
@@ -60,7 +61,7 @@ class ConfigProcessor:
                 task_config_path = join(pipeline_config.directory, task_config.config)
 
                 _logger.info("Processing task config: %s", task_config_path)
-                task_config = self._load_yaml(task_config_path)
+                task_config = EnvYAML(task_config_path).export()
                 task_config = self.overwrite_params(task_config)
                 if task_config:
                     task_type = task_config["type"]
