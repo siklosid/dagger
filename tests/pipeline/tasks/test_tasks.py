@@ -20,8 +20,7 @@ class TestConfigProcessor(unittest.TestCase):
         self.assertEqual(spark_task.airflow_parameters["retries"], 4)
 
     def test_read_env(self):
-        DAGS_DIR = '/Users/lauralehoczki/git/dataeng-airflow-dags/dags/core/orders/'
-        cf = ConfigFinder(DAGS_DIR)
+        cf = ConfigFinder(conf.DAGS_DIR)
         cp = ConfigProcessor(cf)
 
         pipelines = cp.process_pipeline_configs()
@@ -32,4 +31,4 @@ class TestConfigProcessor(unittest.TestCase):
                 if task.name == "batch":
                     batch_task = task
 
-        #self.assertEqual(batch_task.outputs[2].bucket, "cholocal-test")
+        self.assertEqual(batch_task.outputs[2].bucket, "cholocal-test")
