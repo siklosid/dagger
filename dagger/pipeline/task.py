@@ -47,12 +47,6 @@ class Task(ConfigValidator):
                     format_help="dictionary",
                 ),
                 Attribute(attribute_name="task_parameters", nullable=True),
-                Attribute(
-                    attribute_name="environments",
-                    required=False,
-                    nullable=True,
-                    format_help="dictionary",
-                ),
             ]
         )
 
@@ -69,7 +63,6 @@ class Task(ConfigValidator):
         self._airflow_parameters = self.parse_attribute("airflow_task_parameters") or {}
         self._render_parameters(self._airflow_parameters)
         self._template_parameters = self.parse_attribute("template_parameters") or {}
-        self._environments = self.parse_attribute("environments") or {}
 
         self._inputs = []
         self._outputs = []
@@ -125,10 +118,6 @@ class Task(ConfigValidator):
     @property
     def inputs(self) -> List[IO]:
         return self._inputs
-
-    @property
-    def environments(self) -> dict:
-        return self._environments
 
     @property
     def outputs(self) -> List[IO]:

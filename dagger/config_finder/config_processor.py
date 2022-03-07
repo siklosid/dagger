@@ -15,8 +15,6 @@ import dagger.conf as conf
 _logger = logging.getLogger("configFinder")
 DAG_DIR = join(environ.get("AIRFLOW_HOME", "./"), "dags")
 
-ENV = conf.ENV
-
 
 class ConfigProcessor:
     def __init__(self, config_finder: ConfigFinder):
@@ -34,8 +32,8 @@ class ConfigProcessor:
         return config
 
     @staticmethod
-    def overwrite_params(config):
-        env_dependent_params = config.get("environments", {}).get(ENV, {})
+    def localize_params(config):
+        env_dependent_params = config.get("environments", {}).get(conf.ENV, {})
         if env_dependent_params.get("deactivate"):
             return None
         merge(config, env_dependent_params)
@@ -52,8 +50,8 @@ class ConfigProcessor:
             config_path = join(pipeline_config.directory, pipeline_config.config)
 
             _logger.info("Processing config: %s", config_path)
-            config_dict = self._load_yaml(config_path)
-            config_dict = self.overwrite_params(config_dict)
+            config_dict = EnvYAML(config_path).export()
+            config_dict = self.localize_params(config_dict)
             pipeline = Pipeline(pipeline_config.directory, config_dict)
 
             for task_config in pipeline_config.job_configs:
@@ -62,7 +60,7 @@ class ConfigProcessor:
 
                 _logger.info("Processing task config: %s", task_config_path)
                 task_config = EnvYAML(task_config_path).export()
-                task_config = self.overwrite_params(task_config)
+                task_config = self.localize_params(task_config)
                 if task_config:
                     task_type = task_config["type"]
                     pipeline.add_task(
@@ -70,6 +68,8 @@ class ConfigProcessor:
                             task_type, task_name, pipeline_name, pipeline, task_config
                         )
                     )
+                else:
+                    _logger.info(f"{task_name} job is disabled in {conf.ENV} environment")
 
             pipelines.append(pipeline)
 

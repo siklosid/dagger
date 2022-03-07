@@ -28,10 +28,6 @@ class Pipeline(ConfigValidator):
                 ),
                 Attribute(attribute_name="airflow_parameters"),
                 Attribute(
-                    attribute_name="environments",
-                    required=False,
-                ),
-                Attribute(
                     attribute_name="default_args",
                     required=True,
                     nullable=True,
