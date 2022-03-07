@@ -21,18 +21,12 @@ class ConfigProcessor:
         self._config_finder = config_finder
         self._task_factory = TaskFactory()
 
-    @staticmethod
-    def _load_yaml(yaml_path):
-        with open(yaml_path, "r") as stream:
-            try:
-                config = yaml.safe_load(stream)
-            except yaml.YAMLError as exc:
-                _logger.exception("Couldn't read config file {}", yaml_path, exc)
-                exit(1)
-        return config
+    def _load_yaml(self, yaml_path):
+        config_dict = EnvYAML(yaml_path).export()
+        config_dict = self.localize_params(config_dict)
+        return config_dict
 
-    @staticmethod
-    def localize_params(config):
+    def localize_params(self, config):
         env_dependent_params = config.get("environments", {}).get(conf.ENV, {})
         if env_dependent_params.get("deactivate"):
             return None
@@ -50,8 +44,7 @@ class ConfigProcessor:
             config_path = join(pipeline_config.directory, pipeline_config.config)
 
             _logger.info("Processing config: %s", config_path)
-            config_dict = EnvYAML(config_path).export()
-            config_dict = self.localize_params(config_dict)
+            config_dict = self._load_yaml(config_path)
             pipeline = Pipeline(pipeline_config.directory, config_dict)
 
             for task_config in pipeline_config.job_configs:
@@ -59,8 +52,7 @@ class ConfigProcessor:
                 task_config_path = join(pipeline_config.directory, task_config.config)
 
                 _logger.info("Processing task config: %s", task_config_path)
-                task_config = EnvYAML(task_config_path).export()
-                task_config = self.localize_params(task_config)
+                task_config = self._load_yaml(task_config_path)
                 if task_config:
                     task_type = task_config["type"]
                     pipeline.add_task(
