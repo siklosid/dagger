@@ -14,6 +14,10 @@ outputs:
     name: report
     folder: "1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL"
     file_name: report.csv
+  - type: s3
+    name: env_var_test_output
+    bucket: cho${ENV}-test
+    path: test_path
 task_parameters:
     absolute_job_name: tst
     executable: batch.py

@@ -9,3 +9,9 @@ airflow_parameters:
   dag_parameters:
     default_view: "graph"
 alerts:
+
+environments:
+  data:
+    schedule: 30 * * * *
+  local:
+    schedule: 30 1 * * *

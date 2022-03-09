@@ -9,7 +9,7 @@ inputs:
 outputs:
   - type: s3
     name: test
-    bucket: test_bucket
+    bucket: disable_bucket
     path: test/path
 airflow_task_parameters: null
 template_parameters:
@@ -31,7 +31,4 @@ pool: emr
 
 environments:
   local:
-    template_parameters:
-      frequency: '24'
-    airflow_task_parameters:
-      retries: 4
+    deactivate: True

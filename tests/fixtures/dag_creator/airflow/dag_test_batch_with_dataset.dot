@@ -4,9 +4,11 @@ digraph test_batch {
 	"dummy-control-flow" [color="#000000" fillcolor="#ffefeb" label="dummy-control-flow" shape=rectangle style="filled,rounded"]
 	"gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv" [color="#000000" fillcolor="#e8f7e4" label="gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv" shape=rectangle style="filled,rounded"]
 	"redshift-dwh-batch_table" [color="#000000" fillcolor="#e8f7e4" label="redshift-dwh-batch_table" shape=rectangle style="filled,rounded"]
+	"s3-cholocal-test-test_path" [color="#000000" fillcolor="#e8f7e4" label="s3-cholocal-test-test_path" shape=rectangle style="filled,rounded"]
 	"s3-datalake-path-_ds_" [color="#000000" fillcolor="#e8f7e4" label="s3-datalake-path-_ds_" shape=rectangle style="filled,rounded"]
 	batch -> "gdrive-1jxu_wXJa-r-m0R9JS-gOQpQIzmIoNDdL-report_csv"
 	batch -> "redshift-dwh-batch_table"
+	batch -> "s3-cholocal-test-test_path"
 	"dummy-control-flow" -> "s3-datalake-path-_ds_"
 	"s3-datalake-path-_ds_" -> batch
 }

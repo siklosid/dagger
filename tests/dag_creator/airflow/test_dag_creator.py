@@ -23,7 +23,7 @@ class TestDagCreator(unittest.TestCase):
             task_graph.add_pipeline(pipeline)
 
         return task_graph
-
+#
     @staticmethod
     def _read_file(filename):
         with open(filename, "r") as stream:
@@ -39,6 +39,9 @@ class TestDagCreator(unittest.TestCase):
 
         self.dot_test_batch_graph_with_dataset =\
             self._read_file("tests/fixtures/dag_creator/airflow/dag_test_batch_with_dataset.dot")
+
+        self.dot_test_spark_deactivate = \
+            self._read_file("tests/fixtures/dag_creator/airflow/dag_test_spark_deactivate.dot")
 
         self.dot_test_external_sensor =\
             self._read_file("tests/fixtures/dag_creator/airflow/dag_test_external_sensor.dot")
@@ -92,3 +95,20 @@ class TestDagCreator(unittest.TestCase):
             execution_delta_fn = DagCreator._get_execution_date_fn(from_dag_schedule, to_dag_schedule)
             self.assertEqual(execution_delta_fn(execution_date), expected_result)
 
+    def test_disable_task(self):
+        dag_creator = DagCreator(self.task_graph._graph, with_data_nodes=True)
+        dags = dag_creator.traverse_graph()
+
+        self.assertEqual(len(dags), 3)
+        test_spark_dag = dags['test_spark']
+
+        dot = render_dag(test_spark_dag)
+        self.assertEqual(dot.source, self.dot_test_spark_deactivate)
+
+    def test_override_params(self):
+        dag_creator = DagCreator(self.task_graph._graph, with_data_nodes=True)
+        dags = dag_creator.traverse_graph()
+
+        test_spark_dag = dags['test_spark']
+
+        self.assertEqual(test_spark_dag.schedule_interval, "30 1 * * *")

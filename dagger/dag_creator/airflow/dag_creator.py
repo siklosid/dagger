@@ -80,7 +80,6 @@ class DagCreator(GraphTraverserBase):
             default_args["on_failure_callback"] = partial(
                 airflow_task_fail_alerts, pipeline.alerts
             )
-
         dag = DAG(
             pipeline.name,
             description=pipeline.description,
