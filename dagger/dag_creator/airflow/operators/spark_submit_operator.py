@@ -93,19 +93,19 @@ class SparkSubmitOperator(DaggerBaseOperator):
         )
         command_id = response['Command']['CommandId']
         status = 'Pending'
+        status_details = None
         while status in ['Pending', 'InProgress', 'Delayed']:
             time.sleep(30)
-            status = \
-                self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
-                    'StatusDetails']
+            response = self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)
+            status = response['Status']
+            status_details = response['StatusDetails']
         self.log.info(
             self.ssm_client.get_command_invocation(CommandId=command_id, InstanceId=emr_master_instance_id)[
                 'StandardErrorContent'])
 
-        if status == 'Execution Timed Out':
-            raise AirflowException("Spark command execution timed out. Check Spark job status in YARN resource manager")
-        elif status != 'Success':
-            raise AirflowException("Spark command failed")
+        if status != 'Success':
+            raise AirflowException(f"Spark command failed, check Spark job status in YARN resource manager. "
+                                   f"Response status details: {status_details}")
 
     def on_kill(self):
         self.log.info("Sending SIGTERM signal to bash process group")
