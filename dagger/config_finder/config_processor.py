@@ -45,7 +45,10 @@ class ConfigProcessor:
 
             _logger.info("Processing config: %s", config_path)
             config_dict = self._load_yaml(config_path)
-            pipeline = Pipeline(pipeline_config.directory, config_dict)
+            if config_dict:
+                pipeline = Pipeline(pipeline_config.directory, config_dict)
+            else:
+                continue
 
             for task_config in pipeline_config.job_configs:
                 task_name = splitext(task_config.config)[0]
