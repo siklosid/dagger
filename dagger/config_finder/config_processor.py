@@ -48,6 +48,7 @@ class ConfigProcessor:
             if config_dict:
                 pipeline = Pipeline(pipeline_config.directory, config_dict)
             else:
+                _logger.info(f"{pipeline_name} pipeline is disabled in {conf.ENV} environment")
                 continue
 
             for task_config in pipeline_config.job_configs:
