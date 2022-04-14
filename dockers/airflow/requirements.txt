@@ -1,5 +1,5 @@
 croniter==0.3.29
-Click==7.1.2
+Click==8.1.2
 slack==0.0.2
 slackclient==2.5.0
 envyaml==0.2060
