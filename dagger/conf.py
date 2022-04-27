@@ -7,16 +7,16 @@ from pathlib import Path
 # EXTRAS_DIR = os.path.join(BASE_PATH, "extras")
 
 AIRFLOW_HOME = os.environ.get("AIRFLOW_HOME", "/usr/local/airflow/")
-config_file = Path(AIRFLOW_HOME) / "dagger_config.yaml"
-if config_file.is_file():
-    config = EnvYAML(config_file)
-else:
-    config = {}
-
 # App parameters
 DAGS_DIR = os.path.join(AIRFLOW_HOME, "dags")
 ENV = os.environ.get("ENV", "local")
 ENV_SUFFIX = "dev" if ENV == "local" else ""
+
+config_file = Path(AIRFLOW_HOME) / f"{ENV}_dagger_config.yaml"
+if config_file.is_file():
+    config = EnvYAML(config_file)
+else:
+    config = {}
 
 # Airflow parameters
 airflow_config = config.get('airflow', None) or {}
