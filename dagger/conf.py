@@ -24,7 +24,7 @@ WITH_DATA_NODES = airflow_config.get('with_data_nodes', False)
 EXTERNAL_SENSOR_POKE_INTERVAL = airflow_config.get('external_sensor_poke_interval', 600)
 EXTERNAL_SENSOR_TIMEOUT = airflow_config.get('external_sensor_timeout', 28800)
 EXTERNAL_SENSOR_MODE = airflow_config.get('external_sensor_mode', 'reschedule')
-DUMMY_OPERATOR_SHORT_CIRCUIT = airflow_config.get('evaluate', True)
+IS_DUMMY_OPERATOR_SHORT_CIRCUIT = airflow_config.get('is_dummy_operator_short_circuit', True)
 
 # Neo4j parameters
 neo4j_config = config.get('neo4j', None) or {}

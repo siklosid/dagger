@@ -35,8 +35,8 @@ class OperatorFactory:
         return cls(task, dag).create_operator()
 
     @staticmethod
-    def create_control_flow_operator(eval, dag):
-        return make_control_flow(eval, dag)
+    def create_control_flow_operator(is_dummy_operator_short_circuit, dag):
+        return make_control_flow(is_dummy_operator_short_circuit, dag)
 
     @staticmethod
     def create_dataset_operator(data_id, dag):
