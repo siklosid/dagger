@@ -15,7 +15,7 @@ def make_control_flow(is_dummy_operator_short_circuit, dag):
 
 def eval_control_flow(is_dummy_operator_short_circuit, **kwargs):
     True
-    if is_dummy_operator_short_circuit:
+    if not is_dummy_operator_short_circuit:
         return True
 
     if kwargs["task_instance"].next_try_number > 2:
