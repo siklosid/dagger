@@ -3,7 +3,7 @@ airflow:
   external_sensor_poke_interval: 600
   external_sensor_timeout: 28800
   external_sensor_mode: reschedule
-  is_dummy_operator_short_circuit: true
+  is_dummy_operator_short_circuit: false
 
 
 neo4j:
