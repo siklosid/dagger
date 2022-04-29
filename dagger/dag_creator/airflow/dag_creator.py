@@ -69,7 +69,7 @@ class DagCreator(GraphTraverserBase):
         control_flow_task_id = self._get_control_flow_task_id(pipe_id)
         self._tasks[
             control_flow_task_id
-        ] = self._operator_factory.create_control_flow_operator(conf.ENV, dag)
+        ] = self._operator_factory.create_control_flow_operator(conf.IS_DUMMY_OPERATOR_SHORT_CIRCUIT, dag)
 
     def _create_dag(self, pipe_id, node):
         pipeline = node.obj
