@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+from datetime import timedelta
+
+TIMEDELTA_PARAMETERS = ['execution_timeout']
 
 
 class OperatorCreator(ABC):
@@ -16,8 +19,15 @@ class OperatorCreator(ABC):
         for io in ios:
             self._template_parameters[io.name] = io.rendered_name
 
+    def _fix_timedelta_parameters(self):
+        for timedelta_parameter in TIMEDELTA_PARAMETERS:
+            if self._airflow_parameters.get(timedelta_parameter) is not None:
+                self._airflow_parameters[timedelta_parameter] =\
+                    timedelta(seconds=self._airflow_parameters[timedelta_parameter])
+
     def _update_airflow_parameters(self):
         self._airflow_parameters.update(self._task.airflow_parameters)
+        self._fix_timedelta_parameters()
 
         self._airflow_parameters.update({"description": self._task.description})
 
