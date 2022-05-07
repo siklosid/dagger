@@ -94,17 +94,14 @@ class SparkSubmitOperator(DaggerBaseOperator):
                                                                 InstanceStates=["RUNNING"])["Instances"][0][
             "Ec2InstanceId"]
 
-        command_parameters = {
-                "commands": [self.spark_submit_cmd],
-                "executionTimeout": [self.get_execution_timeout()],
-            }
+        command_parameters = {"commands": [self.spark_submit_cmd]}
+        if self._execution_timeout:
+            command_parameters["executionTimeout"] = [self.get_execution_timeout()]
 
         response = self.ssm_client.send_command(
             InstanceIds=[emr_master_instance_id],
             DocumentName="AWS-RunShellScript",
-            Parameters={
-                key: value for key, value in command_parameters.items() if value is not None
-            }
+            Parameters= command_parameters
         )
         command_id = response['Command']['CommandId']
         status = 'Pending'
