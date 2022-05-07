@@ -28,6 +28,7 @@ task_parameters:
   job_args:
       param1: test
 pool: emr
+timeout_in_seconds: 7200
 
 environments:
   local:

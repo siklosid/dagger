@@ -36,6 +36,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
         self.spark_conf_args = spark_conf_args
         self.extra_py_files = extra_py_files
         self.cluster_name = cluster_name
+        self._execution_timeout = kwargs.get('execution_timeout')
 
     @property
     def emr_client(self):
@@ -63,6 +64,12 @@ class SparkSubmitOperator(DaggerBaseOperator):
             spark_submit_cmd += " " + self.job_args
         return spark_submit_cmd
 
+    def get_execution_timeout(self):
+        if self._execution_timeout:
+            return self._execution_timeout.seconds
+
+        return None
+
     def get_cluster_id_by_name(self, emr_cluster_name, cluster_states):
 
         response = self.emr_client.list_clusters(ClusterStates=cluster_states)
@@ -86,10 +93,16 @@ class SparkSubmitOperator(DaggerBaseOperator):
         emr_master_instance_id = self.emr_client.list_instances(ClusterId=cluster_id, InstanceGroupTypes=["MASTER"],
                                                                 InstanceStates=["RUNNING"])["Instances"][0][
             "Ec2InstanceId"]
+
+        send_command_params = {
+            "InstanceIds": [emr_master_instance_id],
+            "DocumentName": "AWS-RunShellScript",
+            "Parameters": {"commands": [self.spark_submit_cmd]},
+            "TimeoutSeconds": self.get_execution_timeout()
+
+        }
         response = self.ssm_client.send_command(
-            InstanceIds=[emr_master_instance_id],
-            DocumentName="AWS-RunShellScript",
-            Parameters={"commands": [self.spark_submit_cmd]},
+            **{key: value for key, value in send_command_params.items() if value is not None}
         )
         command_id = response['Command']['CommandId']
         status = 'Pending'

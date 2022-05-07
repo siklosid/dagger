@@ -37,6 +37,11 @@ class Task(ConfigValidator):
                 ),
                 Attribute(attribute_name="pool", required=False),
                 Attribute(
+                    attribute_name="timeout_in_seconds",
+                    required=False,
+                    format_help="int",
+                    validator=int),
+                Attribute(
                     attribute_name="airflow_task_parameters",
                     nullable=True,
                     format_help="dictionary",
@@ -67,6 +72,7 @@ class Task(ConfigValidator):
         self._inputs = []
         self._outputs = []
         self._pool = self.parse_attribute("pool") or self.default_pool
+        self._timeout_in_seconds = self.parse_attribute("timeout_in_seconds")
         self.process_inputs(config["inputs"])
         self.process_outputs(config["outputs"])
 
@@ -126,6 +132,10 @@ class Task(ConfigValidator):
     @property
     def pool(self):
         return self._pool
+
+    @property
+    def timeout_in_seconds(self):
+        return self._timeout_in_seconds
 
     def add_input(self, task_input: IO):
         _logger.info("Adding input: %s to task: %s", task_input.name, self._name)
