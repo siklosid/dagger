@@ -64,8 +64,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
             spark_submit_cmd += " " + self.job_args
         return spark_submit_cmd
 
-    @property
-    def execution_timeout(self):
+    def get_execution_timeout(self):
         if self._execution_timeout:
             return self._execution_timeout.seconds
 
@@ -99,7 +98,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
             "InstanceIds": [emr_master_instance_id],
             "DocumentName": "AWS-RunShellScript",
             "Parameters": {"commands": [self.spark_submit_cmd]},
-            "TimeoutSeconds": self.execution_timeout
+            "TimeoutSeconds": self.get_execution_timeout()
 
         }
         response = self.ssm_client.send_command(
