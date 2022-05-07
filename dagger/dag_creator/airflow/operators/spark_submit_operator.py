@@ -66,7 +66,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
 
     def get_execution_timeout(self):
         if self._execution_timeout:
-            return self._execution_timeout.seconds
+            return f"{self._execution_timeout.seconds}"
 
         return None
 
