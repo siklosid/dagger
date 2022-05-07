@@ -96,7 +96,7 @@ class SparkSubmitOperator(DaggerBaseOperator):
 
         command_parameters = {
                 "commands": [self.spark_submit_cmd],
-                "executionTimeout": self.get_execution_timeout(),
+                "executionTimeout": [self.get_execution_timeout()],
             }
 
         response = self.ssm_client.send_command(
