@@ -30,6 +30,8 @@ class OperatorCreator(ABC):
 
         self._airflow_parameters.update({"description": self._task.description})
 
+        self._airflow_parameters.update({"task_concurrency": 1})
+
         if self._task.pool:
             self._airflow_parameters["pool"] = self._task.pool
 
