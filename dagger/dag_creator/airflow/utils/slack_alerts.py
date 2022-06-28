@@ -19,6 +19,8 @@ def task_success_slack_alert(context):
     Returns:
         None: Calls the SlackWebhookOperator execute method internally
     """
+    if ENV == "datatst":
+        return
     if context["dag_run"].external_trigger is True:
         return
     if context["dag"].is_paused is True:
@@ -60,6 +62,8 @@ def task_fail_slack_alert(context):
     Returns:
         None: Calls the SlackWebhookOperator execute method internally
     """
+    if ENV == "datatst":
+        return
     if context["dag_run"].external_trigger is True:
         return
     if context["dag"].is_paused is True:
