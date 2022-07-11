@@ -100,4 +100,4 @@ SQOOP_DEFAULT_PROPERTIES = sqoop_config.get('default_properties', {"mapreduce.jo
 # Alert parameters
 alert_config = config.get('alert', None) or {}
 SLACK_TOKEN = alert_config.get('slack_token', None)
-DEFAULT_ALERT = alert_config.get('environments', {}).get(ENV, {}).get('default_alert', {"type": "slack", "channel": "#airflow-jobs", "mentions": None})
+DEFAULT_ALERT = alert_config.get('default_alert', {"type": "slack", "channel": "#airflow-jobs", "mentions": None})
