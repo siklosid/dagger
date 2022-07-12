@@ -96,7 +96,7 @@ def get_task_run_time(task_instance):
 
 
 def airflow_task_fail_alerts(alerts: List[AlertBase], context):
-    if conf.ENV != "data":
+    if conf.ENV == "datatst":
         return
     if context["dag_run"].external_trigger is True:
         return
