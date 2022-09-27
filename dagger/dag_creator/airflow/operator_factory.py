@@ -4,6 +4,7 @@ from dagger.dag_creator.airflow.operator_creators import (
     airflow_op_creator,
     athena_transform_creator,
     batch_creator,
+    dbt_creator,
     dummy_creator,
     python_creator,
     redshift_load_creator,
