@@ -101,7 +101,7 @@ install-dev: clean ## install the package to the active Python's site-packages
 	python -m pip install --upgrade pip; \
 	python setup.py install; \
 	pip install -e . ; \
-	pip install -r reqs/dev.txt -r reqs/test.txt --use-feature=2020-resolver
+	pip install -r reqs/dev.txt -r reqs/test.txt
 
 install-test: clean ## install the package to the active Python's site-packages
 	virtualenv -p python3 venv; \
