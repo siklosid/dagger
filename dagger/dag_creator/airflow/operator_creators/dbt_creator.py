@@ -50,3 +50,10 @@ class DbtCreator(OperatorCreator):
         )
 
         return dbt_op
+
+    # Overwriting function because for dbt we don't want to add inputs/outputs to the template parameters
+    def create_operator(self):
+        self._template_parameters.update(self._task.template_parameters)
+        self._update_airflow_parameters()
+
+        return self._create_operator(**self._airflow_parameters)
