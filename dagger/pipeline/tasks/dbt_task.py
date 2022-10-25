@@ -23,7 +23,7 @@ class DbtTask(Task):
                     attribute_name="profile_name",
                     required=False,
                     parent_fields=["task_parameters"],
-                    comment="Dbt profile name passed into dbt --target, default is default'",
+                    comment="Dbt profile name passed into dbt --target, default is 'default'",
                 ),
                 Attribute(
                     attribute_name="select",

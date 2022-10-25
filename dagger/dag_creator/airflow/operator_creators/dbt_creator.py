@@ -1,6 +1,6 @@
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from airflow.operators.bash import BashOperator
-
+import json
 
 class DbtCreator(OperatorCreator):
     ref_name = "dbt"
@@ -33,17 +33,14 @@ class DbtCreator(OperatorCreator):
         if self._select:
             command += [f"--select {self._select}"]
 
-        dbt_vars = ",".join(
-            [f"{param_name}:{param_value}" for param_name, param_value in self._template_parameters.items()]
-        )
-
         if len(self._template_parameters) > 0:
-            command += [f"--vars {dbt_vars}"]
+            dbt_vars = json.dumps(self._template_parameters)
+            command += [f"--vars '{dbt_vars}'"]
 
         return " ".join(command)
 
     def _create_operator(self, **kwargs):
-        full_bash_command = f"{self._generate_build_command()}; {self._generate_build_command()}"
+        full_bash_command = f"{self._generate_deps_command()}; {self._generate_build_command()}"
 
         dbt_op = BashOperator(
             dag=self._dag,
