@@ -28,8 +28,6 @@ class OperatorCreator(ABC):
     def _update_airflow_parameters(self):
         self._airflow_parameters.update(self._task.airflow_parameters)
 
-        self._airflow_parameters.update({"description": self._task.description})
-
         if self._task.pool:
             self._airflow_parameters["pool"] = self._task.pool
 
