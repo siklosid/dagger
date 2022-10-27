@@ -13,7 +13,6 @@ class AirflowOpCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
         params = {**kwargs}
-        del params["description"]
         airflow_operator_module = importlib.import_module(self._task.module)
         operator_class = getattr(airflow_operator_module, self._task.class_name)
 

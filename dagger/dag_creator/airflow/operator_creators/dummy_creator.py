@@ -10,6 +10,5 @@ class DummyCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
         params = {**kwargs}
-        del params["description"]
 
         return DummyOperator(dag=self._dag, task_id=self._task.name, **params)

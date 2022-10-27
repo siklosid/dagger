@@ -14,7 +14,6 @@ class PythonCreator(OperatorCreator):
 
     def _create_operator(self, **kwargs):
         params = {**kwargs}
-        del params["description"]
 
         python_file = path.relpath(
             path.join(self._task.pipeline.directory, self._task.python),
