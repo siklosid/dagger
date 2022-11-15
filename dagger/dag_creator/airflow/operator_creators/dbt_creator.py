@@ -12,7 +12,7 @@ class DbtCreator(OperatorCreator):
         self._profile_dir = task.profile_dir
         self._profile_name = task.profile_name
         self._select = task.select
-        self._verbose = tasl.verbose
+        self._verbose = task.verbose
 
     def _generate_deps_command(self):
         command = [
