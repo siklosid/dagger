@@ -12,6 +12,7 @@ class DbtCreator(OperatorCreator):
         self._profile_dir = task.profile_dir
         self._profile_name = task.profile_name
         self._select = task.select
+        self._verbose = tasl.verbose
 
     def _generate_deps_command(self):
         command = [
@@ -24,7 +25,9 @@ class DbtCreator(OperatorCreator):
 
     def _generate_build_command(self):
         command = [
-            "dbt build",
+            "dbt",
+            "--debug" if self._verbose else "",
+            "build",
             f"--project-dir {self._project_dir}",
             f"--profiles-dir {self._profile_dir}",
             f"--target {self._profile_name}",
