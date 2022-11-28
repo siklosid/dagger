@@ -1,7 +1,7 @@
 from pathlib import Path
 from time import sleep
 
-from airflow.contrib.hooks.aws_hook import AwsHook
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from airflow.exceptions import AirflowException
 from airflow.utils.decorators import apply_defaults
 
@@ -73,21 +73,18 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     @lazy_property
     def batch_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="batch").get_client_type(
-            "batch", region_name=self.region_name
-        )
+        return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="batch").get_client_type(
+            region_name=self.region_name)
 
     @lazy_property
     def logs_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="logs").get_client_type(
-            "logs", region_name=self.region_name
-        )
+        return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="logs").get_client_type(
+            region_name=self.region_name)
 
     @lazy_property
     def ecs_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="ecs").get_client_type(
-            "ecs", region_name=self.region_name
-        )
+        return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="ecs").get_client_type(
+            region_name=self.region_name)
 
     def _validate_job_name(self, job_name, absolute_job_name):
         if absolute_job_name is None and job_name is None:
