@@ -11,6 +11,9 @@ cfn/template.json
 # Env
 .sso.env
 
+# Auto generated testing file
+tests/fixtures/config_finder/root/airflow.cfg
+
 # -------------------------------------------------------------------
 
 # Byte-compiled / optimized / DLL files
