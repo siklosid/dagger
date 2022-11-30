@@ -52,7 +52,7 @@ RUN curl -Ls "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awsc
 RUN pip install -U --progress-bar off --no-cache-dir pip setuptools wheel
 
 COPY requirements.txt requirements.txt
-RUN pip install --progress-bar off --no-cache-dir apache-airflow[postgres,s3,slack,statsd]==$AIRFLOW_VERSION --constraint $AIRFLOW_CONSTRAINTS && \
+RUN pip install --progress-bar off --no-cache-dir apache-airflow[amazon,postgres,s3,statsd]==$AIRFLOW_VERSION --constraint $AIRFLOW_CONSTRAINTS && \
     pip install --progress-bar off --no-cache-dir -r requirements.txt && \
     apt-get purge --auto-remove -yq $BUILD_DEPS && \
     apt-get autoremove --purge -yq && \
