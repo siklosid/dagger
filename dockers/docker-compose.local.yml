@@ -22,7 +22,7 @@ services:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__FERNET_KEY=zdkf0niohVjv_9RcdBOj3MpRz6gYr1T_2okkA8KRk-w=
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       - PYTHONPATH=${AIRFLOW_HOME}
       - POSTGRES_HOST=postgres
       - POSTGRES_USER=airflow
@@ -50,7 +50,7 @@ services:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__CORE__FERNET_KEY=zdkf0niohVjv_9RcdBOj3MpRz6gYr1T_2okkA8KRk-w=
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
       - PYTHONPATH=${AIRFLOW_HOME}
       - POSTGRES_HOST=postgres
       - POSTGRES_USER=airflow
@@ -58,7 +58,7 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_PASSWORD=airflow
       - REMOTE_LOGGING=False
-      - AIRFLOW__CORE__COLORED_CONSOLE_LOG=False
+      - AIRFLOW__LOGGING__COLORED_CONSOLE_LOG=False
       - ENV=local
     volumes:
       - ${AIRFLOW_DAGS_DIR}:${AIRFLOW_HOME}/dags
