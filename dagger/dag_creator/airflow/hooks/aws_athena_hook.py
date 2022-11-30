@@ -21,13 +21,13 @@
 This module contains AWS Athena hook
 """
 from time import sleep
-from airflow.contrib.hooks.aws_hook import AwsHook
 from os import path
 
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from botocore.exceptions import ClientError
 
 
-class AWSAthenaHook(AwsHook):
+class AWSAthenaHook(AwsBaseHook):
     """
     Interact with AWS Athena to run, poll queries and return query results
 
@@ -55,17 +55,19 @@ class AWSAthenaHook(AwsHook):
         :return: boto3 session
         """
         if not self.conn:
-            self.conn = self.get_client_type('athena')
+            self.conn = self.get_client_type()
         return self.conn
 
     def get_glue_conn(self):
         if not self.glue_conn:
-            self.glue_conn = self.get_client_type('glue')
+            session = self.get_session()
+            self.glue_conn = session.client('glue')
         return self.glue_conn
 
     def get_s3_conn(self):
         if not self.s3_conn:
-            self.s3_conn = self.get_resource_type('s3')
+            session = self.get_session()
+            self.s3_conn = session.resource('s3')
         return self.s3_conn
 
     def drop_table(self, database, table):

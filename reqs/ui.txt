@@ -1,6 +1,6 @@
-wtforms==3.0.0
-flask==2.0.2
-python-dotenv==0.19.2
-flask-wtf==1.0.0
-requests==2.26.0
-elasticsearch==7.7.1
+elasticsearch==7.17.7
+Flask-WTF==0.15.1
+flask==2.2.2
+python-dotenv==0.21.0
+requests==2.28.1
+WTForms==2.3.3
