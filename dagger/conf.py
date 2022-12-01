@@ -9,7 +9,7 @@ from pathlib import Path
 AIRFLOW_HOME = os.environ.get("AIRFLOW_HOME", "/usr/local/airflow/")
 config_file = Path(AIRFLOW_HOME) / "dagger_config.yaml"
 if config_file.is_file():
-    config = EnvYAML(config_file)
+    config = EnvYAML(config_file, strict=False)
 else:
     config = {}
 
