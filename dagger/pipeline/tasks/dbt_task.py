@@ -31,6 +31,12 @@ class DbtTask(Task):
                     parent_fields=["task_parameters"],
                     comment="Passed into dbt --select",
                 ),
+                Attribute(
+                    attribute_name="verbose",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    comment="Verbose debug level dbt logging",
+                ),
             ]
         )
 
@@ -41,6 +47,7 @@ class DbtTask(Task):
         self._profile_dir = self.parse_attribute("profile_dir")
         self._profile_name = self.parse_attribute("profile_name") or 'default'
         self._select = self.parse_attribute("select")
+        self._verbose = self.parse_attribute("verbose") or False
 
     @property
     def project_dir(self):
@@ -57,3 +64,7 @@ class DbtTask(Task):
     @property
     def select(self):
         return self._select
+    
+    @property
+    def verbose(self):
+        return self._verbose
