@@ -53,7 +53,7 @@ class AthenaTransformTask(Task):
                 Attribute(
                     attribute_name="partitioned_by",
                     required=False,
-                    validator=list,
+                    validator=str,
                     comment="The list of fields to partition by. These fields should come last in the select statement",
                     parent_fields=["task_parameters"],
                 ),
