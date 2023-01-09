@@ -87,7 +87,7 @@ class RedshiftLoadTask(Task):
                     attribute_name="alter_columns",
                     required=False,
                     parent_fields=["task_parameters"],
-                    format_help="comma separated strings as <column_name>:<column_type>,<column_name:column_type>",
+                    format_help="comma separated strings as <column_name>:<column_type>,<column_name>:<column_type>",
                     comment="If you want to alter the column types that are inferred from the "
                             "redshift spectrum table given in the copy_ddl_from parameter"
                 ),
