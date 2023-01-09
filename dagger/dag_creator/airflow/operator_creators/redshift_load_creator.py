@@ -23,6 +23,7 @@ class RedshiftLoadCreator(OperatorCreator):
         self._tmp_table_quoted = f"\"{self._tmp_table}\"" if self._tmp_table else None
 
         self._copy_ddl_from = self._task.copy_ddl_from
+        self._alter_columns = self._task.alter_columns
 
         self._sort_keys = self._task.sort_keys
 
@@ -98,9 +99,25 @@ class RedshiftLoadCreator(OperatorCreator):
             f"RENAME TO {self._output_table_quoted};\n" \
             f"END"
 
+    def _get_alter_columns_cmd(self):
+        if self._alter_columns is None:
+            return None
+
+        alter_column_commands = []
+        alter_columns = self._alter_columns.split(",")
+        for alter_column in alter_columns:
+            [column_name, column_type] = alter_column.split(":")
+            alter_column_commands.append(
+                f"ALTER TABLE {self._output_schema_quoted}.{self._tmp_table_quoted} "
+                f"ALTER COLUMN {column_name} TYPE {column_type}"
+            )
+
+        return ";\n".join(alter_column_commands)
+
     def _get_cmd(self):
         raw_load_cmd = [
             self._get_create_table_cmd(),
+            self._get_alter_columns_cmd(),
             self._get_sort_key_cmd(),
             self._get_delete_cmd(),
             self._get_load_cmd(),
