@@ -1,4 +1,5 @@
 from os.path import join
+from typing import Optional
 
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from dagger.dag_creator.airflow.operators.postgres_operator import PostgresOperator
@@ -36,7 +37,7 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return sql_string
 
-    def _get_create_table_cmd(self):
+    def _get_create_table_cmd(self) -> Optional[str]:
         if self._tmp_table and self._task.create_table_ddl:
             ddl = self._read_sql(self._task.pipeline.directory, self._task.create_table_ddl)
             return ddl.format(schema_name=self._output_schema_quoted, table_name=self._tmp_table_quoted)
@@ -55,7 +56,7 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return None
 
-    def _get_sort_key_cmd(self):
+    def _get_sort_key_cmd(self) -> Optional[str]:
         sort_key_cmd = None
         if self._sort_keys:
             sort_key_cmd =\
@@ -63,7 +64,7 @@ class RedshiftLoadCreator(OperatorCreator):
                 f"ALTER COMPOUND SORTKEY({self._sort_keys})"
         return sort_key_cmd
 
-    def _get_delete_cmd(self):
+    def _get_delete_cmd(self) -> Optional[str]:
         if self._task.incremental:
             return f"DELETE FROM {self._output_schema_quoted}.{self._output_table_quoted}" \
                    f"WHERE {self._task.delete_condition}"
@@ -73,7 +74,7 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return None
 
-    def _get_load_cmd(self):
+    def _get_load_cmd(self) -> Optional[str]:
         table_name = self._tmp_table_quoted or self._output_table_quoted
         columns = "({})".format(self._task.columns) if self._task.columns else ""
         extra_parameters = "\n".join(
@@ -88,7 +89,7 @@ class RedshiftLoadCreator(OperatorCreator):
                f"iam_role '{self._task.iam_role}'\n" \
                f"{extra_parameters}"
 
-    def _get_replace_table_cmd(self):
+    def _get_replace_table_cmd(self) -> Optional[str]:
         if self._tmp_table is None:
             return None
 
@@ -99,7 +100,7 @@ class RedshiftLoadCreator(OperatorCreator):
             f"RENAME TO {self._output_table_quoted};\n" \
             f"END"
 
-    def _get_alter_columns_cmd(self):
+    def _get_alter_columns_cmd(self) -> Optional[str]:
         if self._alter_columns is None:
             return None
 
@@ -114,7 +115,7 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return ";\n".join(alter_column_commands)
 
-    def _get_cmd(self):
+    def _get_cmd(self) -> str:
         raw_load_cmd = [
             self._get_create_table_cmd(),
             self._get_alter_columns_cmd(),
