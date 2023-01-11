@@ -104,7 +104,7 @@ class RedshiftLoadCreator(OperatorCreator):
         if self._alter_columns is None:
             return None
 
-        alter_column_commands = []
+        alter_column_commands = ["set autocommit on"]
         alter_columns = self._alter_columns.split(",")
         for alter_column in alter_columns:
             [column_name, column_type] = alter_column.split(":")
@@ -112,6 +112,7 @@ class RedshiftLoadCreator(OperatorCreator):
                 f"ALTER TABLE {self._output_schema_quoted}.{self._tmp_table_quoted} "
                 f"ALTER COLUMN {column_name} TYPE {column_type}"
             )
+        alter_column_commands.append("set autocommit off")
 
         return ";\n".join(alter_column_commands)
 
