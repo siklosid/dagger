@@ -2,7 +2,7 @@ from os.path import join
 from typing import Optional
 
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
-from dagger.dag_creator.airflow.operators.postgres_operator import PostgresOperator
+from dagger.dag_creator.airflow.operators.redshift_sql_operator import RedshiftSQLOperator
 
 
 class RedshiftLoadCreator(OperatorCreator):
@@ -132,14 +132,13 @@ class RedshiftLoadCreator(OperatorCreator):
     def _create_operator(self, **kwargs):
         load_cmd = self._get_cmd()
 
-        redshift_op = PostgresOperator(
+        redshift_op = RedshiftSQLOperator(
             dag=self._dag,
             task_id=self._task.name,
             sql=load_cmd,
-            postgres_conn_id=self._task.postgres_conn_id,
-            params=self._template_parameters,
+            redshift_conn_id=self._task.postgres_conn_id,
+            split_parameters=True,
             autocommit=True,
-            **kwargs,
+            **kwargs
         )
-
         return redshift_op
