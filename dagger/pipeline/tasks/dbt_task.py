@@ -12,24 +12,24 @@ class DbtTask(Task):
                 Attribute(
                     attribute_name="project_dir",
                     parent_fields=["task_parameters"],
-                    comment="Path to the dbt project directory",
+                    comment="Which directory to look in for the dbt_project.yml file",
                 ),
                 Attribute(
                     attribute_name="profile_dir",
                     parent_fields=["task_parameters"],
-                    comment="Path to the dbt profile dir",
+                    comment="Which directory to look in for the profiles.yml file",
                 ),
                 Attribute(
                     attribute_name="profile_name",
                     required=False,
                     parent_fields=["task_parameters"],
-                    comment="Dbt profile name passed into dbt --target, default is 'default'",
+                    comment="Which target to load for the given profile (--target dbt option). Default is 'default'",
                 ),
                 Attribute(
                     attribute_name="select",
                     required=False,
                     parent_fields=["task_parameters"],
-                    comment="Passed into dbt --select",
+                    comment="Specify the nodes to include (--select dbt option)",
                 ),
             ]
         )
@@ -39,7 +39,7 @@ class DbtTask(Task):
 
         self._project_dir = self.parse_attribute("project_dir")
         self._profile_dir = self.parse_attribute("profile_dir")
-        self._profile_name = self.parse_attribute("profile_name") or 'default'
+        self._profile_name = self.parse_attribute("profile_name") or "default"
         self._select = self.parse_attribute("select")
 
     @property
