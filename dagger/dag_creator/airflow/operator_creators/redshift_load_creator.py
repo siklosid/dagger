@@ -85,7 +85,7 @@ class RedshiftLoadCreator(OperatorCreator):
         )
 
         return f"copy {self._output_schema_quoted}.{table_name}{columns}\n" \
-               f"from 's3://chodatastg-data-lake/dwh/salesforce/task/task'\n" \
+               f"from '{self._input_path}'\n" \
                f"iam_role '{self._task.iam_role}'\n" \
                f"{extra_parameters}"
 
