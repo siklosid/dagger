@@ -9,8 +9,7 @@ class BatchCreator(OperatorCreator):
         super().__init__(task, dag)
 
     def _generate_command(self):
-        command = []
-        command += [self._task.executable_prefix, self._task.executable]
+        command = [self._task.executable_prefix, self._task.executable]
         for param_name, param_value in self._template_parameters.items():
             command.append(
                 "--{name}={value}".format(name=param_name, value=param_value)
