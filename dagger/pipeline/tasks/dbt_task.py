@@ -1,8 +1,8 @@
-from dagger.pipeline.task import Task
+from dagger.pipeline.tasks.batch_task import BatchTask
 from dagger.utilities.config_validator import Attribute
 
 
-class DbtTask(Task):
+class DbtTask(BatchTask):
     ref_name = "dbt"
 
     @classmethod
