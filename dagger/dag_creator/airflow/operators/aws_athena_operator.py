@@ -23,6 +23,7 @@ from uuid import uuid4
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.hooks.aws_athena_hook import AWSAthenaHook
+from dagger.utilities.randomise import generate_random_name
 from os import path
 
 
@@ -55,10 +56,13 @@ class AWSAthenaOperator(DaggerBaseOperator):
     def __init__(self, query, database, s3_tmp_results_location, s3_output_location, output_table, is_incremental,
                  partitioned_by=None, output_format=None, aws_conn_id='aws_default', client_request_token=None,
                  query_execution_context=None, result_configuration=None, sleep_time=30, max_tries=None,
-                 workgroup='primary',
+                 workgroup='primary', blue_green_deployment=False,
                  *args, **kwargs):
         super(AWSAthenaOperator, self).__init__(*args, **kwargs)
         self.query = query
+        # blue green deployment only works with non incremental queries
+        self.blue_green_deployment = blue_green_deployment if not is_incremental else False
+
         self.database = database
         self.output_location = s3_tmp_results_location
         self.s3_output_location = s3_output_location
@@ -70,7 +74,8 @@ class AWSAthenaOperator(DaggerBaseOperator):
         self.partitioned_by = partitioned_by
         self.output_format = output_format
         self.aws_conn_id = aws_conn_id
-        self.client_request_token = client_request_token or str(uuid4())
+        self.client_request_query_token = client_request_token or str(uuid4())
+        self.client_request_view_token = str(uuid4())
         self.workgroup = workgroup
         self.query_execution_context = query_execution_context or {}
         self.result_configuration = result_configuration or {}
@@ -82,14 +87,20 @@ class AWSAthenaOperator(DaggerBaseOperator):
     def get_hook(self):
         return AWSAthenaHook(self.aws_conn_id, self.sleep_time, client_type="athena")
 
-    def build_insert_into_query(self):
+    def get_output_table_name(self):
+        if not self.blue_green_deployment:
+            return self.output_table
+
+        return f"__{self.output_table}_{generate_random_name()}"
+
+    def build_insert_into_query(self, output_table_name):
         return f"""\
-INSERT INTO {self.database}.{self.output_table}
+INSERT INTO {self.database}.{output_table_name}
 {self.query}
                 """
 
-    def build_ctas_query(self):
-        s3_table_location = path.join(self.s3_output_location, self.database, self.output_table)
+    def build_ctas_query(self, output_table_name):
+        s3_table_location = path.join(self.s3_output_location, self.database, output_table_name)
         with_parameters_dict = {
             "external_location": f"'{s3_table_location}/'",
         }
@@ -104,47 +115,35 @@ INSERT INTO {self.database}.{self.output_table}
         with_parameters_expression =\
             ",\n    ".join([f"{parameter} = {value}" for parameter, value in with_parameters_dict.items()])
 
+        create_view_statement = ""
         return f"""\
-CREATE TABLE {self.database}.{self.output_table}
+CREATE TABLE {self.database}.{output_table_name}
 WITH (
     {with_parameters_expression}
 )
 AS {self.query}
         """
 
-    def extend_query(self, query):
-        if self.is_incremental and self.hook.check_table_exists(self.database, self.output_table):
-            return self.build_insert_into_query()
+    def extend_query(self, output_table_name):
+        if self.is_incremental and self.hook.check_table_exists(self.database, output_table_name):
+            return self.build_insert_into_query(output_table_name)
         else:
-            return self.build_ctas_query()
+            return self.build_ctas_query(output_table_name)
 
-    def execute(self, context):
-        """
-        Run Presto Query on Athena
-        """
-        self.hook = self.get_hook()
+    def cleanup_table(self, table_name):
+        self.log.info(f"Dropping table: {self.database}.{table_name}")
+        self.hook.drop_table(self.database, table_name)
+        self.log.info(
+            f"Deleting s3 location: s3://{self.s3_output_bucket}/{self.s3_output_path}/{self.database}/{table_name}")
+        self.hook.delete_s3_location(self.s3_output_bucket, self.s3_output_path, self.database, table_name)
 
-        self.log.info(f"""
+    def cleanup_staging_tables(self, staging_table_names):
+        for table_name in staging_table_names:
+            self.cleanup_table(table_name)
 
-            is_incremental: {self.is_incremental}
-            output_database: {self.database}
-            output_table: {self.output_table}
-            s3_output_location: {self.s3_output_location}
-
-        """)
-
-        if not self.is_incremental:
-            self.log.info(f"Dropping table: {self.database}.{self.output_table}")
-            self.hook.drop_table(self.database, self.output_table)
-            self.log.info(f"Deleting s3 location: s3://{self.s3_output_bucket}/{self.s3_output_path}/{self.database}/{self.output_table}")
-            self.hook.delete_s3_location(self.s3_output_bucket, self.s3_output_path, self.database, self.output_table)
-
-        self.query_execution_context['Database'] = self.database
-        self.result_configuration['OutputLocation'] = self.output_location
-        query = self.extend_query(self.query)
-        self.log.info(f"Running query\n{query}")
+    def execute_query(self, query, client_token):
         self.query_execution_id = self.hook.run_query(query, self.query_execution_context,
-                                                      self.result_configuration, self.client_request_token,
+                                                      self.result_configuration, client_token,
                                                       self.workgroup)
         query_status = self.hook.poll_query_status(self.query_execution_id, self.max_tries)
 
@@ -158,6 +157,47 @@ AS {self.query}
                 'Final state of Athena job is {}. '
                 'Max tries of poll status exceeded, query_execution_id is {}.'
                 .format(query_status, self.query_execution_id))
+
+    def execute(self, context):
+        """
+        Run Presto Query on Athena
+        """
+        self.hook = self.get_hook()
+
+        self.log.info(f"""
+
+            is_incremental: {self.is_incremental}
+            output_database: {self.database}
+            output_table: {self.output_table}
+            s3_output_location: {self.s3_output_location}
+            blue_green_deployment: {self.blue_green_deployment}
+
+        """)
+
+        if not self.is_incremental and not self.blue_green_deployment:
+            self.cleanup_table(self.output_table)
+
+        output_table_name = self.get_output_table_name()
+        staging_table_names = None
+        if self.blue_green_deployment:
+            search_pattern = f"__{self.output_table}_*"
+            staging_table_names = self.hook.search_tables(self.database, search_pattern)
+
+        self.query_execution_context['Database'] = self.database
+        self.result_configuration['OutputLocation'] = self.output_location
+
+        query = self.extend_query(output_table_name)
+        self.log.info(f"Running query\n{query}")
+        self.execute_query(query, self.client_request_query_token)
+
+        if self.blue_green_deployment:
+            create_view_statement = f"""\
+            CREATE OR REPLACE VIEW {self.database}.{self.output_table} AS (SELECT * FROM {self.database}.{output_table_name}) 
+                    """
+            self.log.info(f"Running query\n{create_view_statement}")
+            self.execute_query(create_view_statement, self.client_request_view_token)
+
+            self.cleanup_staging_tables(staging_table_names)
 
         return self.query_execution_id
 

@@ -97,6 +97,17 @@ class AWSAthenaHook(AwsBaseHook):
         bucket = s3.Bucket(s3_bucket)
         bucket.objects.filter(Prefix=f"{path.join(s3_path, database, table)}/").delete()
 
+    def search_tables(self, database, table_name_pattern):
+        response = self.get_glue_conn().get_tables(
+            DatabaseName=database,
+            Expression=table_name_pattern,
+            MaxResults=5
+        )
+
+        table_names = [table['Name'] for table in response['TableList']]
+
+        return table_names
+
     def run_query(self, query, query_context, result_configuration, client_request_token=None,
                   workgroup='primary'):
         """
