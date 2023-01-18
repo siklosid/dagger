@@ -137,7 +137,6 @@ class RedshiftLoadCreator(OperatorCreator):
             task_id=self._task.name,
             sql=load_cmd,
             redshift_conn_id=self._task.postgres_conn_id,
-            split_parameters=True,
             autocommit=True,
             **kwargs
         )
