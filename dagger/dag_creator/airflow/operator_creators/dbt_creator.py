@@ -1,3 +1,5 @@
+import base64
+
 from dagger.dag_creator.airflow.operator_creators.batch_creator import BatchCreator
 import json
 
@@ -22,8 +24,11 @@ class DbtCreator(BatchCreator):
             command.append(f"--select={self._select}")
 
         if len(self._template_parameters) > 0:
-            dbt_vars = json.dumps(self._template_parameters)
-            command.append(f"--vars={dbt_vars}")
+            # Transform template parameters into a JSON base64 encoded.
+            # This is used to avoid parsing issues with special characters.
+            vars_json = json.dumps(self._template_parameters)
+            vars_bas364 = base64.b64encode(bytes(vars_json, "utf-8")).decode("utf-8").replace("=", "")
+            command.append(f"--vars_base64={vars_bas364}")
 
         return command
 
