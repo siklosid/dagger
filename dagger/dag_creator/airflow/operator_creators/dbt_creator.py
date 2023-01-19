@@ -15,15 +15,15 @@ class DbtCreator(BatchCreator):
 
     def _generate_command(self):
         command = [self._task.executable_prefix, self._task.executable]
-        command.append(f"--project-dir {self._project_dir}")
-        command.append(f"--profiles-dir {self._profile_dir}")
-        command.append(f"--target {self._profile_name}")
+        command.append(f"--project-dir={self._project_dir}")
+        command.append(f"--profiles-dir={self._profile_dir}")
+        command.append(f"--target={self._profile_name}")
         if self._select:
-            command.append(f"--select {self._select}")
+            command.append(f"--select={self._select}")
 
         if len(self._template_parameters) > 0:
             dbt_vars = json.dumps(self._template_parameters)
-            command.append(f"--vars='{dbt_vars}'")
+            command.append(f"--vars={dbt_vars}")
 
         return command
 
