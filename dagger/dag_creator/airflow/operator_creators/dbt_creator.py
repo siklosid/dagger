@@ -17,9 +17,9 @@ class DbtCreator(BatchCreator):
 
     def _generate_command(self):
         command = [self._task.executable_prefix, self._task.executable]
-        command.append(f"--project-dir={self._project_dir}")
-        command.append(f"--profiles-dir={self._profile_dir}")
-        command.append(f"--target={self._profile_name}")
+        command.append(f"--project_dir={self._project_dir}")
+        command.append(f"--profiles_dir={self._profile_dir}")
+        command.append(f"--profile_name={self._profile_name}")
         if self._select:
             command.append(f"--select={self._select}")
 
