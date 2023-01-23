@@ -86,7 +86,8 @@ class AWSBatchOperator(DaggerBaseOperator):
         return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="ecs").get_client_type(
             region_name=self.region_name)
 
-    def _validate_job_name(self, job_name, absolute_job_name):
+    @staticmethod
+    def _validate_job_name(job_name, absolute_job_name):
         if absolute_job_name is None and job_name is None:
             raise Exception("Both job_name and absolute_job_name cannot be null")
 
