@@ -27,8 +27,8 @@ class DbtCreator(BatchCreator):
             # Transform template parameters into a JSON base64 encoded.
             # This is used to avoid parsing issues with special characters.
             vars_json = json.dumps(self._template_parameters)
-            vars_bas364 = base64.b64encode(bytes(vars_json, "utf-8")).decode("utf-8").replace("=", "")
-            command.append(f"--vars_base64={vars_bas364}")
+            vars_base64 = base64.b64encode(bytes(vars_json, "utf-8")).decode("utf-8").replace("=", "")
+            command.append(f"--vars_base64={vars_base64}")
 
         return command
 
