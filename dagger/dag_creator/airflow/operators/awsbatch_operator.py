@@ -102,6 +102,14 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     def execute(self, context):
         self.task_instance = context["ti"]
+        self.log.info(
+            "\n"
+            f"\n\tJob name: {self.job_name}"
+            f"\n\tJob queue: {self.job_queue}"
+            f"\n\tJob definition: {self.job_definition}"
+            "\n"
+        )
+
         res = self.batch_client.submit_job(
             jobName=self.job_name,
             jobQueue=self.job_queue,
@@ -111,9 +119,7 @@ class AWSBatchOperator(DaggerBaseOperator):
         self.job_id = res["jobId"]
         self.log.info(
             "\n"
-            f"\n\tJob name: {self.job_name}"
-            f"\n\tJob definition: {self.job_definition}"
-            f"\n\tJob id: {self.job_id}"
+            f"\n\tJob ID: {self.job_id}"
             "\n"
         )
         self.poll_task()
