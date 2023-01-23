@@ -108,7 +108,6 @@ class AWSBatchOperator(DaggerBaseOperator):
             jobDefinition=self.job_definition,
             containerOverrides=self.overrides,
         )
-        job_path = self.job_name.replace("-", "/")
         self.job_id = res["jobId"]
         self.log.info(
             "\n"
