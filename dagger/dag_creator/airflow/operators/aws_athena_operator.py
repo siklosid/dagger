@@ -24,6 +24,7 @@ from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBase
 from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.hooks.aws_athena_hook import AWSAthenaHook
 from dagger.utilities.randomise import generate_random_name
+from tenacity import retry, stop_after_attempt, wait_fixed
 from os import path
 
 
@@ -130,6 +131,7 @@ AS {self.query}
         else:
             return self.build_ctas_query(output_table_name)
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(60))
     def cleanup_table(self, table_name):
         self.log.info(f"Dropping table: {self.database}.{table_name}")
         self.hook.drop_table(self.database, table_name)
