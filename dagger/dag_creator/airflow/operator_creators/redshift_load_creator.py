@@ -147,7 +147,7 @@ class RedshiftLoadCreator(OperatorCreator):
         if self._tmp_table is None:
             return None
 
-        return f"DROP TABLE IF EXISTS {self._output_schema_quoted}.{self._tmp_table_quoted};\n"
+        return f"DROP TABLE IF EXISTS {self._output_schema_quoted}.{self._tmp_table_quoted}"
 
     def _get_cmd(self) -> str:
         raw_load_cmd = [
