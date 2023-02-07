@@ -11,7 +11,7 @@ class RedshiftLoadCreator(OperatorCreator):
     def __init__(self, task, dag):
         super().__init__(task, dag)
 
-        self._input_path = self._task.inputs[0].rendered_name
+        self._input_path = join(self._task.inputs[0].rendered_name, "")
         self._input_s3_bucket = self._task.inputs[0].bucket
         self._input_s3_prefix = self._task.inputs[0].path
 
