@@ -115,8 +115,16 @@ class RedshiftLoadCreator(OperatorCreator):
 
         return ";\n".join(alter_column_commands)
 
+    def _get_drop_tmp_table_cmd(self) -> Optional[str]:
+        if self._tmp_table is None:
+            return None
+
+        return
+        f"DROP TABLE IF EXISTS {self._output_schema_quoted}.{self._tmp_table_quoted};\n"
+
     def _get_cmd(self) -> str:
         raw_load_cmd = [
+            self._get_drop_tmp_table_cmd(),
             self._get_create_table_cmd(),
             self._get_alter_columns_cmd(),
             self._get_sort_key_cmd(),
