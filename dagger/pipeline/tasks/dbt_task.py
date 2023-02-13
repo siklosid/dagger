@@ -31,6 +31,12 @@ class DbtTask(BatchTask):
                     parent_fields=["task_parameters"],
                     comment="Specify the nodes to include (--select dbt option)",
                 ),
+                Attribute(
+                    attribute_name="dbt_command",
+                    required=False,
+                    parent_fields=["task_parameters"],
+                    comment="Specify the name of the DBT command to run",
+                ),
             ]
         )
 
@@ -41,6 +47,7 @@ class DbtTask(BatchTask):
         self._profile_dir = self.parse_attribute("profile_dir")
         self._profile_name = self.parse_attribute("profile_name") or "default"
         self._select = self.parse_attribute("select")
+        self._dbt_command = self.parse_attribute("dbt_command")
 
     @property
     def project_dir(self):
@@ -57,3 +64,7 @@ class DbtTask(BatchTask):
     @property
     def select(self):
         return self._select
+
+    @property
+    def dbt_command(self):
+        return self._dbt_command
