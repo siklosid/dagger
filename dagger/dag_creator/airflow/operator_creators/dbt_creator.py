@@ -14,12 +14,14 @@ class DbtCreator(BatchCreator):
         self._profile_dir = task.profile_dir
         self._profile_name = task.profile_name
         self._select = task.select
+        self._dbt_command = task.dbt_command
 
     def _generate_command(self):
         command = [self._task.executable_prefix, self._task.executable]
         command.append(f"--project_dir={self._project_dir}")
         command.append(f"--profiles_dir={self._profile_dir}")
         command.append(f"--profile_name={self._profile_name}")
+        command.append(f"--dbt_command={self._dbt_command}")
         if self._select:
             command.append(f"--select={self._select}")
 
@@ -29,7 +31,8 @@ class DbtCreator(BatchCreator):
 
         return command
 
-    # Overwriting function because for dbt we don't want to add inputs/outputs to the template parameters
+    # Overwriting function because for dbt we don't want to add inputs/outputs to the
+    # template parameters.
     def create_operator(self):
         self._template_parameters.update(self._task.template_parameters)
         self._update_airflow_parameters()
