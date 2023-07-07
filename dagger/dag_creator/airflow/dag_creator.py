@@ -49,7 +49,7 @@ class DagCreator(GraphTraverserBase):
 
         return execution_date_fn
 
-    def _get_external_task_sensor_name(self, from_task_id: str):
+    def _get_external_task_sensor_name(self, from_task_id: str) -> str:
         from_pipeline_name = self._task_graph.get_node(from_task_id).obj.pipeline_name
         from_task_name = self._task_graph.get_node(from_task_id).obj.name
         return f"{from_pipeline_name}-{from_task_name}-sensor"
