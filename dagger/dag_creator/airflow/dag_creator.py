@@ -1,17 +1,17 @@
 import re
-import croniter
 from datetime import timedelta, datetime
 from functools import partial
 
 from airflow import DAG
 from airflow.sensors.external_task import ExternalTaskSensor
 
+import croniter
 from dagger import conf
 from dagger.alerts.alert import airflow_task_fail_alerts
 from dagger.dag_creator.airflow.operator_factory import OperatorFactory
 from dagger.dag_creator.airflow.utils.macros import user_defined_macros
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
-from dagger.graph.task_graph import Graph
+from dagger.graph.task_graph import Graph, Node
 
 
 # noinspection PyStatementEffect
@@ -49,12 +49,15 @@ class DagCreator(GraphTraverserBase):
 
         return execution_date_fn
 
-    def _get_external_task_sensor_name(self, from_task_id: str):
+    def _get_external_task_sensor_name(self, from_task_id: str) -> str:
         from_pipeline_name = self._task_graph.get_node(from_task_id).obj.pipeline_name
         from_task_name = self._task_graph.get_node(from_task_id).obj.name
         return f"{from_pipeline_name}-{from_task_name}-sensor"
 
     def _get_external_task_sensor(self, from_task_id: str, to_task_id: str) -> ExternalTaskSensor:
+        """
+        create an object of external task sensor for a specific from_task_id and to_task_id
+        """
         external_sensor_name = self._get_external_task_sensor_name(from_task_id)
         from_pipeline_name = external_sensor_name.split("-")[0]
         from_task_name = external_sensor_name.split("-")[1]
@@ -117,7 +120,15 @@ class DagCreator(GraphTraverserBase):
                 re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
-    def _create_edge_without_data(self, from_task_id, to_task_ids, node):
+    def _create_edge_without_data(self, from_task_id: str, to_task_ids: list[str], node: Node) -> None:
+        """
+        Creates an edge between tasks without transferring data.
+
+        Args:
+            from_task_id: The ID of the task from which the edge originates.
+            to_task_ids: The IDs of the tasks to which the edge connects.
+            node: The current node in a task graph.
+        """
         from_pipe = (
             self._task_graph.get_node(from_task_id).obj.pipeline_name
             if from_task_id
