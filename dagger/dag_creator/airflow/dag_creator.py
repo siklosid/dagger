@@ -120,7 +120,7 @@ class DagCreator(GraphTraverserBase):
                 re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
-    def _create_edge_without_data(self, from_task_id: str, to_task_ids: list[str], node: Node) -> None:
+    def _create_edge_without_data(self, from_task_id: str, to_task_ids: list, node: Node) -> None:
         """
         Creates an edge between tasks without transferring data.
 
