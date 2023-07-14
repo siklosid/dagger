@@ -144,7 +144,9 @@ class DagCreator(GraphTraverserBase):
                 from_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
                 to_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
                 if not from_schedule.startswith("@") and not to_schedule.startswith("@"):
-                    external_task_sensor_name = self._get_external_task_sensor_name(from_task_id)
+                    external_task_sensor_name = self._get_external_task_sensor_name_dict(
+                        from_task_id
+                    )["external_sensor_name"]
                     if (
                         external_task_sensor_name
                         not in self._sensor_dict.get(to_pipe, dict()).keys()
