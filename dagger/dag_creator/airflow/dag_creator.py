@@ -70,7 +70,10 @@ class DagCreator(GraphTraverserBase):
         from_pipeline_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
         to_pipeline_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
 
+        to_pipe_id = self._task_graph.get_node(to_task_id).obj.pipeline.name
+
         return ExternalTaskSensor(
+            dag=self._dags[to_pipe_id],
             task_id=external_sensor_name,
             external_dag_id=from_pipeline_name,
             external_task_id=from_task_name,
