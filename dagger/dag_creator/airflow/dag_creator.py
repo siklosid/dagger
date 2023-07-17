@@ -49,18 +49,23 @@ class DagCreator(GraphTraverserBase):
 
         return execution_date_fn
 
-    def _get_external_task_sensor_name(self, from_task_id: str) -> str:
+    def _get_external_task_sensor_name_dict(self, from_task_id: str) -> dict:
         from_pipeline_name = self._task_graph.get_node(from_task_id).obj.pipeline_name
         from_task_name = self._task_graph.get_node(from_task_id).obj.name
-        return f"{from_pipeline_name}-{from_task_name}-sensor"
+        return {
+            "from_pipeline_name": from_pipeline_name,
+            "from_task_name": from_task_name,
+            "external_sensor_name": f"{from_pipeline_name}-{from_task_name}-sensor",
+        }
 
     def _get_external_task_sensor(self, from_task_id: str, to_task_id: str) -> ExternalTaskSensor:
         """
         create an object of external task sensor for a specific from_task_id and to_task_id
         """
-        external_sensor_name = self._get_external_task_sensor_name(from_task_id)
-        from_pipeline_name = external_sensor_name.split("-")[0]
-        from_task_name = external_sensor_name.split("-")[1]
+        external_task_sensor_name_dict = self._get_external_task_sensor_name_dict(from_task_id)
+        external_sensor_name = external_task_sensor_name_dict["external_sensor_name"]
+        from_pipeline_name = external_task_sensor_name_dict["from_pipeline_name"]
+        from_task_name = external_task_sensor_name_dict["from_task_name"]
 
         from_pipeline_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
         to_pipeline_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
@@ -117,9 +122,7 @@ class DagCreator(GraphTraverserBase):
 
         dataset_id = node.obj.airflow_name
         if dataset_id not in self._data_tasks[pipe_id]:
-            self._data_tasks[pipe_id][
-                dataset_id
-            ] = self._operator_factory.create_dataset_operator(
+            self._data_tasks[pipe_id][dataset_id] = self._operator_factory.create_dataset_operator(
                 re.sub("[^0-9a-zA-Z-_]+", "_", dataset_id), self._dags[pipe_id]
             )
 
@@ -133,9 +136,7 @@ class DagCreator(GraphTraverserBase):
             node: The current node in a task graph.
         """
         from_pipe = (
-            self._task_graph.get_node(from_task_id).obj.pipeline_name
-            if from_task_id
-            else None
+            self._task_graph.get_node(from_task_id).obj.pipeline_name if from_task_id else None
         )
         for to_task_id in to_task_ids:
             edge_properties = self._task_graph.get_edge(node.obj.alias(), to_task_id)
@@ -146,7 +147,9 @@ class DagCreator(GraphTraverserBase):
                 from_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
                 to_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
                 if not from_schedule.startswith("@") and not to_schedule.startswith("@"):
-                    external_task_sensor_name = self._get_external_task_sensor_name(from_task_id)
+                    external_task_sensor_name = self._get_external_task_sensor_name_dict(
+                        from_task_id
+                    )["external_sensor_name"]
                     if (
                         external_task_sensor_name
                         not in self._sensor_dict.get(to_pipe, dict()).keys()
@@ -167,9 +170,7 @@ class DagCreator(GraphTraverserBase):
 
     def _create_edge_with_data(self, from_task_id, to_task_ids, node):
         from_pipe = (
-            self._task_graph.get_node(from_task_id).obj.pipeline_name
-            if from_task_id
-            else None
+            self._task_graph.get_node(from_task_id).obj.pipeline_name if from_task_id else None
         )
         data_id = node.obj.airflow_name
         if from_pipe:
