@@ -86,7 +86,8 @@ class AWSBatchOperator(DaggerBaseOperator):
         return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="ecs").get_client_type(
             region_name=self.region_name)
 
-    def _validate_job_name(self, job_name, absolute_job_name):
+    @staticmethod
+    def _validate_job_name(job_name, absolute_job_name):
         if absolute_job_name is None and job_name is None:
             raise Exception("Both job_name and absolute_job_name cannot be null")
 
@@ -101,19 +102,24 @@ class AWSBatchOperator(DaggerBaseOperator):
 
     def execute(self, context):
         self.task_instance = context["ti"]
+        self.log.info(
+            "\n"
+            f"\n\tJob name: {self.job_name}"
+            f"\n\tJob queue: {self.job_queue}"
+            f"\n\tJob definition: {self.job_definition}"
+            "\n"
+        )
+
         res = self.batch_client.submit_job(
             jobName=self.job_name,
             jobQueue=self.job_queue,
             jobDefinition=self.job_definition,
             containerOverrides=self.overrides,
         )
-        job_path = self.job_name.replace("-", "/")
         self.job_id = res["jobId"]
         self.log.info(
             "\n"
-            f"\n\tJob name: {self.job_name}"
-            f"\n\tJob definition: {self.job_definition}"
-            f"\n\tJob id: {self.job_id}"
+            f"\n\tJob ID: {self.job_id}"
             "\n"
         )
         self.poll_task()

@@ -53,7 +53,7 @@ class AthenaTransformTask(Task):
                 Attribute(
                     attribute_name="partitioned_by",
                     required=False,
-                    validator=list,
+                    validator=str,
                     comment="The list of fields to partition by. These fields should come last in the select statement",
                     parent_fields=["task_parameters"],
                 ),
@@ -62,6 +62,13 @@ class AthenaTransformTask(Task):
                     required=False,
                     validator=str,
                     comment="Output file format. One of PARQUET/ORC/JSON/CSV",
+                    parent_fields=["task_parameters"],
+                ),
+                Attribute(
+                    attribute_name="blue_green_deployment",
+                    required=False,
+                    validator=bool,
+                    comment="Set to true for blue green deployment. Only works with non incremental transformations.",
                     parent_fields=["task_parameters"],
                 )
             ]
@@ -82,6 +89,7 @@ class AthenaTransformTask(Task):
         self._is_incremental = self.parse_attribute("is_incremental")
         self._partitioned_by = self.parse_attribute("partitioned_by")
         self._output_format = self.parse_attribute("output_format")
+        self._blue_green_deployment = self.parse_attribute("blue_green_deployment") or False
 
         self._add_hidden_s3_output()
 
@@ -116,6 +124,10 @@ class AthenaTransformTask(Task):
     @property
     def output_format(self):
         return self._output_format
+
+    @property
+    def blue_green_deployment(self):
+        return self._blue_green_deployment
 
     def _add_hidden_s3_output(self):
         output_athena = self._outputs[0]

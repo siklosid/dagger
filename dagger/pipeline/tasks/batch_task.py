@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from dagger import conf
 from dagger.pipeline.task import Task

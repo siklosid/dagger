@@ -14,6 +14,7 @@ from dagger.dag_creator.airflow.operator_creators import (
     sqoop_creator,
 )
 from dagger.dag_creator.airflow.utils.operator_factories import make_control_flow
+from dagger.utilities.classes import get_deep_obj_subclasses
 
 
 class DataOperator(DummyOperator):
@@ -27,7 +28,7 @@ class OperatorFactory:
     def __init__(self):
         self.factory = dict()
 
-        for cls in OperatorCreator.__subclasses__():
+        for cls in get_deep_obj_subclasses(OperatorCreator):
             self.factory[cls.ref_name] = cls
 
     def create_operator(self, task, dag):

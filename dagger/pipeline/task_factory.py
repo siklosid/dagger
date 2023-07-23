@@ -12,13 +12,14 @@ from dagger.pipeline.tasks import (
     spark_task,
     sqoop_task,
 )
+from dagger.utilities.classes import get_deep_obj_subclasses
 
 
 class TaskFactory:
     def __init__(self):
         self.factory = dict()
 
-        for cls in Task.__subclasses__():
+        for cls in get_deep_obj_subclasses(Task):
             self.factory[cls.ref_name] = cls
 
     def create_task(self, ref_name, task_name, pipeline_name, pipeline, task_config):

@@ -8,13 +8,14 @@ from dagger.pipeline.ios import (
     redshift_io,
     s3_io
 )
+from dagger.utilities.classes import get_deep_obj_subclasses
 
 
 class IOFactory:
     def __init__(self):
         self.factory = dict()
 
-        for cls in IO.__subclasses__():
+        for cls in get_deep_obj_subclasses(IO):
             self.factory[cls.ref_name] = cls
 
     def create_io(self, ref_name, io_config, task):
