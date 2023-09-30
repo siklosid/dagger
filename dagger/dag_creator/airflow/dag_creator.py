@@ -58,7 +58,7 @@ class DagCreator(GraphTraverserBase):
             "external_sensor_name": f"{from_pipeline_name}-{from_task_name}-sensor",
         }
 
-    def _get_external_task_sensor(self, from_task_id: str, to_task_id: str) -> ExternalTaskSensor:
+    def _get_external_task_sensor(self, from_task_id: str, to_task_id: str, follow_external_dependency: dict) -> ExternalTaskSensor:
         """
         create an object of external task sensor for a specific from_task_id and to_task_id
         """
@@ -72,6 +72,14 @@ class DagCreator(GraphTraverserBase):
 
         to_pipe_id = self._task_graph.get_node(to_task_id).obj.pipeline.name
 
+
+        extra_args = {
+            'mode': conf.EXTERNAL_SENSOR_MODE,
+            'poke_interval': conf.EXTERNAL_SENSOR_POKE_INTERVAL,
+            'timeout': conf.EXTERNAL_SENSOR_TIMEOUT,
+        }
+        extra_args.update(follow_external_dependency)
+
         return ExternalTaskSensor(
             dag=self._dags[to_pipe_id],
             task_id=external_sensor_name,
@@ -80,9 +88,7 @@ class DagCreator(GraphTraverserBase):
             execution_date_fn=self._get_execution_date_fn(
                 from_pipeline_schedule, to_pipeline_schedule
             ),
-            mode=conf.EXTERNAL_SENSOR_MODE,
-            poke_interval=conf.EXTERNAL_SENSOR_POKE_INTERVAL,
-            timeout=conf.EXTERNAL_SENSOR_TIMEOUT,
+            **extra_args
         )
 
     def _create_control_flow_task(self, pipe_id, dag):
@@ -143,7 +149,7 @@ class DagCreator(GraphTraverserBase):
             to_pipe = self._task_graph.get_node(to_task_id).obj.pipeline_name
             if from_pipe and from_pipe == to_pipe:
                 self._tasks[from_task_id] >> self._tasks[to_task_id]
-            elif from_pipe and from_pipe != to_pipe and edge_properties.follow_external_dependency:
+            elif from_pipe and from_pipe != to_pipe and edge_properties.follow_external_dependency is not None:
                 from_schedule = self._task_graph.get_node(from_task_id).obj.pipeline.schedule
                 to_schedule = self._task_graph.get_node(to_task_id).obj.pipeline.schedule
                 if not from_schedule.startswith("@") and not to_schedule.startswith("@"):
@@ -155,7 +161,7 @@ class DagCreator(GraphTraverserBase):
                         not in self._sensor_dict.get(to_pipe, dict()).keys()
                     ):
                         external_task_sensor = self._get_external_task_sensor(
-                            from_task_id, to_task_id
+                            from_task_id, to_task_id, edge_properties.follow_external_dependency
                         )
                         self._sensor_dict[to_pipe] = {
                             external_task_sensor_name: external_task_sensor
