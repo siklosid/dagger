@@ -5,7 +5,8 @@ inputs:                        # format: list | Use dagger init-io cli
     name: redshift_input
     schema: dwh
     table: batch_table
-    follow_external_dependency: True
+    follow_external_dependency:
+      poke_interval: 60
 outputs:                       # format: list | Use dagger init-io cli
   - type: dummy
     name: first_dummy_output
