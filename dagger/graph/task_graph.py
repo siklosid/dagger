@@ -55,7 +55,7 @@ class Node(ABC):
 
 
 class Edge:
-    def __init__(self, follow_external_dependency=False):
+    def __init__(self, follow_external_dependency=None):
         self._follow_external_dependency = follow_external_dependency
 
     @property

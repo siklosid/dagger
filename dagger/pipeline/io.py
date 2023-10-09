@@ -19,9 +19,15 @@ class IO(ConfigValidator, ABC):
                 Attribute(
                     attribute_name="follow_external_dependency",
                     required=False,
-                    comment="Weather an external task sensor should be created if this dataset"
-                            "is created in another pipeline. Default is False",
+                    format_help="dictionary or boolean",
+                    comment="External Task Sensor parameters in key value format: https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/sensors/base/index.html"
                 ),
+                # Attribute(
+                #     attribute_name="follow_external_dependency",
+                #     required=False,
+                #     comment="Weather an external task sensor should be created if this dataset"
+                #             "is created in another pipeline. Default is False",
+                # ),
             ]
         )
 
@@ -34,7 +40,17 @@ class IO(ConfigValidator, ABC):
         self._has_dependency = self.parse_attribute("has_dependency")
         if self._has_dependency is None:
             self._has_dependency = True
-        self._follow_external_dependency = self.parse_attribute("follow_external_dependency") or False
+
+        follow_external_dependency = self.parse_attribute("follow_external_dependency")
+        if follow_external_dependency is not None:
+            if isinstance(follow_external_dependency, bool):
+                if follow_external_dependency:
+                    follow_external_dependency = dict()
+                else:
+                    follow_external_dependency = None
+            else:
+                follow_external_dependency = dict(follow_external_dependency)
+        self._follow_external_dependency = follow_external_dependency
 
     def __eq__(self, other):
         return self.alias() == other.alias()
