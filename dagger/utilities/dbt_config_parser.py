@@ -23,6 +23,12 @@ class DBTConfigParser:
         prod_dbt_profile = profile_yaml[self._dbt_project_dir]['outputs']['data']
         self._default_data_dir = prod_dbt_profile.get('s3_data_dir') or prod_dbt_profile.get('s3_staging_dir')
 
+    def generate_io(self, model_name: str) -> tuple[list[dict], list[dict]]:
+        model_inputs = self._parse_dbt_model_inputs(model_name)
+        model_dagger_inputs = self.generate_dagger_inputs(model_inputs)
+        model_dagger_outputs = self.generate_dagger_outputs(model_inputs)
+        return model_dagger_inputs, model_dagger_outputs
+
     def parse_dbt_staging_model(self, dbt_staging_model: str) -> Union[str, str]:
         _model_split, core_table = dbt_staging_model.split('__')
         core_schema = _model_split.split('_')[-1]
