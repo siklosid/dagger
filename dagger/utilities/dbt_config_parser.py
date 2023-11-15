@@ -22,6 +22,51 @@ class DBTConfigParser:
         profile_yaml = yaml.safe_load(open(dbt_profile_path, "r"))
         prod_dbt_profile = profile_yaml[self._dbt_project_dir]['outputs']['data']
         self._default_data_dir = prod_dbt_profile.get('s3_data_dir') or prod_dbt_profile.get('s3_staging_dir')
+
+    def parse_dbt_staging_model(self, dbt_staging_model: str) -> Union[str, str]:
+        _model_split, core_table = dbt_staging_model.split('__')
+        core_schema = _model_split.split('_')[-1]
+
+        return core_schema, core_table
+
+    def generate_dagger_inputs(self, dbt_inputs: dict) -> Union[list[dict], None]:
+        dagger_inputs = []
+        for dbt_input in dbt_inputs['inputs']:
+            model_name = dbt_input['model_name']
+            athena_input = ATHENA_IO_BASE.copy()
+            s3_input = S3_IO_BASE.copy()
+
+            if (model_name.startswith("stg_")):
+                athena_input['name'] = model_name
+                athena_input['schema'], athena_input['table'] = self.parse_dbt_staging_model(model_name)
+
+                dagger_inputs.append(athena_input)
+            else:
+                athena_input['name'] = athena_input['table'] = model_name
+                athena_input['schema'] = dbt_input['schema']
+
+                s3_input['name'] = model_name
+                s3_input['bucket'] = self._default_data_bucket
+                s3_input['path'] = dbt_input['relative_s3_path']
+
+                dagger_inputs.append(athena_input)
+                dagger_inputs.append(s3_input)
+
+        return dagger_inputs or None
+
+    def generate_dagger_outputs(self, dbt_inputs: dict) -> list[dict]:
+        athena_input = ATHENA_IO_BASE.copy()
+        s3_input = S3_IO_BASE.copy()
+
+        athena_input['name'] = athena_input['table'] = dbt_inputs['model_name']
+        athena_input['schema'] = dbt_inputs['schema']
+
+        s3_input['name'] = dbt_inputs['model_name']
+        s3_input['bucket'] = self._default_data_bucket
+        s3_input['relative_s3_path'] = dbt_inputs['relative_s3_path']
+
+        return [athena_input, s3_input]
+
     def _get_model_data_location(self, node: dict, schema: str, dbt_model_name: str) -> str:
         location = node.get("unrendered_config", {}).get("external_location")
         if not location:
