@@ -1,7 +1,7 @@
 import logging
 from os import path
 from mergedeep import merge
-from dbt_config_parser import DBTConfigParser
+from dagger.utilities.dbt_config_parser import DBTConfigParser
 
 import yaml
 
