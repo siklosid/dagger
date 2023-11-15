@@ -7,12 +7,13 @@ import yaml
 ATHENA_IO_BASE = {"type": "athena"}
 S3_IO_BASE = {"type": "s3"}
 
+
 class DBTConfigParser:
 
-    def __init__(self, default_config_parameters:dict):
+    def __init__(self, default_config_parameters: dict):
         self._default_data_bucket = default_config_parameters["data_bucket"]
         self._dbt_project_dir = default_config_parameters.get("project_dir", None)
-        dbt_manifest_path = path.join(self._dbt_project_dir, "target","manifest.json")
+        dbt_manifest_path = path.join(self._dbt_project_dir, "target", "manifest.json")
         self._dbt_profile_dir = default_config_parameters.get("profile_dir", None)
         dbt_profile_path = path.join(self._dbt_profile_dir, "profiles.yml")
 
