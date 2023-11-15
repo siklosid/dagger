@@ -1,6 +1,6 @@
 from os import path
 from os.path import join
-from typing import Union
+from typing import Union, Tuple
 import json
 import yaml
 
@@ -25,21 +25,25 @@ class DBTConfigParser:
         self._default_data_dir = prod_dbt_profile.get('s3_data_dir') or prod_dbt_profile.get('s3_staging_dir')
 
     def generate_io(self, model_name: str) -> tuple[list[dict], list[dict]]:
-        model_inputs = self._parse_dbt_model_inputs(model_name)
-        model_dagger_inputs = self.generate_dagger_inputs(model_inputs)
-        model_dagger_outputs = self.generate_dagger_outputs(model_inputs)
+        """
+        Generates the dagger inputs and outputs for the respective dbt model
+        Args:
+        model_parents = self._get_dbt_model_parents(model_name)
+        model_dagger_inputs = self.generate_dagger_inputs(model_parents)
+        model_dagger_outputs = self.generate_dagger_outputs(model_parents['model_name'], model_parents['schema'], model_parents['relative_s3_path'])
+
         return model_dagger_inputs, model_dagger_outputs
 
-    def parse_dbt_staging_model(self, dbt_staging_model: str) -> Union[str, str]:
+    def parse_dbt_staging_model(self, dbt_staging_model: str) -> Tuple[str, str]:
         _model_split, core_table = dbt_staging_model.split('__')
         core_schema = _model_split.split('_')[-1]
 
         return core_schema, core_table
 
-    def generate_dagger_inputs(self, dbt_inputs: dict) -> Union[list[dict], None]:
+    def generate_dagger_inputs(self, dbt_model_parents: dict) -> Union[list[dict], None]:
         dagger_inputs = []
-        for dbt_input in dbt_inputs['inputs']:
-            model_name = dbt_input['model_name']
+        for parent in dbt_model_parents['inputs']:
+            model_name = parent['model_name']
             athena_input = ATHENA_IO_BASE.copy()
             s3_input = S3_IO_BASE.copy()
 
@@ -50,27 +54,26 @@ class DBTConfigParser:
                 dagger_inputs.append(athena_input)
             else:
                 athena_input['name'] = athena_input['table'] = model_name
-                athena_input['schema'] = dbt_input['schema']
+                athena_input['schema'] = parent['schema']
 
                 s3_input['name'] = model_name
                 s3_input['bucket'] = self._default_data_bucket
-                s3_input['path'] = dbt_input['relative_s3_path']
+                s3_input['path'] = parent['relative_s3_path']
 
                 dagger_inputs.append(athena_input)
                 dagger_inputs.append(s3_input)
 
         return dagger_inputs or None
 
-    def generate_dagger_outputs(self, dbt_inputs: dict) -> list[dict]:
+    def generate_dagger_outputs(self, model_name: str, schema: str, relative_s3_path: str) -> list[dict]:
         athena_input = ATHENA_IO_BASE.copy()
         s3_input = S3_IO_BASE.copy()
 
-        athena_input['name'] = athena_input['table'] = dbt_inputs['model_name']
-        athena_input['schema'] = dbt_inputs['schema']
+        athena_input['name'] = athena_input['table'] = s3_input['name'] = model_name
+        athena_input['schema'] = schema
 
-        s3_input['name'] = dbt_inputs['model_name']
         s3_input['bucket'] = "cho${ENV}-data-lake"
-        s3_input['relative_s3_path'] = dbt_inputs['relative_s3_path']
+        s3_input['relative_s3_path'] = relative_s3_path
 
         return [athena_input, s3_input]
 
@@ -81,7 +84,7 @@ class DBTConfigParser:
 
         return location.split("data-lake/")[1]
 
-    def _parse_dbt_model_inputs(self, model_name: str) -> dict:
+    def _get_dbt_model_parents(self, model_name: str) -> dict:
         inputs_dict = {}
         inputs_list = []
         dbt_ref_to_model = f'model.{self._dbt_project_dir}.{model_name}'
