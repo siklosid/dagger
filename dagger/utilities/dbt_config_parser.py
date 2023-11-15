@@ -69,7 +69,7 @@ class DBTConfigParser:
         athena_input['schema'] = dbt_inputs['schema']
 
         s3_input['name'] = dbt_inputs['model_name']
-        s3_input['bucket'] = self._default_data_bucket
+        s3_input['bucket'] = "cho${ENV}-data-lake"
         s3_input['relative_s3_path'] = dbt_inputs['relative_s3_path']
 
         return [athena_input, s3_input]
