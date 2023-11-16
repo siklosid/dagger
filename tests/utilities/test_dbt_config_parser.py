@@ -20,6 +20,7 @@ DEFAULT_CONFIG_PARAMS = {
     "project_dir": "main",
     "profile_dir": ".dbt",
 }
+MODEL_NAME = "model1"
 
 
 class TestDBTConfigParser(unittest.TestCase):
@@ -28,3 +29,9 @@ class TestDBTConfigParser(unittest.TestCase):
     @patch("yaml.safe_load", return_value=DBT_PROFILE_FIXTURE)
     def setUp(self, mock_open, mock_json_load, mock_safe_load):
         self._dbt_config_parser = DBTConfigParser(DEFAULT_CONFIG_PARAMS)
+
+
+    def test_get_dbt_model_parents(self):
+        result = self._dbt_config_parser._get_dbt_model_parents(MODEL_NAME)
+
+        self.assertDictEqual(result, EXPECTED_DBT_MODEL_PARENTS)

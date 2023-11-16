@@ -65,3 +65,22 @@ DBT_PROFILE_FIXTURE = {
         }
     }
 }
+
+EXPECTED_DBT_MODEL_PARENTS = {
+    "inputs": [
+        {
+            "model_name": "stg_core_schema1__table1",
+            "relative_s3_path": "path1/tmp/analytics_engineering/stg_core_schema1__table1",
+            "schema": "analytics_engineering",
+        },
+        {
+            "model_name": "model2",
+            "relative_s3_path": "path2/model2",
+            "schema": "analytics_engineering",
+        },
+    ],
+    "model_name": "model1",
+    "node_name": "model.main.model1",
+    "relative_s3_path": "path1/model1",
+    "schema": "analytics_engineering",
+}
