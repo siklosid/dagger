@@ -57,6 +57,11 @@ class DBTConfigParser:
 
         Returns:
             Tuple[str, str]: core schema and table name
+
+        >>> parse_dbt_staging_model("schema_name__table")
+        ('schema_name', 'table')
+        >>> parse_dbt_staging_model("another_schema__another_table")
+        ('another_schema', 'another_table')
         """
         _model_split, core_table = dbt_staging_model.split("__")
         core_schema = _model_split.split("_")[-1]
