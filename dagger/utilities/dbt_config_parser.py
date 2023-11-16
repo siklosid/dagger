@@ -146,7 +146,7 @@ class DBTConfigParser:
             str: The S3 path of the dbt model relative to the data bucket
 
         """
-        location = node.get("unrendered_config", {}).get("external_location")
+        location = node.get("config", {}).get("external_location")
         if not location:
             location = join(self._default_data_dir, schema, dbt_model_name)
 
