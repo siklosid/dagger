@@ -105,3 +105,18 @@ EXPECTED_DAGGER_INPUTS = [
         "type": "s3",
     },
 ]
+
+EXPECTED_DAGGER_OUTPUTS = [
+    {
+        "name": "model1",
+        "schema": "analytics_engineering",
+        "table": "model1",
+        "type": "athena",
+    },
+    {
+        "bucket": "cho${ENV}-data-lake",
+        "name": "model1",
+        "relative_s3_path": "path1/model1",
+        "type": "s3",
+    },
+]

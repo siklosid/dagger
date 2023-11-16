@@ -42,3 +42,12 @@ class TestDBTConfigParser(unittest.TestCase):
         )
 
         self.assertListEqual(result_inputs, EXPECTED_DAGGER_INPUTS)
+
+    def test_generate_dagger_outputs(self):
+        result_outputs = self._dbt_config_parser.generate_dagger_outputs(
+            EXPECTED_DBT_MODEL_PARENTS["model_name"],
+            EXPECTED_DBT_MODEL_PARENTS["schema"],
+            EXPECTED_DBT_MODEL_PARENTS["relative_s3_path"],
+        )
+
+        self.assertListEqual(result_outputs, EXPECTED_DAGGER_OUTPUTS)
