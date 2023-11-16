@@ -24,7 +24,7 @@ class DBTConfigParser:
             data = f.read()
         self._manifest_data = json.loads(data)
         profile_yaml = yaml.safe_load(open(dbt_profile_path, "r"))
-        prod_dbt_profile = profile_yaml[self._dbt_project_dir]["outputs"]["data"]
+        prod_dbt_profile = profile_yaml[self._dbt_project_dir.split("/")[-1]]["outputs"]["data"]
         self._default_data_dir = prod_dbt_profile.get(
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
