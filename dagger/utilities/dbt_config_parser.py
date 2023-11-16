@@ -29,7 +29,7 @@ class DBTConfigParser:
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
 
-    def generate_io(self, model_name: str) -> tuple[list[dict], list[dict]]:
+    def generate_io(self, model_name: str) -> Tuple[list[dict], list[dict]]:
         """
         Generates the dagger inputs and outputs for the respective dbt model
         Args:
