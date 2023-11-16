@@ -35,3 +35,10 @@ class TestDBTConfigParser(unittest.TestCase):
         result = self._dbt_config_parser._get_dbt_model_parents(MODEL_NAME)
 
         self.assertDictEqual(result, EXPECTED_DBT_MODEL_PARENTS)
+
+    def test_generate_dagger_inputs(self):
+        result_inputs = self._dbt_config_parser.generate_dagger_inputs(
+            EXPECTED_DBT_MODEL_PARENTS
+        )
+
+        self.assertListEqual(result_inputs, EXPECTED_DAGGER_INPUTS)

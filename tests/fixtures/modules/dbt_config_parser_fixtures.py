@@ -84,3 +84,24 @@ EXPECTED_DBT_MODEL_PARENTS = {
     "relative_s3_path": "path1/model1",
     "schema": "analytics_engineering",
 }
+
+EXPECTED_DAGGER_INPUTS = [
+    {
+        "name": "stg_core_schema1__table1",
+        "schema": "schema1",
+        "table": "table1",
+        "type": "athena",
+    },
+    {
+        "name": "model2",
+        "schema": "analytics_engineering",
+        "table": "model2",
+        "type": "athena",
+    },
+    {
+        "bucket": "bucket1-data-lake",
+        "name": "model2",
+        "path": "path2/model2",
+        "type": "s3",
+    },
+]
