@@ -1,11 +1,13 @@
 from os import path
 from os.path import join
-from typing import Union, Tuple
+from typing import Union, Tuple, List, Dict
+
 import json
 import yaml
 
 ATHENA_IO_BASE = {"type": "athena"}
 S3_IO_BASE = {"type": "s3"}
+
 
 
 class DBTConfigParser:
@@ -29,14 +31,14 @@ class DBTConfigParser:
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
 
-    def generate_io(self, model_name: str) -> Tuple[list[dict], list[dict]]:
+    def generate_io(self, model_name: str) -> Tuple[List[Dict], List[Dict]]:
         """
         Generates the dagger inputs and outputs for the respective dbt model
         Args:
             model_name: name of the dbt model
 
         Returns:
-            tuple[list[dict], list[dict]]: dagger inputs and outputs for the respective dbt model
+            tuple[List[Dict], List[Dict]]: dagger inputs and outputs for the respective dbt model
 
         """
         model_parents = self._get_dbt_model_parents(model_name)
@@ -70,7 +72,7 @@ class DBTConfigParser:
 
     def generate_dagger_inputs(
         self, dbt_model_parents: dict
-    ) -> Union[list[dict], None]:
+    ) -> Union[List[Dict], None]:
         """
         Generates the dagger inputs for the respective dbt model. This means that all parents of the dbt model are added as dagger inputs.
         Staging models are added as Athena inputs and core models are added as Athena and S3 inputs.
@@ -79,7 +81,7 @@ class DBTConfigParser:
             dbt_model_parents: All parents of the dbt model
 
         Returns:
-            Union[list[dict], None]: dagger inputs for the respective dbt model. If there are no parents, returns None
+            Union[List[Dict], None]: dagger inputs for the respective dbt model. If there are no parents, returns None
 
         """
         dagger_inputs = []
@@ -111,7 +113,7 @@ class DBTConfigParser:
 
     def generate_dagger_outputs(
         self, model_name: str, schema: str, relative_s3_path: str
-    ) -> list[dict]:
+    ) -> List[Dict]:
         """
         Generates the dagger outputs for the respective dbt model.
         This means that an Athena and S3 output is added for the dbt model.
@@ -121,7 +123,7 @@ class DBTConfigParser:
             relative_s3_path: The S3 path of the dbt model relative to the data bucket
 
         Returns:
-            list[dict]: dagger S3 and Athena outputs for the respective dbt model
+            List[Dict]: dagger S3 and Athena outputs for the respective dbt model
 
         """
         athena_input = ATHENA_IO_BASE.copy()
