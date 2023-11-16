@@ -169,23 +169,23 @@ class DBTConfigParser:
         nodes = self._manifest_data["nodes"]
         model_info = nodes[f"model.main.{model_name}"]
 
-        parents_as_full_selectors = model_info.get("depends_on", {}).get("nodes", [])
-        inputs = [x.split(".")[-1] for x in parents_as_full_selectors]
+        parent_node_names = model_info.get("depends_on", {}).get("nodes", [])
+        parent_model_names = [x.split(".")[-1] for x in parent_node_names]
 
-        for index, node_name in enumerate(parents_as_full_selectors):
-            if not (".int_" in node_name):
-                dbt_parent_model_name = node_name.split(".")[-1]
-                parent_model_node = nodes.get(node_name)
+        for index, parent_node_name in enumerate(parent_node_names):
+            if not (".int_" in parent_node_name):
+                parent_model_name = parent_node_name.split(".")[-1]
+                parent_model_node = nodes.get(parent_node_name)
                 parent_schema = parent_model_node.get("schema")
 
                 model_data_location = self._get_model_data_location(
-                    parent_model_node, parent_schema, dbt_parent_model_name
+                    parent_model_node, parent_schema, parent_model_name
                 )
 
                 inputs_list.append(
                     {
                         "schema": parent_schema,
-                        "model_name": inputs[index],
+                        "model_name": parent_model_names[index],
                         "relative_s3_path": model_data_location,
                     }
                 )
