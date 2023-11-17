@@ -25,7 +25,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
                     "macro.main.macro2",
                 ],
                 "nodes": [
-                    "model.main.stg_core_schema1__table1",
+                    "model.main.stg_core_schema2__table2",
                     "model.main.model2",
                     "model.main.int_model3",
                 ],
@@ -33,14 +33,32 @@ DBT_MANIFEST_FILE_FIXTURE = {
         },
         "model.main.stg_core_schema1__table1": {
             "schema": "analytics_engineering",
+            "name": "stg_core_schema1__table1",
+            "depends_on": {
+                "macros": [],
+                "nodes": ["source.main.core_schema1.table1"],
+            },
+        },
+        "model.main.stg_core_schema2__table2": {
+            "schema": "analytics_engineering",
+            "name": "stg_core_schema2__table2",
+            "depends_on": {
+                "macros": [],
+                "nodes": [
+                    "source.main.core_schema2.table2",
+                    "source.main.core_schema2.table3",
+                ],
+            },
         },
         "model.main.model2": {
+            "name": "model2",
             "schema": "analytics_engineering",
             "config": {
                 "external_location": "s3://bucket1-data-lake/path2/model2",
             },
         },
         "model.main.int_model3": {
+            "name": "int_model3",
             "schema": "analytics_engineering",
         },
     }
@@ -66,41 +84,51 @@ DBT_PROFILE_FIXTURE = {
     }
 }
 
-EXPECTED_DBT_MODEL_PARENTS = {
-    "inputs": [
-        {
-            "model_name": "stg_core_schema1__table1",
-            "relative_s3_path": "path1/tmp/analytics_engineering/stg_core_schema1__table1",
-            "schema": "analytics_engineering",
-        },
-        {
-            "model_name": "model2",
-            "relative_s3_path": "path2/model2",
-            "schema": "analytics_engineering",
-        },
-    ],
-    "model_name": "model1",
-    "node_name": "model.main.model1",
-    "relative_s3_path": "path1/model1",
-    "schema": "analytics_engineering",
-}
+EXPECTED_STAGING_NODE = [
+    {
+        "type": "athena",
+        "name": "stg_core_schema1__table1",
+        "schema": "core_schema1",
+        "table": "table1",
+    }
+]
+EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
+    {
+        "type": "athena",
+        "name": "stg_core_schema2__table2",
+        "schema": "core_schema2",
+        "table": "table2",
+    },
+    {
+        "type": "athena",
+        "name": "stg_core_schema2__table3",
+        "schema": "core_schema2",
+        "table": "table3",
+    },
+]
 
 EXPECTED_DAGGER_INPUTS = [
     {
-        "name": "stg_core_schema1__table1",
-        "schema": "schema1",
-        "table": "table1",
+        "name": "stg_core_schema2__table2",
+        "schema": "core_schema2",
+        "table": "table2",
         "type": "athena",
     },
     {
-        "name": "model2",
+        "name": "stg_core_schema2__table3",
+        "schema": "core_schema2",
+        "table": "table3",
+        "type": "athena",
+    },
+    {
+        "name": "analytics_engineering_model2_athena",
         "schema": "analytics_engineering",
         "table": "model2",
         "type": "athena",
     },
     {
         "bucket": "bucket1-data-lake",
-        "name": "model2",
+        "name": "analytics_engineering_model2_s3",
         "path": "path2/model2",
         "type": "s3",
     },
@@ -108,15 +136,15 @@ EXPECTED_DAGGER_INPUTS = [
 
 EXPECTED_DAGGER_OUTPUTS = [
     {
-        "name": "model1",
+        "name": "analytics_engineering_fct_supplier_revenue_athena",
         "schema": "analytics_engineering",
-        "table": "model1",
+        "table": "fct_supplier_revenue",
         "type": "athena",
     },
     {
-        "bucket": "cho${ENV}-data-lake",
-        "name": "model1",
-        "relative_s3_path": "path1/model1",
+        "bucket": "bucket1-data-lake",
+        "name": "analytics_engineering_fct_supplier_revenue_s3",
+        "path": "path1/model1",
         "type": "s3",
     },
 ]

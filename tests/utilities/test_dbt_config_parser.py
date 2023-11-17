@@ -6,11 +6,12 @@ from unittest.mock import patch, MagicMock
 from dagger.utilities.dbt_config_parser import DBTConfigParser
 from dagger.utilities.module import Module
 from tests.fixtures.modules.dbt_config_parser_fixtures import (
-    EXPECTED_DBT_MODEL_PARENTS,
+    EXPECTED_DAGGER_OUTPUTS,
     EXPECTED_DAGGER_INPUTS,
     DBT_MANIFEST_FILE_FIXTURE,
     DBT_PROFILE_FIXTURE,
-    EXPECTED_DAGGER_OUTPUTS,
+    EXPECTED_STAGING_NODE,
+    EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
 )
 
 _logger = logging.getLogger("root")
@@ -29,25 +30,44 @@ class TestDBTConfigParser(unittest.TestCase):
     @patch("yaml.safe_load", return_value=DBT_PROFILE_FIXTURE)
     def setUp(self, mock_open, mock_json_load, mock_safe_load):
         self._dbt_config_parser = DBTConfigParser(DEFAULT_CONFIG_PARAMS)
+        self._sample_dbt_node = DBT_MANIFEST_FILE_FIXTURE["nodes"][
+            "model.main.stg_core_schema1__table1"
+        ]
 
-
-    def test_get_dbt_model_parents(self):
-        result = self._dbt_config_parser._get_dbt_model_parents(MODEL_NAME)
-
-        self.assertDictEqual(result, EXPECTED_DBT_MODEL_PARENTS)
-
-    def test_generate_dagger_inputs(self):
-        result_inputs = self._dbt_config_parser.generate_dagger_inputs(
-            EXPECTED_DBT_MODEL_PARENTS
+    @skip("Run only locally")
+    def test_generate_task_configs(self):
+        module = Module(
+            path_to_config="./tests/fixtures/modules/dbt_test_config.yaml",
+            target_dir="./tests/fixtures/modules/",
         )
 
-        self.assertListEqual(result_inputs, EXPECTED_DAGGER_INPUTS)
+        module.generate_task_configs()
 
-    def test_generate_dagger_outputs(self):
-        result_outputs = self._dbt_config_parser.generate_dagger_outputs(
-            EXPECTED_DBT_MODEL_PARENTS["model_name"],
-            EXPECTED_DBT_MODEL_PARENTS["schema"],
-            EXPECTED_DBT_MODEL_PARENTS["relative_s3_path"],
-        )
+    def test_generate_dagger_dependency(self):
+        test_inputs = [
+            (
+                DBT_MANIFEST_FILE_FIXTURE["nodes"][
+                    "model.main.stg_core_schema1__table1"
+                ],
+                EXPECTED_STAGING_NODE,
+            ),
+            (
+                DBT_MANIFEST_FILE_FIXTURE["nodes"][
+                    "model.main.stg_core_schema2__table2"
+                ],
+                EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
+            ),
+        ]
+        for mock_input, expected_output in test_inputs:
+            result = self._dbt_config_parser._generate_dagger_dependency(mock_input)
+            self.assertListEqual(result, expected_output)
 
-        self.assertListEqual(result_outputs, EXPECTED_DAGGER_OUTPUTS)
+    def test_generate_io_inputs(self):
+        result, _ = self._dbt_config_parser.generate_dagger_io(MODEL_NAME)
+
+        self.assertListEqual(result, EXPECTED_DAGGER_INPUTS)
+
+    def test_generate_io_outputs(self):
+        _, result = self._dbt_config_parser.generate_dagger_io(MODEL_NAME)
+
+        self.assertListEqual(result, EXPECTED_DAGGER_OUTPUTS)
