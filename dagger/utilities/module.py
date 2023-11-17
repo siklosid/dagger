@@ -85,7 +85,7 @@ class Module:
                 task_dict = yaml.safe_load(task_str)
 
                 if task == 'dbt':
-                    inputs, outputs = self._dbt_module.generate_io(branch_name)
+                    inputs, outputs = self._dbt_module.generate_dagger_io(branch_name)
                     task_dict['inputs'] = inputs
                     task_dict['outputs'] = outputs
                     task_dict['task_parameters']['select'] = branch_name

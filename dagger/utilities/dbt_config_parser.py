@@ -1,11 +1,13 @@
+import json
 from os import path
 from os.path import join
-from typing import Union, Tuple
-import json
+from pprint import pprint
+from typing import Tuple, List, Dict
+
 import yaml
 
-ATHENA_IO_BASE = {"type": "athena"}
-S3_IO_BASE = {"type": "s3"}
+ATHENA_TASK_BASE = {"type": "athena"}
+S3_TASK_BASE = {"type": "s3"}
 
 
 class DBTConfigParser:
@@ -24,116 +26,58 @@ class DBTConfigParser:
             data = f.read()
         self._manifest_data = json.loads(data)
         profile_yaml = yaml.safe_load(open(dbt_profile_path, "r"))
-        prod_dbt_profile = profile_yaml[self._dbt_project_dir.split("/")[-1]]["outputs"]["data"]
+        prod_dbt_profile = profile_yaml[self._dbt_project_dir.split("/")[-1]][
+            "outputs"
+        ]["data"]
         self._default_data_dir = prod_dbt_profile.get(
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
 
-    def generate_io(self, model_name: str) -> Tuple[list[dict], list[dict]]:
+    def _generate_dagger_dependency(self, node: dict) -> List[Dict]:
         """
-        Generates the dagger inputs and outputs for the respective dbt model
+        Generates the dagger task based on whether the DBT model node is a staging model or not.
+        If the DBT model node represents a staging model, then a dagger athena task is generated for each source of the DBT model.
+        If the DBT model node is not a staging model, then a dagger athena task and an s3 task is generated for the DBT model node itself.
         Args:
-            model_name: name of the dbt model
+            node: The extracted node from the manifest.json file
 
         Returns:
-            tuple[list[dict], list[dict]]: dagger inputs and outputs for the respective dbt model
+            List[Dict]: The respective dagger tasks for the DBT model node
 
         """
-        model_parents = self._get_dbt_model_parents(model_name)
-        model_dagger_inputs = self.generate_dagger_inputs(model_parents)
-        model_dagger_outputs = self.generate_dagger_outputs(
-            model_parents["model_name"],
-            model_parents["schema"],
-            model_parents["relative_s3_path"],
-        )
+        model_name = node["name"]
 
-        return model_dagger_inputs, model_dagger_outputs
+        s3_task = S3_TASK_BASE.copy()
+        dagger_tasks = []
 
-    def parse_dbt_staging_model(self, dbt_staging_model: str) -> Tuple[str, str]:
-        """
-        Parses the dbt staging model to get the core schema and table name
-        Args:
-            dbt_staging_model: name of the DBT staging model
+        if model_name.startswith("stg_"):
+            source_nodes = node.get("depends_on", {}).get("nodes", [])
+            for source_node in source_nodes:
+                _, project_name, schema_name, table_name = source_node.split(".")
+                athena_task = ATHENA_TASK_BASE.copy()
 
-        Returns:
-            Tuple[str, str]: core schema and table name
+                athena_task["name"] = f"stg_{schema_name}__{table_name}"
+                athena_task["schema"] = schema_name
+                athena_task["table"] = table_name
 
-        >>> parse_dbt_staging_model("schema_name__table")
-        ('schema_name', 'table')
-        >>> parse_dbt_staging_model("another_schema__another_table")
-        ('another_schema', 'another_table')
-        """
-        _model_split, core_table = dbt_staging_model.split("__")
-        core_schema = _model_split.split("_")[-1]
+                dagger_tasks.append(athena_task)
+        else:
+            athena_task = ATHENA_TASK_BASE.copy()
+            model_schema = node["schema"]
+            athena_task["name"] = f"{model_schema}_{model_name}_athena"
+            athena_task["table"] = model_name
+            athena_task["schema"] = node["schema"]
 
-        return core_schema, core_table
+            s3_task["name"] = f"{model_schema}_{model_name}_s3"
+            s3_task["bucket"] = self._default_data_bucket
+            s3_task["path"] = self._get_model_data_location(
+                node, model_schema, model_name
+            )
 
-    def generate_dagger_inputs(
-        self, dbt_model_parents: dict
-    ) -> Union[list[dict], None]:
-        """
-        Generates the dagger inputs for the respective dbt model. This means that all parents of the dbt model are added as dagger inputs.
-        Staging models are added as Athena inputs and core models are added as Athena and S3 inputs.
-        Intermediate models are not added as an input.
-        Args:
-            dbt_model_parents: All parents of the dbt model
+            dagger_tasks.append(athena_task)
+            dagger_tasks.append(s3_task)
 
-        Returns:
-            Union[list[dict], None]: dagger inputs for the respective dbt model. If there are no parents, returns None
-
-        """
-        dagger_inputs = []
-        for parent in dbt_model_parents["inputs"]:
-            model_name = parent["model_name"]
-            athena_input = ATHENA_IO_BASE.copy()
-            s3_input = S3_IO_BASE.copy()
-
-            if model_name.startswith("stg_"):
-                athena_input["name"] = model_name
-                (
-                    athena_input["schema"],
-                    athena_input["table"],
-                ) = self.parse_dbt_staging_model(model_name)
-
-                dagger_inputs.append(athena_input)
-            else:
-                athena_input["name"] = athena_input["table"] = model_name
-                athena_input["schema"] = parent["schema"]
-
-                s3_input["name"] = model_name
-                s3_input["bucket"] = self._default_data_bucket
-                s3_input["path"] = parent["relative_s3_path"]
-
-                dagger_inputs.append(athena_input)
-                dagger_inputs.append(s3_input)
-
-        return dagger_inputs or None
-
-    def generate_dagger_outputs(
-        self, model_name: str, schema: str, relative_s3_path: str
-    ) -> list[dict]:
-        """
-        Generates the dagger outputs for the respective dbt model.
-        This means that an Athena and S3 output is added for the dbt model.
-        Args:
-            model_name: The name of the dbt model
-            schema: The schema of the dbt model
-            relative_s3_path: The S3 path of the dbt model relative to the data bucket
-
-        Returns:
-            list[dict]: dagger S3 and Athena outputs for the respective dbt model
-
-        """
-        athena_input = ATHENA_IO_BASE.copy()
-        s3_input = S3_IO_BASE.copy()
-
-        athena_input["name"] = athena_input["table"] = s3_input["name"] = model_name
-        athena_input["schema"] = schema
-
-        s3_input["bucket"] = "cho${ENV}-data-lake"
-        s3_input["relative_s3_path"] = relative_s3_path
-
-        return [athena_input, s3_input]
+        return dagger_tasks
 
     def _get_model_data_location(
         self, node: dict, schema: str, dbt_model_name: str
@@ -148,59 +92,39 @@ class DBTConfigParser:
             dbt_model_name: The name of the dbt model
 
         Returns:
-            str: The S3 path of the dbt model relative to the data bucket
+            str: The relative S3 path of the dbt model relative to the data bucket
 
         """
         location = node.get("config", {}).get("external_location")
         if not location:
             location = join(self._default_data_dir, schema, dbt_model_name)
 
-        return location.split("data-lake/")[1]
+        return location.split(self._default_data_bucket)[1].lstrip("/")
 
-    def _get_dbt_model_parents(self, model_name: str) -> dict:
+    def generate_dagger_io(self, model_name: str) -> Tuple[list, list]:
         """
-        Gets all parents of a single dbt model from the manifest.json file
+        Parse through all the parents of the DBT model and return the dagger inputs and outputs for the DBT model
         Args:
             model_name: The name of the DBT model
 
         Returns:
-            dict: All parents of the dbt model along with the name, schema and S3 path of the dbt model itself
+            Tuple[list, list]: The dagger inputs and outputs for the DBT model
 
         """
-        inputs_dict = {}
         inputs_list = []
-        dbt_ref_to_model = f"model.{self._dbt_project_dir}.{model_name}"
 
         nodes = self._manifest_data["nodes"]
-        model_info = nodes[f"model.main.{model_name}"]
+        model_node = nodes[f"model.main.{model_name}"]
 
-        parent_node_names = model_info.get("depends_on", {}).get("nodes", [])
-        parent_model_names = [x.split(".")[-1] for x in parent_node_names]
+        parent_node_names = model_node.get("depends_on", {}).get("nodes", [])
 
         for index, parent_node_name in enumerate(parent_node_names):
             if not (".int_" in parent_node_name):
-                parent_model_name = parent_node_name.split(".")[-1]
                 parent_model_node = nodes.get(parent_node_name)
-                parent_schema = parent_model_node.get("schema")
+                dagger_input = self._generate_dagger_dependency(parent_model_node)
 
-                model_data_location = self._get_model_data_location(
-                    parent_model_node, parent_schema, parent_model_name
-                )
+                inputs_list += dagger_input
 
-                inputs_list.append(
-                    {
-                        "schema": parent_schema,
-                        "model_name": parent_model_names[index],
-                        "relative_s3_path": model_data_location,
-                    }
-                )
+        output_list = self._generate_dagger_dependency(model_node)
 
-        inputs_dict["model_name"] = model_name
-        inputs_dict["node_name"] = dbt_ref_to_model
-        inputs_dict["inputs"] = inputs_list
-        inputs_dict["schema"] = model_info["schema"]
-        inputs_dict["relative_s3_path"] = self._get_model_data_location(
-            model_info, model_info["schema"], model_name
-        )
-
-        return inputs_dict
+        return inputs_list, output_list
