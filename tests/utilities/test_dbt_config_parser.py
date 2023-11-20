@@ -12,6 +12,7 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     DBT_PROFILE_FIXTURE,
     EXPECTED_STAGING_NODE,
     EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
+    EXPECTED_SEED_NODE,
 )
 
 _logger = logging.getLogger("root")
@@ -57,6 +58,12 @@ class TestDBTConfigParser(unittest.TestCase):
                     "model.main.stg_core_schema2__table2"
                 ],
                 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
+            ),
+            (
+                DBT_MANIFEST_FILE_FIXTURE["nodes"][
+                    "seed.main.seed_buyer_country_overwrite"
+                ],
+                EXPECTED_SEED_NODE,
             ),
         ]
         for mock_input, expected_output in test_inputs:
