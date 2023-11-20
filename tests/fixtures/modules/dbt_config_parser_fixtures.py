@@ -47,6 +47,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
                 "nodes": [
                     "source.main.core_schema2.table2",
                     "source.main.core_schema2.table3",
+                    "seed.main.seed_buyer_country_overwrite",
                 ],
             },
         },
@@ -145,6 +146,17 @@ EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
         "table": "table3",
         "follow_external_dependency": True,
     },
+    {
+        "type": "dummy",
+        "name": "seed_buyer_country_overwrite",
+    },
+]
+
+EXPECTED_SEED_NODE = [
+    {
+        "type": "dummy",
+        "name": "seed_buyer_country_overwrite",
+    }
 ]
 
 EXPECTED_DAGGER_INPUTS = [
@@ -162,6 +174,7 @@ EXPECTED_DAGGER_INPUTS = [
         "type": "athena",
         "follow_external_dependency": True,
     },
+    {"name": "seed_buyer_country_overwrite", "type": "dummy"},
     {
         "name": "analytics_engineering_model2_athena",
         "schema": "analytics_engineering",
