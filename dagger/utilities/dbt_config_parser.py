@@ -34,6 +34,22 @@ class DBTConfigParser:
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
 
+    def _process_seed_input(self, seed_node: dict) -> dict:
+        """
+        Generates a dummy dagger task for the DBT seed node
+        Args:
+            seed_node: The extracted seed node from the manifest.json file
+
+        Returns:
+            dict: The dummy dagger task for the DBT seed node
+
+        """
+        task = {}
+        task["name"] = seed_node.get("name", "")
+        task["type"] = "dummy"
+
+        return task
+
     def _generate_dagger_dependency(self, node: dict) -> List[Dict]:
         """
         Generates the dagger task based on whether the DBT model node is a staging model or not.
