@@ -20,6 +20,7 @@ DEFAULT_CONFIG_PARAMS = {
     "data_bucket": "bucket1-data-lake",
     "project_dir": "main",
     "profile_dir": ".dbt",
+    "dbt_profile": "data",
 }
 MODEL_NAME = "model1"
 

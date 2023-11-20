@@ -17,6 +17,7 @@ class DBTConfigParser:
     """
 
     def __init__(self, default_config_parameters: dict):
+        self._dbt_profile = default_config_parameters.get("dbt_profile", "data")
         self._default_data_bucket = default_config_parameters["data_bucket"]
         self._dbt_project_dir = default_config_parameters.get("project_dir", None)
         dbt_manifest_path = path.join(self._dbt_project_dir, "target", "manifest.json")
@@ -29,7 +30,7 @@ class DBTConfigParser:
         profile_yaml = yaml.safe_load(open(dbt_profile_path, "r"))
         prod_dbt_profile = profile_yaml[self._dbt_project_dir.split("/")[-1]][
             "outputs"
-        ]["data"]
+        ][self._dbt_profile]
         self._default_data_dir = prod_dbt_profile.get(
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
