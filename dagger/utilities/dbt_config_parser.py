@@ -6,9 +6,8 @@ from typing import Tuple, List, Dict
 
 import yaml
 
-ATHENA_TASK_BASE = {"type": "athena"}
+ATHENA_TASK_BASE = {"type": "athena", "follow_external_dependency": True}
 S3_TASK_BASE = {"type": "s3"}
-
 
 
 class DBTConfigParser:
