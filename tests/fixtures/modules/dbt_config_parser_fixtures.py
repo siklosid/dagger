@@ -61,7 +61,44 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "name": "int_model3",
             "schema": "analytics_engineering",
         },
-    }
+        "seed.main.seed_buyer_country_overwrite": {
+            "database": "awsdatacatalog",
+            "schema": "analytics_engineering",
+            "name": "seed_buyer_country_overwrite",
+            "resource_type": "seed",
+            "alias": "seed_buyer_country_overwrite",
+            "tags": ["analytics"],
+            "description": "",
+            "created_at": 1700216177.105391,
+            "depends_on": {"macros": []},
+        },
+    },
+    "sources": {
+        "source.main.core_schema1.table1": {
+            "source_name": "table1",
+            "database": "awsdatacatalog",
+            "schema": "core_schema1",
+            "name": "table1",
+            "tags": ["analytics"],
+            "description": "",
+        },
+        "source.main.core_schema2.table2": {
+            "source_name": "table2",
+            "database": "awsdatacatalog",
+            "schema": "core_schema2",
+            "name": "table2",
+            "tags": ["analytics"],
+            "description": "",
+        },
+        "source.main.core_schema2.table3": {
+            "source_name": "table3",
+            "database": "awsdatacatalog",
+            "schema": "core_schema2",
+            "name": "table3",
+            "tags": ["analytics"],
+            "description": "",
+        },
+    },
 }
 
 DBT_PROFILE_FIXTURE = {
@@ -90,6 +127,7 @@ EXPECTED_STAGING_NODE = [
         "name": "stg_core_schema1__table1",
         "schema": "core_schema1",
         "table": "table1",
+        "follow_external_dependency": True,
     }
 ]
 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
@@ -98,12 +136,14 @@ EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
         "name": "stg_core_schema2__table2",
         "schema": "core_schema2",
         "table": "table2",
+        "follow_external_dependency": True,
     },
     {
         "type": "athena",
         "name": "stg_core_schema2__table3",
         "schema": "core_schema2",
         "table": "table3",
+        "follow_external_dependency": True,
     },
 ]
 
@@ -113,18 +153,21 @@ EXPECTED_DAGGER_INPUTS = [
         "schema": "core_schema2",
         "table": "table2",
         "type": "athena",
+        "follow_external_dependency": True,
     },
     {
         "name": "stg_core_schema2__table3",
         "schema": "core_schema2",
         "table": "table3",
         "type": "athena",
+        "follow_external_dependency": True,
     },
     {
         "name": "analytics_engineering_model2_athena",
         "schema": "analytics_engineering",
         "table": "model2",
         "type": "athena",
+        "follow_external_dependency": True,
     },
     {
         "bucket": "bucket1-data-lake",
@@ -140,6 +183,7 @@ EXPECTED_DAGGER_OUTPUTS = [
         "schema": "analytics_engineering",
         "table": "fct_supplier_revenue",
         "type": "athena",
+        "follow_external_dependency": True,
     },
     {
         "bucket": "bucket1-data-lake",
