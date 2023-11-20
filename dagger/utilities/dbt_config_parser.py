@@ -33,6 +33,10 @@ class DBTConfigParser:
         self._default_data_dir = prod_dbt_profile.get(
             "s3_data_dir"
         ) or prod_dbt_profile.get("s3_staging_dir")
+        self._default_schema = prod_dbt_profile.get("schema")
+
+        self._nodes_in_manifest = self._manifest_data["nodes"]
+        self._sources_in_manifest = self._manifest_data["sources"]
 
     def _process_seed_input(self, seed_node: dict) -> dict:
         """
@@ -67,23 +71,30 @@ class DBTConfigParser:
         s3_task = S3_TASK_BASE.copy()
         dagger_tasks = []
 
-        if model_name.startswith("stg_"):
-            source_nodes = node.get("depends_on", {}).get("nodes", [])
-            for source_node in source_nodes:
-                _, project_name, schema_name, table_name = source_node.split(".")
-                athena_task = ATHENA_TASK_BASE.copy()
+        if node.get("resource_type") == "seed":
+            task = self._process_seed_input(node)
+            dagger_tasks.append(task)
+        elif model_name.startswith("stg_"):
+            source_node_names = node.get("depends_on", {}).get("nodes", [])
+            for source_node_name in source_node_names:
+                if source_node_name.startswith("seed"):
+                    source_node = self._nodes_in_manifest[source_node_name]
+                    task = self._process_seed_input(source_node)
+                else:
+                    source_node = self._sources_in_manifest[source_node_name]
+                    task = ATHENA_TASK_BASE.copy()
 
-                athena_task["name"] = f"stg_{schema_name}__{table_name}"
-                athena_task["schema"] = schema_name
-                athena_task["table"] = table_name
+                    task["schema"] = source_node.get("schema", self._default_schema)
+                    task["table"] = source_node.get("name", "")
+                    task["name"] = f"stg_{task['schema']}__{task['table']}"
 
-                dagger_tasks.append(athena_task)
+                dagger_tasks.append(task)
         else:
             athena_task = ATHENA_TASK_BASE.copy()
             model_schema = node["schema"]
             athena_task["name"] = f"{model_schema}_{model_name}_athena"
             athena_task["table"] = model_name
-            athena_task["schema"] = node["schema"]
+            athena_task["schema"] = node.get("schema", self._default_schema)
 
             s3_task["name"] = f"{model_schema}_{model_name}_s3"
             s3_task["bucket"] = self._default_data_bucket
@@ -130,14 +141,13 @@ class DBTConfigParser:
         """
         inputs_list = []
 
-        nodes = self._manifest_data["nodes"]
-        model_node = nodes[f"model.main.{model_name}"]
+        model_node = self._nodes_in_manifest[f"model.main.{model_name}"]
 
         parent_node_names = model_node.get("depends_on", {}).get("nodes", [])
 
         for index, parent_node_name in enumerate(parent_node_names):
             if not (".int_" in parent_node_name):
-                parent_model_node = nodes.get(parent_node_name)
+                parent_model_node = self._nodes_in_manifest.get(parent_node_name)
                 dagger_input = self._generate_dagger_dependency(parent_model_node)
 
                 inputs_list += dagger_input
