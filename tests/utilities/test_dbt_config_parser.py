@@ -32,9 +32,7 @@ class TestDBTConfigParser(unittest.TestCase):
     @patch("yaml.safe_load", return_value=DBT_PROFILE_FIXTURE)
     def setUp(self, mock_open, mock_json_load, mock_safe_load):
         self._dbt_config_parser = DBTConfigParser(DEFAULT_CONFIG_PARAMS)
-        self._sample_dbt_node = DBT_MANIFEST_FILE_FIXTURE["nodes"][
-            "model.main.stg_core_schema1__table1"
-        ]
+        self._sample_dbt_node = DBT_MANIFEST_FILE_FIXTURE["nodes"]["model.main.model1"]
 
     @skip("Run only locally")
     def test_generate_task_configs(self):
@@ -45,37 +43,44 @@ class TestDBTConfigParser(unittest.TestCase):
 
         module.generate_task_configs()
 
-    def test_generate_dagger_dependency(self):
+    def test_generate_dagger_inputs(self):
         test_inputs = [
             (
                 DBT_MANIFEST_FILE_FIXTURE["nodes"][
                     "model.main.stg_core_schema1__table1"
                 ],
                 EXPECTED_STAGING_NODE,
+                True,
             ),
             (
                 DBT_MANIFEST_FILE_FIXTURE["nodes"][
                     "model.main.stg_core_schema2__table2"
                 ],
                 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
+                True,
             ),
             (
                 DBT_MANIFEST_FILE_FIXTURE["nodes"][
                     "seed.main.seed_buyer_country_overwrite"
                 ],
                 EXPECTED_SEED_NODE,
+                False,
             ),
         ]
-        for mock_input, expected_output in test_inputs:
-            result = self._dbt_config_parser._generate_dagger_dependency(mock_input)
+        for mock_input, expected_output, follow_external_dependency in test_inputs:
+            result = self._dbt_config_parser._generate_dagger_inputs(mock_input)
             self.assertListEqual(result, expected_output)
 
     def test_generate_io_inputs(self):
-        result, _ = self._dbt_config_parser.generate_dagger_io(MODEL_NAME)
+        result, _ = self._dbt_config_parser.generate_dagger_io(
+            self._sample_dbt_node.get("name")
+        )
 
         self.assertListEqual(result, EXPECTED_DAGGER_INPUTS)
 
     def test_generate_io_outputs(self):
-        _, result = self._dbt_config_parser.generate_dagger_io(MODEL_NAME)
+        _, result = self._dbt_config_parser.generate_dagger_io(
+            self._sample_dbt_node.get("name")
+        )
 
         self.assertListEqual(result, EXPECTED_DAGGER_OUTPUTS)

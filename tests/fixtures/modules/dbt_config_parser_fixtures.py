@@ -3,7 +3,8 @@ DBT_MANIFEST_FILE_FIXTURE = {
         "model.main.model1": {
             "database": "awsdatacatalog",
             "schema": "analytics_engineering",
-            "name": "fct_supplier_revenue",
+            "unique_id": "model.main.model1",
+            "name": "model1",
             "config": {
                 "external_location": "s3://bucket1-data-lake/path1/model1",
                 "materialized": "incremental",
@@ -28,11 +29,13 @@ DBT_MANIFEST_FILE_FIXTURE = {
                     "model.main.stg_core_schema2__table2",
                     "model.main.model2",
                     "model.main.int_model3",
+                    "seed.main.seed_buyer_country_overwrite",
                 ],
             },
         },
         "model.main.stg_core_schema1__table1": {
             "schema": "analytics_engineering",
+            "unique_id": "model.main.stg_core_schema1__table1",
             "name": "stg_core_schema1__table1",
             "depends_on": {
                 "macros": [],
@@ -42,6 +45,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
         "model.main.stg_core_schema2__table2": {
             "schema": "analytics_engineering",
             "name": "stg_core_schema2__table2",
+            "unique_id": "model.main.stg_core_schema2__table2",
             "depends_on": {
                 "macros": [],
                 "nodes": [
@@ -54,17 +58,21 @@ DBT_MANIFEST_FILE_FIXTURE = {
         "model.main.model2": {
             "name": "model2",
             "schema": "analytics_engineering",
+            "unique_id": "model.main.model2",
             "config": {
                 "external_location": "s3://bucket1-data-lake/path2/model2",
             },
+            "depends_on": {"macros": [], "nodes": []},
         },
         "model.main.int_model3": {
             "name": "int_model3",
+            "unique_id": "model.main.int_model3",
             "schema": "analytics_engineering",
         },
         "seed.main.seed_buyer_country_overwrite": {
             "database": "awsdatacatalog",
             "schema": "analytics_engineering",
+            "unique_id": "seed.main.seed_buyer_country_overwrite",
             "name": "seed_buyer_country_overwrite",
             "resource_type": "seed",
             "alias": "seed_buyer_country_overwrite",
@@ -79,6 +87,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table1",
             "database": "awsdatacatalog",
             "schema": "core_schema1",
+            "unique_id": "source.main.core_schema1.table1",
             "name": "table1",
             "tags": ["analytics"],
             "description": "",
@@ -87,6 +96,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table2",
             "database": "awsdatacatalog",
             "schema": "core_schema2",
+            "unique_id": "source.main.core_schema2.table2",
             "name": "table2",
             "tags": ["analytics"],
             "description": "",
@@ -95,6 +105,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table3",
             "database": "awsdatacatalog",
             "schema": "core_schema2",
+            "unique_id": "source.main.core_schema2.table3",
             "name": "table3",
             "tags": ["analytics"],
             "description": "",
@@ -125,7 +136,7 @@ DBT_PROFILE_FIXTURE = {
 EXPECTED_STAGING_NODE = [
     {
         "type": "athena",
-        "name": "stg_core_schema1__table1",
+        "name": "core_schema1__table1_athena",
         "schema": "core_schema1",
         "table": "table1",
         "follow_external_dependency": True,
@@ -134,14 +145,14 @@ EXPECTED_STAGING_NODE = [
 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
     {
         "type": "athena",
-        "name": "stg_core_schema2__table2",
+        "name": "core_schema2__table2_athena",
         "schema": "core_schema2",
         "table": "table2",
         "follow_external_dependency": True,
     },
     {
         "type": "athena",
-        "name": "stg_core_schema2__table3",
+        "name": "core_schema2__table3_athena",
         "schema": "core_schema2",
         "table": "table3",
         "follow_external_dependency": True,
@@ -161,14 +172,14 @@ EXPECTED_SEED_NODE = [
 
 EXPECTED_DAGGER_INPUTS = [
     {
-        "name": "stg_core_schema2__table2",
+        "name": "core_schema2__table2_athena",
         "schema": "core_schema2",
         "table": "table2",
         "type": "athena",
         "follow_external_dependency": True,
     },
     {
-        "name": "stg_core_schema2__table3",
+        "name": "core_schema2__table3_athena",
         "schema": "core_schema2",
         "table": "table3",
         "type": "athena",
@@ -176,7 +187,7 @@ EXPECTED_DAGGER_INPUTS = [
     },
     {"name": "seed_buyer_country_overwrite", "type": "dummy"},
     {
-        "name": "analytics_engineering_model2_athena",
+        "name": "analytics_engineering__model2_athena",
         "schema": "analytics_engineering",
         "table": "model2",
         "type": "athena",
@@ -184,7 +195,7 @@ EXPECTED_DAGGER_INPUTS = [
     },
     {
         "bucket": "bucket1-data-lake",
-        "name": "analytics_engineering_model2_s3",
+        "name": "analytics_engineering__model2_s3",
         "path": "path2/model2",
         "type": "s3",
     },
@@ -192,15 +203,14 @@ EXPECTED_DAGGER_INPUTS = [
 
 EXPECTED_DAGGER_OUTPUTS = [
     {
-        "name": "analytics_engineering_fct_supplier_revenue_athena",
+        "name": "analytics_engineering__model1_athena",
         "schema": "analytics_engineering",
-        "table": "fct_supplier_revenue",
+        "table": "model1",
         "type": "athena",
-        "follow_external_dependency": True,
     },
     {
         "bucket": "bucket1-data-lake",
-        "name": "analytics_engineering_fct_supplier_revenue_s3",
+        "name": "analytics_engineering__model1_s3",
         "path": "path1/model1",
         "type": "s3",
     },
