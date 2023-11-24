@@ -38,7 +38,8 @@ class DBTConfigParser:
         self._nodes_in_manifest = self._manifest_data["nodes"]
         self._sources_in_manifest = self._manifest_data["sources"]
 
-    def _generate_seed_input(self, seed_node: dict) -> dict:
+    @staticmethod
+    def _generate_seed_task(seed_node: dict) -> dict:
         """
         Generates a dummy dagger task for the DBT seed node
         Args:
@@ -102,14 +103,14 @@ class DBTConfigParser:
         dagger_tasks = []
 
         if node.get("resource_type") == "seed":
-            task = self._generate_seed_input(node)
+            task = self._generate_seed_task(node)
             dagger_tasks.append(task)
         elif model_name.startswith("stg_"):
             source_node_names = node.get("depends_on", {}).get("nodes", [])
             for source_node_name in source_node_names:
                 if source_node_name.startswith("seed"):
                     source_node = self._nodes_in_manifest[source_node_name]
-                    task = self._generate_seed_input(source_node)
+                    task = self._generate_seed_task(source_node)
                 else:
                     source_node = self._sources_in_manifest[source_node_name]
                     task = self._get_athena_task(
