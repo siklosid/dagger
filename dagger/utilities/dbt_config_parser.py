@@ -58,8 +58,6 @@ class DBTConfigParser:
     def _get_athena_task(
         self, node: dict, follow_external_dependency: bool = False
     ) -> dict:
-        node_name = node.get("unique_id", "")
-
         task = ATHENA_TASK_BASE.copy()
         if follow_external_dependency:
             task["follow_external_dependency"] = True
