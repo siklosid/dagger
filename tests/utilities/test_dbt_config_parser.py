@@ -50,24 +50,21 @@ class TestDBTConfigParser(unittest.TestCase):
                     "model.main.stg_core_schema1__table1"
                 ],
                 EXPECTED_STAGING_NODE,
-                True,
             ),
             (
                 DBT_MANIFEST_FILE_FIXTURE["nodes"][
                     "model.main.stg_core_schema2__table2"
                 ],
                 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
-                True,
             ),
             (
                 DBT_MANIFEST_FILE_FIXTURE["nodes"][
                     "seed.main.seed_buyer_country_overwrite"
                 ],
                 EXPECTED_SEED_NODE,
-                False,
             ),
         ]
-        for mock_input, expected_output, follow_external_dependency in test_inputs:
+        for mock_input, expected_output in test_inputs:
             result = self._dbt_config_parser._generate_dagger_inputs(mock_input)
             self.assertListEqual(result, expected_output)
 
