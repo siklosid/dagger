@@ -65,7 +65,7 @@ class TestDBTConfigParser(unittest.TestCase):
             ),
         ]
         for mock_input, expected_output in test_inputs:
-            result = self._dbt_config_parser._generate_dagger_inputs(mock_input)
+            result = self._dbt_config_parser._generate_dagger_tasks(mock_input)
             self.assertListEqual(result, expected_output)
 
     def test_generate_io_inputs(self):

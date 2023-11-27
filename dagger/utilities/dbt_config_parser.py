@@ -110,7 +110,7 @@ class DBTConfigParser:
         """
         return [self._get_athena_task(node), self._get_s3_task(node)]
 
-    def _generate_dagger_inputs(
+    def _generate_dagger_tasks(
         self,
         node: dict,
     ) -> List[Dict]:
@@ -194,7 +194,7 @@ class DBTConfigParser:
         for index, parent_node_name in enumerate(parent_node_names):
             if not (".int_" in parent_node_name):
                 parent_model_node = self._nodes_in_manifest.get(parent_node_name)
-                dagger_input = self._generate_dagger_inputs(parent_model_node)
+                dagger_input = self._generate_dagger_tasks(parent_model_node)
 
                 inputs_list += dagger_input
 
