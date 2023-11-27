@@ -58,6 +58,16 @@ class DBTConfigParser:
     def _get_athena_task(
         self, node: dict, follow_external_dependency: bool = False
     ) -> dict:
+        """
+        Generates the dagger athena task for the DBT model node
+        Args:
+            node: The extracted node from the manifest.json file
+            follow_external_dependency: Whether to follow external airflow dependencies or not
+
+        Returns:
+            dict: The dagger athena task for the DBT model node
+
+        """
         task = ATHENA_TASK_BASE.copy()
         if follow_external_dependency:
             task["follow_external_dependency"] = True
@@ -69,6 +79,15 @@ class DBTConfigParser:
         return task
 
     def _get_s3_task(self, node: dict) -> dict:
+        """
+        Generates the dagger s3 task for the DBT model node
+        Args:
+            node: The extracted node from the manifest.json file
+
+        Returns:
+            dict: The dagger s3 task for the DBT model node
+
+        """
         task = S3_TASK_BASE.copy()
 
         schema = node.get("schema", self._default_schema)
@@ -80,6 +99,15 @@ class DBTConfigParser:
         return task
 
     def _generate_dagger_output(self, node: dict):
+        """
+        Generates the dagger output for the DBT model node
+        Args:
+            node: The extracted node from the manifest.json file
+
+        Returns:
+            dict: The dagger output, which is a combination of an athena and s3 task for the DBT model node
+
+        """
         return [self._get_athena_task(node), self._get_s3_task(node)]
 
     def _generate_dagger_inputs(
