@@ -13,6 +13,7 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     EXPECTED_STAGING_NODE,
     EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
     EXPECTED_SEED_NODE,
+    EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
 )
 
 _logger = logging.getLogger("root")
@@ -69,11 +70,19 @@ class TestDBTConfigParser(unittest.TestCase):
             self.assertListEqual(result, expected_output)
 
     def test_generate_io_inputs(self):
-        result, _ = self._dbt_config_parser.generate_dagger_io(
-            self._sample_dbt_node.get("name")
-        )
+        fixtures = [
+            ("model1", EXPECTED_DAGGER_INPUTS),
+            (
+                "model3",
+                EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
+            ),
+        ]
+        for mock_input, expected_output in fixtures:
+            result, _ = self._dbt_config_parser.generate_dagger_io(
+                mock_input
+            )
 
-        self.assertListEqual(result, EXPECTED_DAGGER_INPUTS)
+            self.assertListEqual(result, expected_output)
 
     def test_generate_io_outputs(self):
         _, result = self._dbt_config_parser.generate_dagger_io(

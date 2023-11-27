@@ -81,6 +81,23 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "created_at": 1700216177.105391,
             "depends_on": {"macros": []},
         },
+        "model.main.model3": {
+            "name": "model3",
+            "schema": "analytics_engineering",
+            "unique_id": "model.main.model3",
+            "config": {
+                "external_location": "s3://bucket1-data-lake/path2/model3",
+            },
+            "depends_on": {
+                "macros": [],
+                "nodes": [
+                    "model.main.int_model3",
+                    "model.main.model2",
+                    "seed.main.seed_buyer_country_overwrite",
+                    "model.main.stg_core_schema2__table2",
+                ],
+            },
+        },
     },
     "sources": {
         "source.main.core_schema1.table1": {
@@ -168,6 +185,40 @@ EXPECTED_SEED_NODE = [
         "type": "dummy",
         "name": "seed_buyer_country_overwrite",
     }
+]
+
+EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
+    {
+        "type": "athena",
+        "name": "analytics_engineering__model2_athena",
+        "schema": "analytics_engineering",
+        "table": "model2",
+        "follow_external_dependency": True,
+    },
+    {
+        "bucket": "bucket1-data-lake",
+        "name": "analytics_engineering__model2_s3",
+        "path": "path2/model2",
+        "type": "s3",
+    },
+    {
+        "type": "dummy",
+        "name": "seed_buyer_country_overwrite",
+    },
+    {
+        "type": "athena",
+        "name": "core_schema2__table2_athena",
+        "schema": "core_schema2",
+        "table": "table2",
+        "follow_external_dependency": True,
+    },
+    {
+        "type": "athena",
+        "name": "core_schema2__table3_athena",
+        "schema": "core_schema2",
+        "table": "table3",
+        "follow_external_dependency": True,
+    },
 ]
 
 EXPECTED_DAGGER_INPUTS = [
