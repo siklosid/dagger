@@ -14,6 +14,7 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
     EXPECTED_SEED_NODE,
     EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
+    EXPECTED_EPHEMERAL_NODE,
 )
 
 _logger = logging.getLogger("root")
@@ -35,7 +36,7 @@ class TestDBTConfigParser(unittest.TestCase):
         self._dbt_config_parser = DBTConfigParser(DEFAULT_CONFIG_PARAMS)
         self._sample_dbt_node = DBT_MANIFEST_FILE_FIXTURE["nodes"]["model.main.model1"]
 
-    @skip("Run only locally")
+    # @skip("Run only locally")
     def test_generate_task_configs(self):
         module = Module(
             path_to_config="./tests/fixtures/modules/dbt_test_config.yaml",
@@ -64,6 +65,10 @@ class TestDBTConfigParser(unittest.TestCase):
                 ],
                 EXPECTED_SEED_NODE,
             ),
+            (
+                DBT_MANIFEST_FILE_FIXTURE["nodes"]["model.main.int_model3"],
+                EXPECTED_EPHEMERAL_NODE,
+            ),
         ]
         for mock_input, expected_output in test_inputs:
             result = self._dbt_config_parser._generate_dagger_tasks(mock_input)
@@ -78,9 +83,7 @@ class TestDBTConfigParser(unittest.TestCase):
             ),
         ]
         for mock_input, expected_output in fixtures:
-            result, _ = self._dbt_config_parser.generate_dagger_io(
-                mock_input
-            )
+            result, _ = self._dbt_config_parser.generate_dagger_io(mock_input)
 
             self.assertListEqual(result, expected_output)
 

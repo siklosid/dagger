@@ -202,11 +202,10 @@ class DBTConfigParser:
         parent_node_names = model_node.get("depends_on", {}).get("nodes", [])
 
         for index, parent_node_name in enumerate(parent_node_names):
-            if not (".int_" in parent_node_name):
-                parent_model_node = self._nodes_in_manifest.get(parent_node_name)
-                dagger_input = self._generate_dagger_tasks(parent_model_node)
+            parent_model_node = self._nodes_in_manifest.get(parent_node_name)
+            dagger_input = self._generate_dagger_tasks(parent_model_node)
 
-                inputs_list += dagger_input
+            inputs_list += dagger_input
 
         output_list = self._generate_dagger_output(model_node)
 

@@ -37,6 +37,9 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "schema": "analytics_engineering",
             "unique_id": "model.main.stg_core_schema1__table1",
             "name": "stg_core_schema1__table1",
+            "config": {
+                "materialized": "view",
+            },
             "depends_on": {
                 "macros": [],
                 "nodes": ["source.main.core_schema1.table1"],
@@ -46,6 +49,9 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "schema": "analytics_engineering",
             "name": "stg_core_schema2__table2",
             "unique_id": "model.main.stg_core_schema2__table2",
+            "config": {
+                "materialized": "view",
+            },
             "depends_on": {
                 "macros": [],
                 "nodes": [
@@ -61,6 +67,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "unique_id": "model.main.model2",
             "config": {
                 "external_location": "s3://bucket1-data-lake/path2/model2",
+                "materialized": "table",
             },
             "depends_on": {"macros": [], "nodes": []},
         },
@@ -68,6 +75,9 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "name": "int_model3",
             "unique_id": "model.main.int_model3",
             "schema": "analytics_engineering",
+            "config": {
+                "materialized": "ephemeral",
+            },
         },
         "seed.main.seed_buyer_country_overwrite": {
             "database": "awsdatacatalog",
@@ -189,6 +199,11 @@ EXPECTED_SEED_NODE = [
 
 EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
     {
+        "type": "dummy",
+        "name": "int_model3",
+        "follow_external_dependency": True,
+    },
+    {
         "type": "athena",
         "name": "analytics_engineering__model2_athena",
         "schema": "analytics_engineering",
@@ -221,6 +236,14 @@ EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
     },
 ]
 
+EXPECTED_EPHEMERAL_NODE = [
+    {
+        "type": "dummy",
+        "name": "int_model3",
+        "follow_external_dependency": True,
+    }
+]
+
 EXPECTED_DAGGER_INPUTS = [
     {
         "name": "core_schema2__table2_athena",
@@ -249,6 +272,11 @@ EXPECTED_DAGGER_INPUTS = [
         "name": "analytics_engineering__model2_s3",
         "path": "path2/model2",
         "type": "s3",
+    },
+    {
+        "type": "dummy",
+        "name": "int_model3",
+        "follow_external_dependency": True,
     },
 ]
 
