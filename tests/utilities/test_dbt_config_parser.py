@@ -36,7 +36,7 @@ class TestDBTConfigParser(unittest.TestCase):
         self._dbt_config_parser = DBTConfigParser(DEFAULT_CONFIG_PARAMS)
         self._sample_dbt_node = DBT_MANIFEST_FILE_FIXTURE["nodes"]["model.main.model1"]
 
-    # @skip("Run only locally")
+    @skip("Run only locally")
     def test_generate_task_configs(self):
         module = Module(
             path_to_config="./tests/fixtures/modules/dbt_test_config.yaml",
