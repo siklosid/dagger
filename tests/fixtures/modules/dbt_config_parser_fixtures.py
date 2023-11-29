@@ -114,6 +114,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table1",
             "database": "awsdatacatalog",
             "schema": "core_schema1",
+            "resource_type": "source",
             "unique_id": "source.main.core_schema1.table1",
             "name": "table1",
             "tags": ["analytics"],
@@ -123,6 +124,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table2",
             "database": "awsdatacatalog",
             "schema": "core_schema2",
+            "resource_type": "source",
             "unique_id": "source.main.core_schema2.table2",
             "name": "table2",
             "tags": ["analytics"],
@@ -132,6 +134,7 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "source_name": "table3",
             "database": "awsdatacatalog",
             "schema": "core_schema2",
+            "resource_type": "source",
             "unique_id": "source.main.core_schema2.table3",
             "name": "table3",
             "tags": ["analytics"],
@@ -161,15 +164,17 @@ DBT_PROFILE_FIXTURE = {
 }
 
 EXPECTED_STAGING_NODE = [
+    {"name": "stg_core_schema1__table1", "type": "dummy"},
     {
         "type": "athena",
         "name": "core_schema1__table1_athena",
         "schema": "core_schema1",
         "table": "table1",
         "follow_external_dependency": True,
-    }
+    },
 ]
 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES = [
+    {"name": "stg_core_schema2__table2", "type": "dummy"},
     {
         "type": "athena",
         "name": "core_schema2__table2_athena",
@@ -220,6 +225,7 @@ EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
         "type": "dummy",
         "name": "seed_buyer_country_overwrite",
     },
+    {"name": "stg_core_schema2__table2", "type": "dummy"},
     {
         "type": "athena",
         "name": "core_schema2__table2_athena",
@@ -245,6 +251,7 @@ EXPECTED_EPHEMERAL_NODE = [
 ]
 
 EXPECTED_DAGGER_INPUTS = [
+    {"name": "stg_core_schema2__table2", "type": "dummy"},
     {
         "name": "core_schema2__table2_athena",
         "schema": "core_schema2",
@@ -280,6 +287,24 @@ EXPECTED_DAGGER_INPUTS = [
     },
 ]
 
+EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS = [
+    {
+        "follow_external_dependency": True,
+        "name": "core_schema2__table2_athena",
+        "schema": "core_schema2",
+        "table": "table2",
+        "type": "athena",
+    },
+    {
+        "follow_external_dependency": True,
+        "name": "core_schema2__table3_athena",
+        "schema": "core_schema2",
+        "table": "table3",
+        "type": "athena",
+    },
+    {"name": "seed_buyer_country_overwrite", "type": "dummy"},
+]
+
 EXPECTED_DAGGER_OUTPUTS = [
     {
         "name": "analytics_engineering__model1_athena",
@@ -292,5 +317,12 @@ EXPECTED_DAGGER_OUTPUTS = [
         "name": "analytics_engineering__model1_s3",
         "path": "path1/model1",
         "type": "s3",
+    },
+]
+
+EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS = [
+    {
+        "type": "dummy",
+        "name": "stg_core_schema2__table2",
     },
 ]

@@ -15,6 +15,8 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     EXPECTED_SEED_NODE,
     EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
     EXPECTED_EPHEMERAL_NODE,
+    EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS,
+    EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS,
 )
 
 _logger = logging.getLogger("root")
@@ -48,25 +50,19 @@ class TestDBTConfigParser(unittest.TestCase):
     def test_generate_dagger_inputs(self):
         test_inputs = [
             (
-                DBT_MANIFEST_FILE_FIXTURE["nodes"][
-                    "model.main.stg_core_schema1__table1"
-                ],
+                "model.main.stg_core_schema1__table1",
                 EXPECTED_STAGING_NODE,
             ),
             (
-                DBT_MANIFEST_FILE_FIXTURE["nodes"][
-                    "model.main.stg_core_schema2__table2"
-                ],
+                "model.main.stg_core_schema2__table2",
                 EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
             ),
             (
-                DBT_MANIFEST_FILE_FIXTURE["nodes"][
-                    "seed.main.seed_buyer_country_overwrite"
-                ],
+                "seed.main.seed_buyer_country_overwrite",
                 EXPECTED_SEED_NODE,
             ),
             (
-                DBT_MANIFEST_FILE_FIXTURE["nodes"]["model.main.int_model3"],
+                "model.main.int_model3",
                 EXPECTED_EPHEMERAL_NODE,
             ),
         ]
@@ -81,6 +77,7 @@ class TestDBTConfigParser(unittest.TestCase):
                 "model3",
                 EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
             ),
+            ("stg_core_schema2__table2", EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS),
         ]
         for mock_input, expected_output in fixtures:
             result, _ = self._dbt_config_parser.generate_dagger_io(mock_input)
@@ -88,8 +85,11 @@ class TestDBTConfigParser(unittest.TestCase):
             self.assertListEqual(result, expected_output)
 
     def test_generate_io_outputs(self):
-        _, result = self._dbt_config_parser.generate_dagger_io(
-            self._sample_dbt_node.get("name")
-        )
+        fixtures = [
+            ("model1", EXPECTED_DAGGER_OUTPUTS),
+            ("stg_core_schema2__table2", EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS),
+        ]
+        for mock_input, expected_output in fixtures:
+            _, result = self._dbt_config_parser.generate_dagger_io(mock_input)
 
-        self.assertListEqual(result, EXPECTED_DAGGER_OUTPUTS)
+            self.assertListEqual(result, expected_output)
