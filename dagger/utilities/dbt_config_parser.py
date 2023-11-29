@@ -94,7 +94,7 @@ class DBTConfigParser:
         table = node.get("name", "")
         task["name"] = f"{schema}__{table}_s3"
         task["bucket"] = self._default_data_bucket
-        task["path"] = self._get_model_data_location(node, schema, table)
+        task["path"] = self._get_model_data_location(node, schema, table)[1]
 
         return task
 
@@ -155,7 +155,7 @@ class DBTConfigParser:
 
     def _get_model_data_location(
         self, node: dict, schema: str, dbt_model_name: str
-    ) -> str:
+    ) -> Tuple[str, str]:
         """
         Gets the S3 path of the dbt model relative to the data bucket.
         If external location is not specified in the DBT model config, then the default data directory from the
@@ -173,7 +173,10 @@ class DBTConfigParser:
         if not location:
             location = join(self._default_data_dir, schema, dbt_model_name)
 
-        return location.split(self._default_data_bucket)[1].lstrip("/")
+        split = location.split("//")[1].split("/")
+        bucket_name, data_path = split[0], "/".join(split[1:])
+
+        return bucket_name, data_path
 
     def generate_dagger_io(self, model_name: str) -> Tuple[list, list]:
         """
