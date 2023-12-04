@@ -11,12 +11,12 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     DBT_MANIFEST_FILE_FIXTURE,
     DBT_PROFILE_FIXTURE,
     EXPECTED_STAGING_NODE,
-    EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
     EXPECTED_SEED_NODE,
     EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
     EXPECTED_EPHEMERAL_NODE,
     EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS,
     EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS,
+    EXPECTED_MODEL_NODE,
 )
 
 _logger = logging.getLogger("root")
@@ -47,15 +47,11 @@ class TestDBTConfigParser(unittest.TestCase):
 
         module.generate_task_configs()
 
-    def test_generate_dagger_inputs(self):
+    def test_generate_dagger_tasks(self):
         test_inputs = [
             (
                 "model.main.stg_core_schema1__table1",
                 EXPECTED_STAGING_NODE,
-            ),
-            (
-                "model.main.stg_core_schema2__table2",
-                EXPECTED_STAGING_NODE_MULTIPLE_DEPENDENCIES,
             ),
             (
                 "seed.main.seed_buyer_country_overwrite",
@@ -64,6 +60,10 @@ class TestDBTConfigParser(unittest.TestCase):
             (
                 "model.main.int_model3",
                 EXPECTED_EPHEMERAL_NODE,
+            ),
+            (
+                "model.main.model1",
+                EXPECTED_MODEL_NODE,
             ),
         ]
         for mock_input, expected_output in test_inputs:
