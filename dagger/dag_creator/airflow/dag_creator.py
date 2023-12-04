@@ -163,13 +163,15 @@ class DagCreator(GraphTraverserBase):
                         external_task_sensor = self._get_external_task_sensor(
                             from_task_id, to_task_id, edge_properties.follow_external_dependency
                         )
-                        self._sensor_dict[to_pipe] = {
+
+                        if self._sensor_dict.get(to_pipe) is None:
+                            self._sensor_dict[to_pipe] = {}
+
+                        self._sensor_dict[to_pipe].update({
                             external_task_sensor_name: external_task_sensor
-                        }
-                        (
-                            self._tasks[self._get_control_flow_task_id(to_pipe)]
-                            >> external_task_sensor
-                        )
+                        })
+
+                        self._tasks[self._get_control_flow_task_id(to_pipe)] >> external_task_sensor
                     self._sensor_dict[to_pipe][external_task_sensor_name] >> self._tasks[to_task_id]
             else:
                 self._tasks[self._get_control_flow_task_id(to_pipe)] >> self._tasks[to_task_id]
