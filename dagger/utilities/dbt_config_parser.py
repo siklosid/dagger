@@ -143,18 +143,14 @@ class DBTConfigParser:
         if node.get("resource_type") == "seed":
             task = self._get_dummy_task(node)
             dagger_tasks.append(task)
-        elif node.get("resource_type") == 'source':
+        elif node.get("resource_type") == "source":
             athena_task = self._get_athena_task(node, follow_external_dependency=True)
             dagger_tasks.append(athena_task)
         elif node.get("config", {}).get("materialized") == "ephemeral":
             task = self._get_dummy_task(node, follow_external_dependency=True)
             dagger_tasks.append(task)
         elif node.get("name").startswith("stg_"):
-            source_node_names = node.get("depends_on", {}).get("nodes", [])
             dagger_tasks.append(self._get_dummy_task(node))
-            for source_node_name in source_node_names:
-                task = self._generate_dagger_tasks(source_node_name)
-                dagger_tasks.extend(task)
         else:
             athena_task = self._get_athena_task(node, follow_external_dependency=True)
             s3_task = self._get_s3_task(node)
