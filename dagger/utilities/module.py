@@ -22,7 +22,13 @@ class Module:
         self._branches_to_generate = config["branches_to_generate"]
         self._override_parameters = config.get("override_parameters", {})
         self._default_parameters = config.get("default_parameters", {})
-        self._dbt_module = DBTConfigParser(self._default_parameters)
+
+        if (
+            "dbt_profile" in self._default_parameters.keys()
+            and "project_dir" in self._default_parameters.keys()
+            and "profile_dir" in self._default_parameters.keys()
+        ):
+            self._dbt_module = DBTConfigParser(self._default_parameters)
 
     @staticmethod
     def read_yaml(yaml_str):
