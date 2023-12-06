@@ -25,11 +25,7 @@ class Module:
         self._override_parameters = config.get("override_parameters", {})
         self._default_parameters = config.get("default_parameters", {})
 
-        if (
-            "dbt_profile" in self._default_parameters.keys()
-            and "project_dir" in self._default_parameters.keys()
-            and "profile_dir" in self._default_parameters.keys()
-        ):
+        if 'dbt' in self._tasks.keys():
             self._dbt_module = DBTConfigParser(self._default_parameters)
 
     @staticmethod
