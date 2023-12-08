@@ -112,7 +112,10 @@ class DBTConfigParser:
             dict: The dagger output, which is a combination of an athena and s3 task for the DBT model node
 
         """
-        if node.get("config", {}).get("materialized") in ("view", "ephemeral"):
+        if node.get("config", {}).get("materialized") in (
+            "view",
+            "ephemeral",
+        ) or node.get("name").startswith("stg_"):
             return [self._get_dummy_task(node)]
         else:
             return [self._get_athena_task(node), self._get_s3_task(node)]
@@ -150,7 +153,9 @@ class DBTConfigParser:
             task = self._get_dummy_task(node, follow_external_dependency=True)
             dagger_tasks.append(task)
         elif node.get("name").startswith("stg_"):
-            dagger_tasks.append(self._get_dummy_task(node))
+            dagger_tasks.append(
+                self._get_dummy_task(node, follow_external_dependency=True)
+            )
         else:
             athena_task = self._get_athena_task(node, follow_external_dependency=True)
             s3_task = self._get_s3_task(node)

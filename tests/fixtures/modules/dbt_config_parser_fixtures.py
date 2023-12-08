@@ -164,7 +164,11 @@ DBT_PROFILE_FIXTURE = {
 }
 
 EXPECTED_STAGING_NODE = [
-    {"name": "stg_core_schema1__table1", "type": "dummy"},
+    {
+        "name": "stg_core_schema1__table1",
+        "type": "dummy",
+        "follow_external_dependency": True,
+    },
 ]
 
 EXPECTED_SEED_NODE = [
@@ -197,7 +201,11 @@ EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
         "type": "dummy",
         "name": "seed_buyer_country_overwrite",
     },
-    {"name": "stg_core_schema2__table2", "type": "dummy"}
+    {
+        "name": "stg_core_schema2__table2",
+        "type": "dummy",
+        "follow_external_dependency": True,
+    },
 ]
 
 EXPECTED_EPHEMERAL_NODE = [
@@ -225,7 +233,11 @@ EXPECTED_MODEL_NODE = [
 ]
 
 EXPECTED_DAGGER_INPUTS = [
-    {"name": "stg_core_schema2__table2", "type": "dummy"},
+    {
+        "name": "stg_core_schema2__table2",
+        "type": "dummy",
+        "follow_external_dependency": True,
+    },
     {
         "name": "analytics_engineering__model2_athena",
         "schema": "analytics_engineering",
