@@ -78,6 +78,10 @@ DBT_MANIFEST_FILE_FIXTURE = {
             "config": {
                 "materialized": "ephemeral",
             },
+            "depends_on": {
+                "macros": [],
+                "nodes": ["model.main.int_model2"],
+            },
         },
         "seed.main.seed_buyer_country_overwrite": {
             "database": "awsdatacatalog",
@@ -105,6 +109,21 @@ DBT_MANIFEST_FILE_FIXTURE = {
                     "model.main.model2",
                     "seed.main.seed_buyer_country_overwrite",
                     "model.main.stg_core_schema2__table2",
+                ],
+            },
+        },
+        "model.main.int_model2": {
+            "name": "int_model2",
+            "unique_id": "model.main.int_model2",
+            "schema": "analytics_engineering",
+            "config": {
+                "materialized": "ephemeral",
+            },
+            "depends_on": {
+                "macros": [],
+                "nodes": [
+                    "seed.main.seed_buyer_country_overwrite",
+                    "model.main.stg_core_schema1__table1",
                 ],
             },
         },
@@ -185,6 +204,20 @@ EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
         "follow_external_dependency": True,
     },
     {
+        "type": "dummy",
+        "name": "int_model2",
+        "follow_external_dependency": True,
+    },
+    {
+        "type": "dummy",
+        "name": "seed_buyer_country_overwrite",
+    },
+    {
+        "name": "stg_core_schema1__table1",
+        "type": "dummy",
+        "follow_external_dependency": True,
+    },
+    {
         "type": "athena",
         "name": "analytics_engineering__model2_athena",
         "schema": "analytics_engineering",
@@ -198,10 +231,6 @@ EXPECTED_MODEL_MULTIPLE_DEPENDENCIES = [
         "type": "s3",
     },
     {
-        "type": "dummy",
-        "name": "seed_buyer_country_overwrite",
-    },
-    {
         "name": "stg_core_schema2__table2",
         "type": "dummy",
         "follow_external_dependency": True,
@@ -212,6 +241,20 @@ EXPECTED_EPHEMERAL_NODE = [
     {
         "type": "dummy",
         "name": "int_model3",
+        "follow_external_dependency": True,
+    },
+    {
+        "type": "dummy",
+        "name": "int_model2",
+        "follow_external_dependency": True,
+    },
+    {
+        "type": "dummy",
+        "name": "seed_buyer_country_overwrite",
+    },
+    {
+        "name": "stg_core_schema1__table1",
+        "type": "dummy",
         "follow_external_dependency": True,
     }
 ]
@@ -256,7 +299,17 @@ EXPECTED_DAGGER_INPUTS = [
         "name": "int_model3",
         "follow_external_dependency": True,
     },
+    {
+        "type": "dummy",
+        "name": "int_model2",
+        "follow_external_dependency": True,
+    },
     {"name": "seed_buyer_country_overwrite", "type": "dummy"},
+    {
+        "name": "stg_core_schema1__table1",
+        "type": "dummy",
+        "follow_external_dependency": True,
+    },
 ]
 
 EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS = [
@@ -296,5 +349,14 @@ EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS = [
     {
         "type": "dummy",
         "name": "stg_core_schema2__table2",
+    },
+]
+
+EXPECTED_DBT_INT_MODEL_DAGGER_INPUTS = [
+    {"name": "seed_buyer_country_overwrite", "type": "dummy"},
+    {
+        "name": "stg_core_schema1__table1",
+        "type": "dummy",
+        "follow_external_dependency": True,
     },
 ]

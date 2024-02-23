@@ -17,6 +17,7 @@ from tests.fixtures.modules.dbt_config_parser_fixtures import (
     EXPECTED_DBT_STAGING_MODEL_DAGGER_OUTPUTS,
     EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS,
     EXPECTED_MODEL_NODE,
+    EXPECTED_DBT_INT_MODEL_DAGGER_INPUTS
 )
 
 _logger = logging.getLogger("root")
@@ -78,6 +79,7 @@ class TestDBTConfigParser(unittest.TestCase):
                 EXPECTED_MODEL_MULTIPLE_DEPENDENCIES,
             ),
             ("stg_core_schema2__table2", EXPECTED_DBT_STAGING_MODEL_DAGGER_INPUTS),
+            ("int_model2", EXPECTED_DBT_INT_MODEL_DAGGER_INPUTS),
         ]
         for mock_input, expected_output in fixtures:
             result, _ = self._dbt_config_parser.generate_dagger_io(mock_input)
