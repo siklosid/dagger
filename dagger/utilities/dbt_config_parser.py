@@ -152,6 +152,10 @@ class DBTConfigParser:
         elif node.get("config", {}).get("materialized") == "ephemeral":
             task = self._get_dummy_task(node, follow_external_dependency=True)
             dagger_tasks.append(task)
+
+            ephemeral_parent_node_names = node.get("depends_on", {}).get("nodes", [])
+            for node_name in ephemeral_parent_node_names:
+                dagger_tasks += self._generate_dagger_tasks(node_name)
         elif node.get("name").startswith("stg_"):
             dagger_tasks.append(
                 self._get_dummy_task(node, follow_external_dependency=True)
