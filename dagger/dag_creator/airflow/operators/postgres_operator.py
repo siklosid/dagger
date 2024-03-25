@@ -51,6 +51,6 @@ class PostgresOperator(DaggerBaseOperator):
         self.hook = PostgresHook(
             postgres_conn_id=self.postgres_conn_id, schema=self.database
         )
-        self.hook.run(self.sql, self.autocommit, parameters=self.parameters)
+        self.hook.run(self.sql, self.autocommit, parameters=self.parameters, split_statements=True)
         for output in self.hook.conn.notices:
             self.log.info(output)
