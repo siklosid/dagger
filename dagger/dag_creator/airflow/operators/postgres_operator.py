@@ -1,7 +1,6 @@
 from typing import Iterable, Mapping, Optional, Union
 
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 
 
@@ -28,7 +27,6 @@ class PostgresOperator(DaggerBaseOperator):
     template_ext = (".sql",)
     ui_color = "#ededed"
 
-    @apply_defaults
     def __init__(
         self,
         sql: str,

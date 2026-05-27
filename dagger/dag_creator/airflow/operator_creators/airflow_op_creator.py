@@ -26,7 +26,6 @@ class AirflowOpCreator(OperatorCreator):
                 importlib.import_module(python_module), self._task.function
             )
             params["python_callable"] = python_function
-            params["provide_context"] = True
             params["op_kwargs"] = self._template_parameters
 
         batch_op = operator_class(dag=self._dag, task_id=self._task.name, **params)

@@ -19,8 +19,7 @@
 from typing import Optional
 
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
-from airflow.utils.decorators import apply_defaults
-from airflow.contrib.hooks.aws_hook import AwsHook
+from airflow.providers.amazon.aws.hooks.base_aws import AwsBaseHook
 from airflow.exceptions import AirflowException
 
 from dagger.dag_creator.airflow.utils.decorators import lazy_property
@@ -48,7 +47,6 @@ class AwsGlueJobOperator(DaggerBaseOperator):
     template_ext = ()
     ui_color = '#ededed'
 
-    @apply_defaults
     def __init__(
         self,
         *,
@@ -66,7 +64,7 @@ class AwsGlueJobOperator(DaggerBaseOperator):
 
     @lazy_property
     def logs_client(self):
-        return AwsHook(aws_conn_id=self.aws_conn_id, client_type="logs").get_client_type(
+        return AwsBaseHook(aws_conn_id=self.aws_conn_id, client_type="logs").get_client_type(
             "logs", region_name=self.region_name
         )
 

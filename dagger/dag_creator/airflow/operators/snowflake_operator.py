@@ -1,5 +1,4 @@
-from airflow.contrib.hooks.snowflake_hook import SnowflakeHook
-from airflow.utils.decorators import apply_defaults
+from airflow.providers.snowflake.hooks.snowflake import SnowflakeHook  # noqa: requires apache-airflow-providers-snowflake
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 
 
@@ -30,7 +29,6 @@ class SnowflakeOperator(DaggerBaseOperator):
     template_ext = (".sql",)
     ui_color = "#ededed"
 
-    @apply_defaults
     def __init__(
         self,
         sql,

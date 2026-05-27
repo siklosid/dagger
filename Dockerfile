@@ -1,4 +1,5 @@
-FROM python:3.7.4-slim-stretch
+FROM python:3.7.4-slim-stretch@sha256:34a714dec6e3387e964350dc09d9db95f16df3720d018c9ca024c1e4e20c118b
+RUN apt-get update -yq && apt-get upgrade -yq && rm -rf /var/lib/apt/lists/*
 
 # Add your envrionment variables
 #ARG ACCESS_KEY_ID

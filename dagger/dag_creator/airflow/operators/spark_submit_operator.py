@@ -4,8 +4,6 @@ import time
 
 import boto3
 from airflow.exceptions import AirflowException
-from airflow.utils.decorators import apply_defaults
-
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 
 ENV = os.environ["ENV"].lower()
@@ -16,7 +14,6 @@ class SparkSubmitOperator(DaggerBaseOperator):
     ui_color = "bisque"
     template_fields = ("job_args", "spark_args", "spark_conf_args")
 
-    @apply_defaults
     def __init__(
         self,
         job_file,

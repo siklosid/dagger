@@ -1,13 +1,12 @@
 from functools import partial
 
-from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.operators.python import ShortCircuitOperator
 
 
 def make_control_flow(is_dummy_operator_short_circuit, dag):
     control_flow = ShortCircuitOperator(
         task_id="dummy-control-flow",
         dag=dag,
-        provide_context=True,
         python_callable=partial(eval_control_flow, is_dummy_operator_short_circuit),
     )
     return control_flow

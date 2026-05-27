@@ -1,14 +1,15 @@
 import re
-from datetime import timedelta, datetime
+from datetime import timedelta
 from functools import partial
 
 from airflow import DAG
-from airflow.sensors.external_task import ExternalTaskSensor
 
-import croniter
 from dagger import conf
 from dagger.alerts.alert import airflow_task_fail_alerts
 from dagger.dag_creator.airflow.operator_factory import OperatorFactory
+from dagger.dag_creator.airflow.sensors.cron_aware_external_task_sensor import (
+    CronAwareExternalTaskSensor,
+)
 from dagger.dag_creator.airflow.utils.macros import user_defined_macros
 from dagger.dag_creator.graph_traverser_base import GraphTraverserBase
 from dagger.graph.task_graph import Graph, Node
@@ -33,22 +34,6 @@ class DagCreator(GraphTraverserBase):
             "retry_delay": timedelta(minutes=5),
         }
 
-    @staticmethod
-    def _get_execution_date_fn(from_dag_schedule: str, to_dag_schedule: str):
-        def execution_date_fn(execution_date, **kwargs):
-            to_dag_cron = croniter.croniter(to_dag_schedule, execution_date)
-            to_dag_next_schedule = to_dag_cron.get_next(datetime)
-
-            from_dag_cron = croniter.croniter(from_dag_schedule, to_dag_next_schedule)
-            from_dag_cron.get_next(datetime)
-            # skipping one schedule
-            from_dag_cron.get_prev(datetime)
-            from_dag_target_schedule = from_dag_cron.get_prev(datetime)
-
-            return from_dag_target_schedule
-
-        return execution_date_fn
-
     def _get_external_task_sensor_name_dict(self, from_task_id: str) -> dict:
         from_pipeline_name = self._task_graph.get_node(from_task_id).obj.pipeline_name
         from_task_name = self._task_graph.get_node(from_task_id).obj.name
@@ -58,7 +43,7 @@ class DagCreator(GraphTraverserBase):
             "external_sensor_name": f"{from_pipeline_name}-{from_task_name}-sensor",
         }
 
-    def _get_external_task_sensor(self, from_task_id: str, to_task_id: str, follow_external_dependency: dict) -> ExternalTaskSensor:
+    def _get_external_task_sensor(self, from_task_id: str, to_task_id: str, follow_external_dependency: dict) -> CronAwareExternalTaskSensor:
         """
         create an object of external task sensor for a specific from_task_id and to_task_id
         """
@@ -75,14 +60,13 @@ class DagCreator(GraphTraverserBase):
         extra_args = conf.EXTERNAL_SENSOR_DEFAULT_ARGS.copy()
         extra_args.update(follow_external_dependency)
 
-        return ExternalTaskSensor(
+        return CronAwareExternalTaskSensor(
             dag=self._dags[to_pipe_id],
             task_id=external_sensor_name,
             external_dag_id=from_pipeline_name,
             external_task_id=from_task_name,
-            execution_date_fn=self._get_execution_date_fn(
-                from_pipeline_schedule, to_pipeline_schedule
-            ),
+            from_schedule=from_pipeline_schedule,
+            to_schedule=to_pipeline_schedule,
             **extra_args
         )
 
@@ -104,7 +88,7 @@ class DagCreator(GraphTraverserBase):
             description=pipeline.description,
             default_args=default_args,
             start_date=pipeline.start_date,
-            schedule_interval=pipeline.schedule,
+            schedule=pipeline.schedule,
             user_defined_macros=user_defined_macros,
             **pipeline.parameters,
         )

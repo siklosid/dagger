@@ -5,6 +5,9 @@ from dagger import conf
 from dagger.config_finder.config_finder import ConfigFinder
 from dagger.config_finder.config_processor import ConfigProcessor
 from dagger.dag_creator.airflow.dag_creator import DagCreator
+from dagger.dag_creator.airflow.sensors.cron_aware_external_task_sensor import (
+    CronAwareExternalTaskSensor,
+)
 from dagger.graph.task_graph import TaskGraph
 
 from airflow.utils.dot_renderer import render_dag
@@ -76,8 +79,8 @@ class TestDagCreator(unittest.TestCase):
         dot = render_dag(test_external_sensor_dag)
         self.assertEqual(dot.source, self.dot_test_external_sensor)
 
-    def test_get_execution_delta_fn(self):
-        execution_date = datetime(2021, 12, 28, 18, 30)
+    def test_cron_aware_external_task_sensor_dttm(self):
+        logical_date = datetime(2021, 12, 28, 18, 30)
         test_cases = [
             # (from_dag_schedule, to_dag_schedule, expected_result)
             ("0 * * * *", "30 * * * *", datetime(2021, 12, 28, 18, 0)),  # both hourly with different minutes
@@ -89,11 +92,18 @@ class TestDagCreator(unittest.TestCase):
             ("30 19 * * *", "30 * * * *", datetime(2021, 12, 27, 19, 30)),  # from daily to hourly with same minutes
         ]
 
-        for test_case in test_cases:
-            from_dag_schedule, to_dag_schedule, expected_result = test_case
-
-            execution_delta_fn = DagCreator._get_execution_date_fn(from_dag_schedule, to_dag_schedule)
-            self.assertEqual(execution_delta_fn(execution_date), expected_result)
+        for from_dag_schedule, to_dag_schedule, expected_result in test_cases:
+            sensor = CronAwareExternalTaskSensor(
+                task_id="test_sensor",
+                external_dag_id="from_dag",
+                external_task_id="from_task",
+                from_schedule=from_dag_schedule,
+                to_schedule=to_dag_schedule,
+            )
+            self.assertEqual(
+                sensor._get_dttm_filter({"logical_date": logical_date}),
+                [expected_result],
+            )
 
     def test_disable_task(self):
         dag_creator = DagCreator(self.task_graph._graph, with_data_nodes=True)

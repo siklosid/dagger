@@ -1,4 +1,4 @@
-from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.empty import EmptyOperator
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 from dagger.dag_creator.airflow.operator_creators import (
     airflow_op_creator,
@@ -20,7 +20,7 @@ from dagger.dag_creator.airflow.utils.operator_factories import make_control_flo
 from dagger.utilities.classes import get_deep_obj_subclasses
 
 
-class DataOperator(DummyOperator):
+class DataOperator(EmptyOperator):
     ui_color = "#e8f7e4"
 
     def __init__(self, *args, **kwargs):

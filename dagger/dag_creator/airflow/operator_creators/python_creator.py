@@ -1,7 +1,7 @@
 import importlib
 from os import path
 
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from dagger import conf
 from dagger.dag_creator.airflow.operator_creator import OperatorCreator
 
@@ -28,7 +28,6 @@ class PythonCreator(OperatorCreator):
             dag=self._dag,
             task_id=self._task.name,
             python_callable=python_function,
-            provide_context=True,
             op_kwargs=self._template_parameters,
             **params,
         )

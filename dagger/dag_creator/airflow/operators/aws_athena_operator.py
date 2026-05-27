@@ -21,7 +21,6 @@
 from uuid import uuid4
 
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
-from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.hooks.aws_athena_hook import AWSAthenaHook
 from dagger.utilities.randomise import generate_random_name
 from tenacity import retry, stop_after_attempt, wait_fixed
@@ -53,7 +52,6 @@ class AWSAthenaOperator(DaggerBaseOperator):
     template_fields = ('query', 'database', 'output_location')
     template_ext = ('.sql', )
 
-    @apply_defaults
     def __init__(self, query, database, s3_tmp_results_location, s3_output_location, output_table, is_incremental,
                  partitioned_by=None, output_format=None, aws_conn_id='aws_default', client_request_token=None,
                  query_execution_context=None, result_configuration=None, sleep_time=30, max_tries=None,

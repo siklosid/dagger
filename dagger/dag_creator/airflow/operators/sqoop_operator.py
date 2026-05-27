@@ -2,7 +2,6 @@ import os
 import signal
 
 from airflow.exceptions import AirflowException
-from airflow.utils.decorators import apply_defaults
 from dagger.dag_creator.airflow.hooks.sqoop_hook import SqoopHook
 from dagger.dag_creator.airflow.operators.dagger_base_operator import DaggerBaseOperator
 
@@ -42,7 +41,6 @@ class SqoopOperator(DaggerBaseOperator):
     )
     ui_color = "#7D8CA4"
 
-    @apply_defaults
     def __init__(
         self,
         conn_id="sqoop_default",
